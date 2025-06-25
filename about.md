@@ -13,7 +13,7 @@ Software developer focused on machine learning and AI—currently exploring Larg
 - **Name:** wintrover
 - **Location:** Seoul, Korea
 - **Email:** [wintrover@gmail.com](mailto:wintrover@gmail.com)
-- **Resume:** [wintrover.github.io/resume](https://wintrover.github.io/resume)
+- **Website:** [wintrover.github.io](https://wintrover.github.io)
 
 ### Currently Learning
 
