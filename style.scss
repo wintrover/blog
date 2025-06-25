@@ -296,6 +296,16 @@ footer {
 
 // override default heading margin in post list
 .posts .post h1 {
-  margin: 0.2em 0 15px;
-  font-size: 26px;
+  margin: 0 0 15px;
+  font-size: 20px;
+}
+
+.post .date {
+  margin-bottom: 5em;
+  display: block;
+}
+
+// reset top margin for post titles inside article page
+.post h1 {
+  margin-top: 0;
 }
