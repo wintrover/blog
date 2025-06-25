@@ -294,6 +294,7 @@ footer {
 @import "highlights";
 @import "svg-icons";
 
-+.posts .post h1 {
-  margin-top: 0.2em;
+// override default heading margin in post list
+.posts .post h1 {
+  margin-top: 0.2em !important;
 }
