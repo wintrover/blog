@@ -393,8 +393,8 @@ footer {
   color: #eee;
 }
 .inner-block-content.code-block.dark pre { background: transparent; }
-.inner-block-content.code-block.dark svg {
-  fill: #eee !important;
+.inner-block-content.code-block.dark svg path {
+  fill: #eee;
 }
 
 // Increase top padding for code blocks that include line numbers
