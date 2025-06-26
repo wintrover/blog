@@ -6,7 +6,7 @@ permalink: /about/
 
 ## Profile
 
-Software developer focused on machine learning and AI—currently exploring Large Language Models (LLM) and Retrieval-Augmented Generation (RAG).
+Software developer focused on machine learning and AI. <br>currently exploring Large Language Models (LLM) and Retrieval-Augmented Generation (RAG).
 
 ### Basic Information
 
