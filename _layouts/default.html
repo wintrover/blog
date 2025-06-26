@@ -67,8 +67,9 @@
         }
         const darkBtn = e.target.closest('.dark-mode-toggle');
         if (darkBtn) {
-          const wrapper = darkBtn.closest('.inner-block-content');
-          if (wrapper) wrapper.classList.toggle('dark');
+          document.querySelectorAll('.inner-block-content.code-block').forEach(function (block) {
+            block.classList.toggle('dark');
+          });
         }
       });
 
