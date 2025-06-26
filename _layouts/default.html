@@ -47,5 +47,30 @@
     </div>
 
     {% include analytics.html %}
+
+    <script>
+      document.addEventListener('click', function (e) {
+        const copyBtn = e.target.closest('.copy-clipboard');
+        if (copyBtn) {
+          const wrapper = copyBtn.closest('.inner-block-content');
+          if (!wrapper) return;
+          const code = wrapper.querySelector('pre');
+          if (!code) return;
+          navigator.clipboard.writeText(code.innerText).then(function () {
+            const notice = wrapper.querySelector('.copy-code-block span');
+            if (notice) {
+              notice.textContent = 'Copied!';
+              setTimeout(function () { notice.textContent = 'Copied'; }, 2000);
+            }
+          });
+          return;
+        }
+        const darkBtn = e.target.closest('.dark-mode-toggle');
+        if (darkBtn) {
+          const wrapper = darkBtn.closest('.inner-block-content');
+          if (wrapper) wrapper.classList.toggle('dark');
+        }
+      });
+    </script>
   </body>
 </html>

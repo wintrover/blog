@@ -315,3 +315,53 @@ footer {
 .post h1 {
   margin-top: 0;
 }
+
+/* Custom code block styling */
+.inner-block-content.code-block {
+  position: relative;
+  margin: 1.5em 0;
+  background: #f5f5f5;
+  border-radius: 6px;
+  overflow: hidden;
+  font-size: 15px;
+}
+
+.inner-block-content.code-block pre {
+  margin: 0;
+  padding: 1em 1.5em;
+  overflow-x: auto;
+}
+
+.language-block {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: #e0e0e0;
+  color: #333;
+  font-size: 12px;
+  padding: 2px 6px;
+  border-bottom-left-radius: 6px;
+  text-transform: uppercase;
+}
+
+.copy-code-block,
+.dark-mode-block {
+  position: absolute;
+  top: 0;
+}
+.copy-code-block { right: 45px; }
+.dark-mode-block { right: 90px; }
+
+.copy-clipboard,
+.dark-mode-toggle {
+  background: transparent;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+}
+
+.inner-block-content.code-block.dark {
+  background: #2d2d2d;
+  color: #eee;
+}
+.inner-block-content.code-block.dark pre { background: transparent; }
