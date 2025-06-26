@@ -329,7 +329,9 @@ footer {
 .inner-block-content.code-block pre {
   margin: 0;
   padding: 1em 1.5em;
-  overflow-x: auto;
+  overflow-x: visible;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 .language-block {
