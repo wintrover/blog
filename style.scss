@@ -344,6 +344,21 @@ footer {
   text-transform: uppercase;
 }
 
+.code-action-group {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+}
+
+// override individual blocks when inside group
+.code-action-group .copy-code-block,
+.code-action-group .dark-mode-block {
+  position: static;
+  top: auto;
+}
+
 .copy-code-block,
 .dark-mode-block {
   position: absolute;
@@ -359,7 +374,9 @@ footer {
   line-height: 24px;
   margin-right: 4px;
 }
-.dark-mode-block { right: 45px; }
+.dark-mode-block {
+  right: 45px;
+}
 
 .copy-clipboard,
 .dark-mode-toggle {

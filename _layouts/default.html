@@ -71,6 +71,21 @@
           if (wrapper) wrapper.classList.toggle('dark');
         }
       });
+
+      // Group copy & dark mode blocks into a single action bar
+      document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.inner-block-content.code-block').forEach(function (wrapper) {
+          const copy = wrapper.querySelector('.copy-code-block');
+          const dark = wrapper.querySelector('.dark-mode-block');
+          if (copy || dark) {
+            const group = document.createElement('div');
+            group.className = 'code-action-group';
+            if (copy) group.appendChild(copy);
+            if (dark) group.appendChild(dark);
+            wrapper.appendChild(group);
+          }
+        });
+      });
     </script>
   </body>
 </html>
