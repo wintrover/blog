@@ -59,8 +59,8 @@
           navigator.clipboard.writeText(code.innerText).then(function () {
             const notice = wrapper.querySelector('.copy-code-block span');
             if (notice) {
-              notice.textContent = 'Copied!';
-              setTimeout(function () { notice.textContent = 'Copied'; }, 2000);
+              notice.textContent = 'copied';
+              setTimeout(function () { notice.textContent = 'copy'; }, 2000);
             }
           });
           return;
@@ -75,6 +75,8 @@
 
       // Group copy & dark mode blocks into a single action bar
       document.addEventListener('DOMContentLoaded', function () {
+        // set default copy label
+        document.querySelectorAll('.copy-code-block span').forEach(function (s) { s.textContent = 'copy'; });
         document.querySelectorAll('.inner-block-content.code-block').forEach(function (wrapper) {
           const copy = wrapper.querySelector('.copy-code-block');
           const dark = wrapper.querySelector('.dark-mode-block');
