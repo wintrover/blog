@@ -10,10 +10,10 @@ Software developer focused on machine learning and AI—currently exploring Larg
 
 ### Basic Information
 
-- **Name:** wintrover
+- **Name:** Su Hyok Yun
 - **Location:** Seoul, Korea
 - **Email:** [wintrover@gmail.com](mailto:wintrover@gmail.com)
-- **Website:** [wintrover.github.io](https://wintrover.github.io)
+- **Resume:** [wintrover.github.io](https://wintrover.github.io)
 
 ### Currently Learning
 
