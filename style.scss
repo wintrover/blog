@@ -349,7 +349,16 @@ footer {
   position: absolute;
   top: 0;
 }
-.copy-code-block { right: 90px; }
+.copy-code-block {
+  display: flex;
+  align-items: center;
+  right: 90px;
+}
+.copy-code-block span,
+.copy-code-block button {
+  height: 24px; // match SVG icon height
+  line-height: 24px;
+}
 .dark-mode-block { right: 45px; }
 
 .copy-clipboard,
