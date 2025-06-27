@@ -20,6 +20,7 @@ try:
 except Exception as err:  # 예외는 발생하지 않지만 혹시 몰라 래핑
     logging.warning(".env 로드 중 예기치 못한 문제 발생: %s", err)
 
+_MAX_LIST_PER_PAGE: int = 100
 
 class DevtoPublisherError(Exception):
     """dev.to 퍼블리싱 중 발생한 예외를 래핑하기 위한 커스텀 예외"""
@@ -116,14 +117,47 @@ class DevtoClient:
             logging.exception("dev.to 업로드 실패")
             raise DevtoPublisherError("dev.to 업로드 중 오류가 발생했습니다") from err
 
+    # 내 글 목록 조회 (draft / published)
+    def list_my_articles(self, state: str = "all") -> list[dict]:
+        """/articles/me 엔드포인트 호출
+
+        state: all | draft | published |
+        returns: list[dict]
+        """
+        url = f"{self.BASE_URL}/articles/me"
+        params = {"state": state, "per_page": _MAX_LIST_PER_PAGE}
+        try:
+            resp = self.session.get(url, params=params, timeout=30)
+            logging.info("목록 조회 status: %d", resp.status_code)
+            resp.raise_for_status()
+            return resp.json()
+        except requests.RequestException as err:
+            logging.exception("목록 조회 실패")
+            raise DevtoPublisherError("dev.to 글 목록을 읽지 못했습니다") from err
+
+    def update_article(self, article_id: int, payload: Dict[str, Any]) -> Tuple[int, str]:
+        """PUT /articles/{id}"""
+        url = f"{self.BASE_URL}/articles/{article_id}"
+        try:
+            resp = self.session.put(url, json=payload, timeout=30)
+            logging.info("업데이트 status: %d", resp.status_code)
+            resp.raise_for_status()
+            article_url = resp.json().get("url", "(unknown)")
+            logging.info("업데이트 성공: %s", article_url)
+            return resp.status_code, article_url
+        except requests.RequestException as err:
+            logging.exception("업데이트 실패")
+            raise DevtoPublisherError("dev.to 글 업데이트 중 오류가 발생했습니다") from err
+
 
 def main() -> None:
     if len(sys.argv) < 2:
-        logging.error("사용법: python devto_publish.py <markdown_file_path> [--draft]")
+        logging.error("사용법: python devto_publish.py <markdown_file_path> [--draft] [--update]")
         sys.exit(1)
 
     filepath = sys.argv[1]
     draft_flag = "--draft" in sys.argv[2:]
+    update_flag = "--update" in sys.argv[2:]
 
     try:
         post = MarkdownPost(filepath)
@@ -132,8 +166,22 @@ def main() -> None:
 
         api_key = os.environ.get("DEVTO_API_KEY")
         client = DevtoClient(api_key)
-        status, url = client.publish(payload)
-        logging.info("%s 로 업로드 완료 (HTTP %d)", url, status)
+
+        if update_flag:
+            # 동일 제목의 드래프트를 찾아 업데이트
+            articles = client.list_my_articles(state="draft")
+            target = next((a for a in articles if a.get("title") == post.front_matter.get("title")), None)
+            if target:
+                article_id = target.get("id")
+                status, url = client.update_article(article_id, payload)
+                logging.info("초안 업데이트 완료: %s (HTTP %d)", url, status)
+            else:
+                logging.warning("일치하는 초안이 없어 새로 생성합니다")
+                status, url = client.publish(payload)
+                logging.info("새 초안 생성: %s (HTTP %d)", url, status)
+        else:
+            status, url = client.publish(payload)
+            logging.info("%s 로 업로드 완료 (HTTP %d)", url, status)
     except DevtoPublisherError as err:
         logging.error("작업 실패: %s", err)
         sys.exit(2)
