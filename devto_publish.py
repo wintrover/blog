@@ -5,12 +5,20 @@ from typing import Tuple, Dict, Any
 
 import requests
 import yaml
+from dotenv import load_dotenv
 
 # 로깅 설정 – 콘솔에 시간ㆍ레벨ㆍ메시지 모두 출력
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
 )
+
+# .env 파일을 자동으로 읽어 환경변수 주입
+try:
+    load_dotenv()
+    logging.debug(".env 파일 로드 완료")
+except Exception as err:  # 예외는 발생하지 않지만 혹시 몰라 래핑
+    logging.warning(".env 로드 중 예기치 못한 문제 발생: %s", err)
 
 
 class DevtoPublisherError(Exception):
