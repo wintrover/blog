@@ -48,6 +48,29 @@
 
     {% include analytics.html %}
 
+    <!-- Mermaid.js for rendering diagrams -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>
+      // Convert Rouge-generated mermaid code blocks into actual Mermaid containers
+      document.addEventListener("DOMContentLoaded", function () {
+        // ------------------------------
+        // 1) MERMAID REPLACEMENT
+        // ------------------------------
+        document.querySelectorAll("pre > code.language-mermaid").forEach(function (codeBlock) {
+          const pre = codeBlock.parentElement; // <pre>
+          const diagram = document.createElement("div");
+          diagram.className = "mermaid";
+          diagram.textContent = codeBlock.textContent;
+          pre.parentElement.replaceChild(diagram, pre);
+        });
+
+        // 3) Initialise Mermaid after DOM update
+        if (window.mermaid) {
+          window.mermaid.initialize({ startOnLoad: true });
+        }
+      });
+    </script>
+
     <script>
       document.addEventListener('click', function (e) {
         const copyBtn = e.target.closest('.copy-clipboard');
