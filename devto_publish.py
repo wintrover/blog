@@ -69,7 +69,13 @@ class MarkdownPost:
         try:
             _, fm, body = raw.split("---", 2)
             self.front_matter = SafeYamlLoader.load(fm)
+
+            # 1) HTML 코드 블록을 마크다운 펜스로 변환하여 코드 손실 방지
+            body = self._convert_html_code_blocks(body)
+
+            # 2) dev.to 렌더에 불필요한 Jekyll 전용 wrapper 제거
             cleaned = self._strip_html_wrappers(body)
+
             # mermaid 블록은 parse 단계에서 그대로 두고, 이후 client 생성 후 변환함
             self.body_markdown = cleaned.strip()
             logging.info("프론트매터와 본문 파싱 완료")
@@ -107,6 +113,29 @@ class MarkdownPost:
         return payload
 
     # ------------------------------------------------------
+    # 내부 헬퍼 – HTML <pre><code> 블록을 ```lang 펜스 블록으로 변환
+    # ------------------------------------------------------
+    @staticmethod
+    def _convert_html_code_blocks(markdown_body: str) -> str:
+        """Rouge 출력 형태의 <pre class="language-xyz"><code>...</code></pre>를
+        dev.to가 이해하는 펜스 코드 블록으로 치환한다."""
+
+        import html
+        pattern = re.compile(
+            r"<pre[^>]*class=\"[^\"]*language-([^\"\s]+)[^\"]*\"[^>]*>\s*<code[^>]*>(.*?)</code>\s*</pre>",
+            re.DOTALL | re.IGNORECASE,
+        )
+
+        def _replacer(match: re.Match) -> str:
+            language = match.group(1)
+            code_html = match.group(2)
+            # HTML 엔티티 복원 및 앞뒤 공백 제거
+            code_text = html.unescape(code_html.strip())
+            return f"```{language}\n{code_text}\n```"
+
+        return pattern.sub(_replacer, markdown_body)
+
+    # ------------------------------------------------------
     # 내부 헬퍼 – dev.to 변환 시 필요 없는 Jekyll 코드 복사/다크모드 블록 제거
     # ------------------------------------------------------
     @staticmethod
@@ -114,42 +143,55 @@ class MarkdownPost:
         """`language-block`, `copy-code-block`, `dark-mode-block` 류의 div 래퍼 제거
 
         Jekyll 하이라이트용 부가 마크업이 dev.to 에서는 불필요하거나 렌더 문제를 일으킨다.
-        간단히 해당 div 와 하위 내용 전체를 제거한다.
+        필요 시 래퍼 태그만 제거하고 내부 코드는 보존한다.
         """
 
-        unwanted_classes = (
+        unwanted_single_line = (
             "language-block glue-font-weight-medium",
+        )
+        # 내부 전체를 제거할 블록 – 버튼, 다크모드 토글 등 불필요한 UI 요소
+        unwanted_full_block = (
             "copy-code-block",
             "dark-mode-block",
-            "inner-block-content code-block",
         )
+        # 코드 래퍼 – 여는/닫는 태그만 제거하고 내부 내용은 살린다
+        code_wrapper_class = "inner-block-content code-block"
 
-        lines = markdown_body.splitlines()
         cleaned_lines: list[str] = []
-        skip_depth = 0
+        skip_mode = None  # None | "full"
+        in_code_wrapper = False
 
-        def line_starts_unwanted_div(line: str) -> bool:
-            return any(cls in line for cls in unwanted_classes) and "<div" in line
-
-        for line in lines:
+        for line in markdown_body.splitlines():
             stripped = line.strip()
 
-            # 시작 태그 여부
-            if skip_depth == 0 and line_starts_unwanted_div(stripped):
-                # 새 블록 시작 – 건너뛰기 모드 진입
-                skip_depth = 1
+            # 전체를 제거할 블록 시작 여부 (copy/dark)
+            if any(cls in stripped for cls in unwanted_full_block) and "<div" in stripped:
+                skip_mode = "full"
                 continue
 
-            if skip_depth > 0:
-                # 블록 안에서 중첩 div 추적
-                if "<div" in stripped:
-                    skip_depth += 1
+            if skip_mode == "full":
                 if "</div>" in stripped:
-                    skip_depth -= 1
-                # skip 상태 계속 유지
+                    skip_mode = None
                 continue
 
-            # 정상 라인 보존
+            # 코드 래퍼 div – 태그만 제거, 내부는 살림
+            if not in_code_wrapper and code_wrapper_class in stripped and "<div" in stripped:
+                in_code_wrapper = True
+                continue  # 여는 태그 제거
+
+            if in_code_wrapper:
+                if "</div>" in stripped:
+                    in_code_wrapper = False  # 닫는 태그 제거
+                    continue
+                # 내부 라인은 보존
+                cleaned_lines.append(line)
+                continue
+
+            # 단순 한 줄 div 제거 (language name)
+            if any(cls in stripped for cls in unwanted_single_line):
+                continue
+
+            # 그 외 일반 라인 보존
             cleaned_lines.append(line)
 
         return "\n".join(cleaned_lines)

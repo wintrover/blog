@@ -329,22 +329,12 @@ footer {
 
 .inner-block-content.code-block pre {
   margin: 0;
-  padding: 1em 1.5em;
+  padding: 2.4em 1.5em 1em;
   overflow-x: visible;
+  overflow-y: visible;
+  overflow: visible;
   white-space: pre-wrap;
   word-break: break-word;
-}
-
-.language-block {
-  position: absolute;
-  top: 0;
-  left: 0;
-  background: #e0e0e0;
-  color: #333;
-  font-size: 12px;
-  padding: 2px 6px;
-  border-bottom-right-radius: 6px;
-  text-transform: uppercase;
 }
 
 .code-action-group {
@@ -400,5 +390,39 @@ footer {
 
 // Increase top padding for code blocks that include line numbers
 pre[class*="language-"].line-numbers {
-  padding-top: 3em;
+  padding-top: 2.4em;
+}
+
+/* Apply the same look & feel to Jekyll/Rouge default code blocks */
+figure.highlight, div.highlighter-rouge,
+div[class^="language-"], div[class*=" language-"] {
+  position: relative;
+  margin: 1.5em 0;
+  background: #f5f5f5;
+  border-radius: 6px;
+  overflow: hidden;
+  font-size: 15px;
+}
+figure.highlight pre, div.highlighter-rouge pre,
+div[class^="language-"] pre, div[class*=" language-"] pre {
+  margin: 0;
+  padding: 2.4em 1.5em 1em;
+  overflow-x: auto;
+  overflow-y: visible;
+  overflow: visible;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* language label top-left */
+.language-label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: #e0e0e0;
+  color: #333;
+  font-size: 12px;
+  padding: 2px 6px;
+  border-bottom-right-radius: 6px;
+  text-transform: uppercase;
 }
