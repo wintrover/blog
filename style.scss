@@ -402,7 +402,7 @@ footer {
 
 // Increase top padding for code blocks that include line numbers
 pre[class*="language-"].line-numbers {
-  padding-top: 3em;
+  padding-top: 2.4em;
 }
 
 /* Apply the same look & feel to Jekyll/Rouge default code blocks */
@@ -418,7 +418,7 @@ div[class^="language-"], div[class*=" language-"] {
 figure.highlight pre, div.highlighter-rouge pre,
 div[class^="language-"] pre, div[class*=" language-"] pre {
   margin: 0;
-  padding: 1em 1.5em;
+  padding: 2.4em 1.5em 1em;
   overflow-x: auto;
   overflow-y: visible;
   overflow: visible;
