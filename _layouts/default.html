@@ -86,10 +86,14 @@
 
             // ---------- determine language ----------
             var lang = (function () {
-              var match = Array.from(code.classList || []).find(function (cls) {
-                return cls.indexOf("language-") === 0;
-              });
-              return match ? match.replace("language-", "") : "text";
+              function findLang(el) {
+                if (!el) return null;
+                return Array.from(el.classList || []).find(function (c) {
+                  return c.indexOf("language-") === 0;
+                });
+              }
+              var cls = findLang(code) || findLang(pre) || findLang(orig);
+              return cls ? cls.replace("language-", "") : "text";
             })();
             var langLabel = lang.toUpperCase();
 
