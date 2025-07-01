@@ -179,14 +179,58 @@
         // set default copy label
         document.querySelectorAll('.copy-code-block span').forEach(function (s) { s.textContent = 'copy'; });
         document.querySelectorAll('.inner-block-content.code-block').forEach(function (wrapper) {
-          if (wrapper.querySelector('.code-action-group')) return; // already grouped
-          const copy = wrapper.querySelector('.copy-code-block');
-          const dark = wrapper.querySelector('.dark-mode-block');
-          if (copy || dark) {
+          // assemble or ensure standard children (copy/dark/lang)
+
+          let copy = wrapper.querySelector('.copy-code-block');
+          if (!copy) {
+            copy = document.createElement('div');
+            copy.className = 'copy-code-block';
+            copy.innerHTML =
+              '<span class="hidden">copy</span>' +
+              '<button class="copy-clipboard">' +
+              '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#202124">' +
+              '<path d="M360-240q-33 0-56.5-23.5T280-320v-480q0-33 23.5-56.5T360-880h360q33 0 56.5-23.5T800-800v480q0 33-23.5-56.5T720-240H360Zm0-80h360v-480H360v480ZM200-80q-33 0-56.5-23.5T120-160v-560h80v560h440v80H200Zm160-240v-480 480Z"></path>' +
+              '</svg></button>';
+            wrapper.appendChild(copy);
+          }
+
+          let dark = wrapper.querySelector('.dark-mode-block');
+          if (!dark) {
+            dark = document.createElement('div');
+            dark.className = 'dark-mode-block';
+            dark.innerHTML =
+              '<button class="dark-mode-toggle">' +
+              '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#202124">' +
+              '<path d="M480-120q-150 0-255-105T120-480q0-150 105-255t255-105q14 0 27.5 1t26.5 3q-41 29-65.5 75.5T444-660q0 90 63 153t153 63q55 0 101-24.5t75-65.5q2 13 3 26.5t1 27.5q0 150-105 255T480-120Zm0-80q88 0 158-48.5T740-375q-20 5-40 8t-40 3q-123 0-209.5-86.5T364-660q0-20 3-40t8-40q-78 32-126.5 102T200-480q0 116 82 198t198 82Zm-10-270Z"></path>' +
+              '</svg></button>';
+            wrapper.appendChild(dark);
+          }
+
+          // language label
+          let label = wrapper.querySelector('.language-label');
+          if (!label) {
+            const pre = wrapper.querySelector('pre');
+            const code = pre ? (pre.querySelector('code') || pre) : null;
+            function findLang(el) {
+              if (!el) return null;
+              return Array.from(el.classList || []).find(function (c) {
+                return c.indexOf('language-') === 0;
+              });
+            }
+            const langCls = findLang(code) || findLang(pre);
+            const lang = langCls ? langCls.replace('language-', '') : 'text';
+            label = document.createElement('span');
+            label.className = 'language-label';
+            label.textContent = lang.toUpperCase();
+            wrapper.appendChild(label);
+          }
+
+          // finally, create action group if not present
+          if (!wrapper.querySelector('.code-action-group')) {
             const group = document.createElement('div');
             group.className = 'code-action-group';
-            if (copy) group.appendChild(copy);
-            if (dark) group.appendChild(dark);
+            group.appendChild(copy);
+            group.appendChild(dark);
             wrapper.appendChild(group);
           }
         });
