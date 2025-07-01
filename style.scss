@@ -337,17 +337,7 @@ footer {
   word-break: break-word;
 }
 
-.language-block {
-  position: absolute;
-  top: 0;
-  left: 0;
-  background: #e0e0e0;
-  color: #333;
-  font-size: 12px;
-  padding: 2px 6px;
-  border-bottom-right-radius: 6px;
-  text-transform: uppercase;
-}
+.language-block { display: none; }
 
 .code-action-group {
   position: absolute;
