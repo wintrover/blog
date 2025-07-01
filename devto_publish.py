@@ -209,8 +209,11 @@ class MarkdownPost:
                     fp.write(png_bytes)
                 logging.info("다이어그램 PNG 저장: %s", filepath)
 
-            raw_url = f"https://raw.githubusercontent.com/{owner}/{repo}/{branch}/images/{filename}"
-            return f"![mermaid diagram]({raw_url})"
+            # blob URL + ?raw=true -> GitHub가 objects.githubusercontent.com 익명화 URL로 302 리다이렉트
+            blob_url = (
+                f"https://github.com/{owner}/{repo}/blob/{branch}/images/{filename}?raw=true"
+            )
+            return f"![mermaid diagram]({blob_url})"
 
         self.body_markdown = pattern.sub(_replacer, self.body_markdown)
 
