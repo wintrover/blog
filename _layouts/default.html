@@ -130,9 +130,10 @@
             langSpan.className = "language-label";
             langSpan.textContent = langLabel;
 
-            group.appendChild(langSpan);
             group.appendChild(copyDiv);
             group.appendChild(darkDiv);
+
+            wrapper.appendChild(langSpan);
             wrapper.appendChild(group);
 
             // replace original container
