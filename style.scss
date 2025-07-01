@@ -331,6 +331,8 @@ footer {
   margin: 0;
   padding: 1em 1.5em;
   overflow-x: visible;
+  overflow-y: visible;
+  overflow: visible;
   white-space: pre-wrap;
   word-break: break-word;
 }
@@ -418,6 +420,8 @@ div[class^="language-"] pre, div[class*=" language-"] pre {
   margin: 0;
   padding: 1em 1.5em;
   overflow-x: auto;
+  overflow-y: visible;
+  overflow: visible;
   white-space: pre-wrap;
   word-break: break-word;
 }
