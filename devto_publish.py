@@ -6,6 +6,12 @@ from typing import Tuple, Dict, Any
 import requests
 import yaml
 from dotenv import load_dotenv
+import re
+import base64
+import zlib
+import urllib.parse
+import subprocess, hashlib, os
+from pathlib import Path
 
 # 로깅 설정 – 콘솔에 시간ㆍ레벨ㆍ메시지 모두 출력
 logging.basicConfig(
@@ -64,6 +70,7 @@ class MarkdownPost:
             _, fm, body = raw.split("---", 2)
             self.front_matter = SafeYamlLoader.load(fm)
             cleaned = self._strip_html_wrappers(body)
+            # mermaid 블록은 parse 단계에서 그대로 두고, 이후 client 생성 후 변환함
             self.body_markdown = cleaned.strip()
             logging.info("프론트매터와 본문 파싱 완료")
         except ValueError as err:
@@ -74,19 +81,26 @@ class MarkdownPost:
         title = self.front_matter.get("title")
         tags = self.front_matter.get("tags", [])
         if isinstance(tags, list):
-            tags_csv = ",".join(tags)
+            tokens = [str(t).strip() for t in tags if t]
+        elif isinstance(tags, str):
+            # 공백 또는 콤마 기준 분할
+            tokens = [t.strip() for t in re.split(r"[ ,]+", tags) if t.strip()]
         else:
-            tags_csv = str(tags)
+            tokens = []
+
+        # dev.to 는 태그를 최대 4개, 각 태그 30자 이하, 알파뉴메릭·하이픈·언더스코어만 허용
+        tags_list = tokens[:4]
 
         if not title:
             raise DevtoPublisherError("프론트매터에 'title' 항목이 필요합니다")
 
+        # dev.to 는 태그를 최대 4개까지만 허용한다
         payload = {
             "article": {
                 "title": title,
                 "published": published,
                 "body_markdown": self.body_markdown,
-                "tags": tags_csv,
+                "tags": tags_list,
             }
         }
         logging.debug("dev.to payload 구성 완료: %s", payload)
@@ -107,6 +121,7 @@ class MarkdownPost:
             "language-block glue-font-weight-medium",
             "copy-code-block",
             "dark-mode-block",
+            "inner-block-content code-block",
         )
 
         lines = markdown_body.splitlines()
@@ -139,6 +154,66 @@ class MarkdownPost:
 
         return "\n".join(cleaned_lines)
 
+    def convert_mermaid_blocks(self, client: "DevtoClient") -> None:
+        """Mermaid 코드 블록을 PNG 로 렌더링 후 dev.to 이미지 업로드 URL 로 치환"""
+
+        import re
+        pattern = re.compile(r"```mermaid\n(.*?)```", re.DOTALL | re.IGNORECASE)
+
+        def render_png(mermaid_src: str) -> bytes:
+            """kroki 서버에 POST 하여 PNG 바이트 획득"""
+            try:
+                resp = requests.post("https://kroki.io/mermaid/png", data=mermaid_src.encode("utf-8"), timeout=30)
+                resp.raise_for_status()
+                return resp.content
+            except requests.RequestException as err:
+                logging.exception("kroki 렌더 실패")
+                raise DevtoPublisherError("Mermaid 렌더링 실패") from err
+
+        def get_repo_info() -> tuple[str, str, str]:
+            """현재 git repo 의 (owner, repo, branch) 획득"""
+            try:
+                remote_url = subprocess.check_output(["git", "config", "--get", "remote.origin.url"], text=True).strip()
+                branch = subprocess.check_output(["git", "rev-parse", "--abbrev-ref", "HEAD"], text=True).strip()
+            except subprocess.CalledProcessError as err:
+                logging.exception("git 정보 조회 실패")
+                raise DevtoPublisherError("git 정보를 읽지 못했습니다. 이미지 링크를 만들 수 없습니다") from err
+
+            # remote url 형식 처리
+            if remote_url.startswith("git@"):
+                # git@github.com:owner/repo.git
+                path_part = remote_url.split(":", 1)[1]
+            elif remote_url.startswith("https://"):
+                path_part = remote_url.split("github.com/")[1]
+            else:
+                raise DevtoPublisherError("지원하지 않는 remote.origin.url 형식")
+
+            owner_repo = path_part.removesuffix(".git")
+            owner, repo = owner_repo.split("/", 1)
+            return owner, repo, branch
+
+        owner, repo, branch = get_repo_info()
+        images_dir = Path("images")
+        images_dir.mkdir(exist_ok=True)
+
+        def _replacer(match: re.Match) -> str:
+            mermaid_code = match.group(1).strip()
+            # 파일명: mermaid_<hash>.png
+            sha = hashlib.sha1(mermaid_code.encode("utf-8")).hexdigest()[:10]
+            filename = f"mermaid_{sha}.png"
+            filepath = images_dir / filename
+
+            if not filepath.exists():
+                png_bytes = render_png(mermaid_code)
+                with open(filepath, "wb") as fp:
+                    fp.write(png_bytes)
+                logging.info("다이어그램 PNG 저장: %s", filepath)
+
+            raw_url = f"https://raw.githubusercontent.com/{owner}/{repo}/{branch}/images/{filename}"
+            return f"![mermaid diagram]({raw_url})"
+
+        self.body_markdown = pattern.sub(_replacer, self.body_markdown)
+
 
 class DevtoClient:
     """dev.to API 클라이언트"""
@@ -157,7 +232,23 @@ class DevtoClient:
         try:
             resp = self.session.post(url, json=payload, timeout=30)
             logging.info("dev.to 응답 상태코드: %s", resp.status_code)
-            resp.raise_for_status()
+            if resp.status_code == 422 and "Title has already been used" in resp.text:
+                # dev.to 의 5분 중복 제한 우회 – 제목 뒤에 공백+점 추가 후 한 번만 재시도
+                logging.warning("제목 중복 422 – 한 번에 한해 제목 끝에 '.' 추가 후 재시도합니다")
+                new_payload = payload.copy()
+                new_payload["article"] = dict(payload["article"])  # shallow copy
+                new_payload["article"]["title"] = payload["article"]["title"] + "."
+                retry_resp = self.session.post(url, json=new_payload, timeout=30)
+                logging.info("재시도 status: %s", retry_resp.status_code)
+                retry_resp.raise_for_status()
+                article_url = retry_resp.json().get("url", "(unknown)")
+                return retry_resp.status_code, article_url
+
+            try:
+                resp.raise_for_status()
+            except requests.RequestException:
+                logging.error("dev.to 응답 본문: %s", resp.text)
+                raise
             article_url = resp.json().get("url", "(unknown)")
             logging.info("게시 성공: %s", article_url)
             return resp.status_code, article_url
@@ -197,6 +288,8 @@ class DevtoClient:
             logging.exception("업데이트 실패")
             raise DevtoPublisherError("dev.to 글 업데이트 중 오류가 발생했습니다") from err
 
+    # dev.to API 는 현재 이미지 업로드 엔드포인트를 제공하지 않는다
+
 
 def main() -> None:
     if len(sys.argv) < 2:
@@ -210,15 +303,23 @@ def main() -> None:
     try:
         post = MarkdownPost(filepath)
         post.parse()
-        payload = post.to_devto_payload(published=not draft_flag)
 
         api_key = os.environ.get("DEVTO_API_KEY")
         client = DevtoClient(api_key)
 
+        # Mermaid 블록을 dev.to 호스팅 이미지로 교체
+        post.convert_mermaid_blocks(client)
+
+        payload = post.to_devto_payload(published=not draft_flag)
+
         if update_flag:
-            # 동일 제목의 드래프트를 찾아 업데이트
+            # 동일 제목 게시글(드래프트 우선) 탐색
             articles = client.list_my_articles(state="draft")
             target = next((a for a in articles if a.get("title") == post.front_matter.get("title")), None)
+            if target is None:
+                # 최근 5분 중복 오류 방지를 위해 'all' 에서도 검색 (published 포함)
+                articles_all = client.list_my_articles(state="all")
+                target = next((a for a in articles_all if a.get("title") == post.front_matter.get("title")), None)
             if target:
                 article_id = target.get("id")
                 status, url = client.update_article(article_id, payload)
