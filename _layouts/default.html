@@ -158,6 +158,33 @@
     </script>
 
     <script>
+      // 드롭다운 메뉴 제어
+      document.addEventListener('DOMContentLoaded', function() {
+        const dropdown = document.querySelector('.dropdown');
+        const dropbtn = dropdown.querySelector('.dropbtn');
+        
+        // 드롭다운 버튼 클릭 이벤트
+        dropbtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          dropdown.classList.toggle('active');
+        });
+        
+        // 드롭다운 외부 클릭 시 닫기
+        document.addEventListener('click', function(e) {
+          if (!dropdown.contains(e.target)) {
+            dropdown.classList.remove('active');
+          }
+        });
+        
+        // 드롭다운 내부 링크 클릭 시 닫기
+        dropdown.querySelectorAll('.dropdown-content a').forEach(function(link) {
+          link.addEventListener('click', function() {
+            dropdown.classList.remove('active');
+          });
+        });
+      });
+
       document.addEventListener('click', function (e) {
         const copyBtn = e.target.closest('.copy-clipboard');
         if (copyBtn) {
