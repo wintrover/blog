@@ -426,3 +426,329 @@ div[class^="language-"] pre, div[class*=" language-"] pre {
   border-bottom-right-radius: 6px;
   text-transform: uppercase;
 }
+
+// Category styles
+.category-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-right: 8px;
+}
+
+.category-badge.cvfactory {
+  background-color: #e3f2fd;
+  color: #1976d2;
+  border: 1px solid #bbdefb;
+}
+
+.category-badge.company-work {
+  background-color: #e8f5e8;
+  color: #388e3c;
+  border: 1px solid #c8e6c9;
+}
+
+// Category page styles
+.category-page {
+  .category-header {
+    margin-bottom: 3rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #f0f0f0;
+    
+    h1 {
+      color: #333;
+      margin-bottom: 0.5rem;
+    }
+    
+    .category-description {
+      color: #666;
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .category-stats {
+      color: #999;
+      font-size: 0.9rem;
+    }
+  }
+  
+  .posts-list {
+    .post-preview {
+      margin-bottom: 2rem;
+      padding: 1.5rem;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      
+      &:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        transform: translateY(-2px);
+      }
+      
+      .post-category {
+        margin-bottom: 0.5rem;
+      }
+      
+      h2 {
+        margin-bottom: 0.5rem;
+        
+        a {
+          color: #333;
+          text-decoration: none;
+          
+          &:hover {
+            color: #007bff;
+          }
+        }
+      }
+      
+      .post-meta {
+        color: #666;
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+        
+        .post-date {
+          margin-right: 1rem;
+        }
+        
+        .post-tags {
+          .tag {
+            background-color: #f5f5f5;
+            color: #666;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            margin-right: 4px;
+          }
+        }
+      }
+      
+      .post-excerpt {
+        color: #555;
+        line-height: 1.6;
+      }
+    }
+  }
+  
+  .no-posts {
+    text-align: center;
+    padding: 3rem;
+    color: #999;
+  }
+}
+
+// Categories page styles
+.categories-page {
+  h1 {
+    margin-bottom: 1rem;
+    color: #333;
+  }
+  
+  p {
+    color: #666;
+    margin-bottom: 2rem;
+  }
+  
+  .categories-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+    
+    .category-card {
+      padding: 2rem;
+      border-radius: 12px;
+      text-align: center;
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+      
+      &:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+      }
+      
+      .category-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+      }
+      
+      h2 {
+        margin-bottom: 0.5rem;
+        
+        a {
+          color: #333;
+          text-decoration: none;
+          
+          &:hover {
+            color: #007bff;
+          }
+        }
+      }
+      
+      p {
+        color: #666;
+        margin-bottom: 1rem;
+      }
+      
+      .category-count {
+        .count-number {
+          font-size: 2rem;
+          font-weight: bold;
+          color: #333;
+        }
+        
+        .count-label {
+          color: #999;
+          font-size: 0.9rem;
+        }
+      }
+    }
+    
+    .category-card.cvfactory {
+      background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+      border-color: #2196f3;
+      
+      &:hover {
+        border-color: #1976d2;
+      }
+    }
+    
+    .category-card.company-work {
+      background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%);
+      border-color: #4caf50;
+      
+      &:hover {
+        border-color: #388e3c;
+      }
+    }
+  }
+  
+  .categories-all {
+    border-top: 2px solid #f0f0f0;
+    padding-top: 2rem;
+    
+    h2 {
+      margin-bottom: 1rem;
+      color: #333;
+    }
+    
+    .categories-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      
+      .category-item {
+        a {
+          color: #333;
+          text-decoration: none;
+          padding: 0.5rem 1rem;
+          border-radius: 6px;
+          transition: all 0.3s ease;
+          display: block;
+          
+          &:hover {
+            background-color: #f5f5f5;
+            color: #007bff;
+          }
+        }
+        
+        .category-post-count {
+          color: #999;
+          font-size: 0.9rem;
+        }
+      }
+    }
+  }
+}
+
+// Dropdown menu styles
+.dropdown {
+  position: relative;
+  display: inline-block;
+  
+  .dropbtn {
+    background-color: transparent;
+    color: #333;
+    padding: 8px 16px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    
+    &:hover {
+      background-color: #f5f5f5;
+    }
+  }
+  
+  .dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #fff;
+    min-width: 200px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    border-radius: 8px;
+    z-index: 1;
+    top: 100%;
+    right: 0;
+    margin-top: 4px;
+    border: 1px solid #e0e0e0;
+    
+    a {
+      color: #333;
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+      transition: all 0.3s ease;
+      
+      &:hover {
+        background-color: #f5f5f5;
+        color: #007bff;
+      }
+    }
+  }
+  
+  &:hover .dropdown-content {
+    display: block;
+  }
+}
+
+// Mobile responsive styles
+@media (max-width: 768px) {
+  .dropdown {
+    .dropbtn {
+      padding: 6px 12px;
+      font-size: 14px;
+    }
+    
+    .dropdown-content {
+      min-width: 180px;
+      margin-top: 2px;
+      
+      a {
+        padding: 10px 12px;
+        font-size: 14px;
+      }
+    }
+  }
+  
+  .categories-page {
+    .categories-grid {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+      
+      .category-card {
+        padding: 1.5rem;
+      }
+    }
+    
+    .categories-all {
+      .categories-list {
+        grid-template-columns: 1fr;
+      }
+    }
+  }
+}

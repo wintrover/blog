@@ -1,0 +1,57 @@
+---
+layout: default
+---
+
+<div class="category-page">
+  <div class="category-header">
+    <h1>{{ page.category_name }}</h1>
+    <div class="category-description">
+      {% if page.category_name == "CVFactory" %}
+        개인 프로젝트 관련 포스트
+      {% elsif page.category_name == "Company Work" %}
+        회사 업무 일지 관련 포스트
+      {% else %}
+        모든 카테고리의 포스트
+      {% endif %}
+    </div>
+    <div class="category-stats">
+      총 {{ page.posts.size }}개의 포스트
+    </div>
+  </div>
+
+  <div class="posts-list">
+    {% for post in page.posts %}
+      <article class="post-preview">
+        <div class="post-category">
+          {% if post.category == "CVFactory" %}
+            <span class="category-badge cvfactory">CVFactory</span>
+          {% elsif post.category == "Company Work" %}
+            <span class="category-badge company-work">Company Work</span>
+          {% endif %}
+        </div>
+        <h2><a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a></h2>
+        <div class="post-meta">
+          <span class="post-date">{{ post.date | date: "%Y년 %m월 %d일" }}</span>
+          <span class="post-tags">
+            {% for tag in post.tags %}
+              <span class="tag">{{ tag }}</span>
+            {% endfor %}
+          </span>
+        </div>
+        <div class="post-excerpt">
+          {% if post.excerpt %}
+            {{ post.excerpt }}
+          {% else %}
+            {{ post.content | truncatewords: 50 }}
+          {% endif %}
+        </div>
+      </article>
+    {% endfor %}
+  </div>
+
+  {% if page.posts.size == 0 %}
+    <div class="no-posts">
+      <p>이 카테고리에 포스트가 아직 없습니다.</p>
+    </div>
+  {% endif %}
+</div>
