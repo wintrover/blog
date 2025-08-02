@@ -55,17 +55,36 @@ layout: default
     filterPostsByCategory(category);
   });
 
-  // 카테고리 선택 시 드롭다운 즉시 닫기
+  // 카테고리 선택 시 페이지 새로고침 방지 및 필터링
   document.addEventListener('DOMContentLoaded', function() {
     var dropdownLinks = document.querySelectorAll('.dropdown-content a');
     var dropdown = document.querySelector('.dropdown');
     
     dropdownLinks.forEach(function(link) {
       link.addEventListener('click', function(e) {
+        e.preventDefault(); // 페이지 새로고침 방지
+        
+        // URL에서 카테고리 추출
+        var href = this.getAttribute('href');
+        var category = href.split('=')[1];
+        
+        // URL 변경 (페이지 새로고침 없이)
+        var newUrl = window.location.pathname + (category ? '?category=' + category : '');
+        window.history.pushState({category: category}, '', newUrl);
+        
         // 드롭다운 즉시 닫기
         dropdown.classList.remove('active');
+        
+        // 필터링 실행
+        filterPostsByCategory(category);
       });
     });
+  });
+
+  // 브라우저 뒤로 가기/앞으로 가기 버튼 처리
+  window.addEventListener('popstate', function(e) {
+    var category = e.state && e.state.category ? e.state.category : 'all';
+    filterPostsByCategory(category);
   });
 
   // 카테고리별 포스트 필터링
