@@ -2,24 +2,28 @@
 layout: default
 ---
 
-<!-- 왼쪽 고정 사이드바 -->
-<aside class="sidebar">
-  <div class="sidebar-content">
-    <h3>카테고리</h3>
-    <ul class="category-list">
-      <li><a href="#" data-category="all" class="category-link">전체</a></li>
-      <li><a href="#" data-category="ai" class="category-link">AI</a></li>
-      <li><a href="#" data-category="backend" class="category-link">Backend</a></li>
-      <li><a href="#" data-category="frontend" class="category-link">Frontend</a></li>
-      <li><a href="#" data-category="company-work" class="category-link">Company Work</a></li>
-      <li><a href="#" data-category="career" class="category-link">Career</a></li>
-      <li><a href="#" data-category="project" class="category-link">Project</a></li>
-      <li><a href="#" data-category="study" class="category-link">Study</a></li>
-    </ul>
-  </div>
-</aside>
+<!-- 플렉스박스 레이아웃 래퍼 -->
+<div class="layout-wrapper">
+  <!-- 왼쪽 고정 사이드바 -->
+  <aside class="sidebar">
+    <div class="sidebar-content">
+      <h3>카테고리</h3>
+      <ul class="category-list">
+        <li><a href="#" data-category="all" class="category-link">전체</a></li>
+        <li><a href="#" data-category="ai" class="category-link">AI</a></li>
+        <li><a href="#" data-category="backend" class="category-link">Backend</a></li>
+        <li><a href="#" data-category="frontend" class="category-link">Frontend</a></li>
+        <li><a href="#" data-category="company-work" class="category-link">Company Work</a></li>
+        <li><a href="#" data-category="career" class="category-link">Career</a></li>
+        <li><a href="#" data-category="project" class="category-link">Project</a></li>
+        <li><a href="#" data-category="study" class="category-link">Study</a></li>
+      </ul>
+    </div>
+  </aside>
 
-<div class="posts">
+  <!-- 메인 콘텐츠 영역 -->
+  <main class="main-content">
+    <div class="posts">
   {% for post in site.posts %}
     <article class="post" data-category="{{ post.category | default: 'all' }}">
 
@@ -28,6 +32,8 @@ layout: default
 
     </article>
   {% endfor %}
+    </div>
+  </main>
 </div>
 
 <script>
