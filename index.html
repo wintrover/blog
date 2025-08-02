@@ -3,7 +3,15 @@ layout: default
 ---
 
 <div class="posts">
-  {% for post in site.posts %}
+  {% assign category = page.category | default: 'all' %}
+  
+  {% if category == 'all' %}
+    {% assign filtered_posts = site.posts %}
+  {% else %}
+    {% assign filtered_posts = site.posts | where: 'category', category %}
+  {% endif %}
+  
+  {% for post in filtered_posts %}
     <article class="post">
 
       <span class="date">{{ post.date | date: "%Y-%m-%d" }}</span>
@@ -11,4 +19,55 @@ layout: default
 
     </article>
   {% endfor %}
+  
+  {% if filtered_posts.size == 0 %}
+    <div class="no-posts">
+      <p>해당 카테고리의 포스트가 없습니다.</p>
+    </div>
+  {% endif %}
 </div>
+
+<script>
+  // URL 파라미터에서 카테고리 읽기
+  function getUrlParameter(name) {
+    name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+    var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+    var results = regex.exec(location.search);
+    return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+  }
+
+  // 카테고리 이름 한글화
+  function getCategoryName(category) {
+    var categoryNames = {
+      'cvfactory': 'CVFactory',
+      'company-work': 'Company Work',
+      'all': '전체'
+    };
+    return categoryNames[category] || category;
+  }
+
+  // 페이지 로드 시 카테고리 설정
+  document.addEventListener('DOMContentLoaded', function() {
+    var category = getUrlParameter('category');
+    
+    // 현재 카테고리 표시
+    var categoryIndicator = document.createElement('span');
+    categoryIndicator.className = 'category-indicator';
+    
+    if (category) {
+      categoryIndicator.textContent = getCategoryName(category);
+      document.querySelector('.site-name').appendChild(categoryIndicator);
+    }
+    
+    // 드롭다운 메뉴에서 현재 카테고리 활성화
+    var dropdownLinks = document.querySelectorAll('.dropdown-content a');
+    dropdownLinks.forEach(function(link) {
+      link.classList.remove('active');
+      
+      var linkCategory = link.getAttribute('href').split('=')[1];
+      if (linkCategory === category) {
+        link.classList.add('active');
+      }
+    });
+  });
+</script>

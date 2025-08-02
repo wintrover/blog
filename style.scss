@@ -721,6 +721,12 @@ div[class^="language-"] pre, div[class*=" language-"] pre {
         background-color: #f5f5f5;
         color: #007bff;
       }
+      
+      &.active {
+        background-color: #007bff;
+        color: #fff;
+        font-weight: bold;
+      }
     }
   }
   
@@ -728,6 +734,25 @@ div[class^="language-"] pre, div[class*=" language-"] pre {
   &.active .dropdown-content {
     display: block;
   }
+}
+
+// 현재 카테고리 표시 스타일
+.category-indicator {
+  display: inline-block;
+  background-color: #007bff;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  margin-left: 8px;
+  font-weight: normal;
+}
+
+.no-posts {
+  text-align: center;
+  padding: 40px;
+  color: #666;
+  font-style: italic;
 }
 
 // Mobile responsive styles
