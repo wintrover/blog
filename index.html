@@ -2,6 +2,23 @@
 layout: default
 ---
 
+<!-- 왼쪽 고정 사이드바 -->
+<aside class="sidebar">
+  <div class="sidebar-content">
+    <h3>카테고리</h3>
+    <ul class="category-list">
+      <li><a href="#" data-category="all" class="category-link">전체</a></li>
+      <li><a href="#" data-category="ai" class="category-link">AI</a></li>
+      <li><a href="#" data-category="backend" class="category-link">Backend</a></li>
+      <li><a href="#" data-category="frontend" class="category-link">Frontend</a></li>
+      <li><a href="#" data-category="company-work" class="category-link">Company Work</a></li>
+      <li><a href="#" data-category="career" class="category-link">Career</a></li>
+      <li><a href="#" data-category="project" class="category-link">Project</a></li>
+      <li><a href="#" data-category="study" class="category-link">Study</a></li>
+    </ul>
+  </div>
+</aside>
+
 <div class="posts">
   {% for post in site.posts %}
     <article class="post" data-category="{{ post.category | default: 'all' }}">
@@ -40,12 +57,12 @@ layout: default
       category = 'all';
     }
     
-    // 드롭다운 메뉴에서 현재 카테고리 활성화
-    var dropdownLinks = document.querySelectorAll('.dropdown-content a');
-    dropdownLinks.forEach(function(link) {
+    // 사이드바 메뉴에서 현재 카테고리 활성화
+    var categoryLinks = document.querySelectorAll('.category-link');
+    categoryLinks.forEach(function(link) {
       link.classList.remove('active');
       
-      var linkCategory = link.getAttribute('href').split('=')[1];
+      var linkCategory = link.getAttribute('data-category');
       if (linkCategory === category) {
         link.classList.add('active');
       }
@@ -57,23 +74,24 @@ layout: default
 
   // 카테고리 선택 시 페이지 새로고침 방지 및 필터링
   document.addEventListener('DOMContentLoaded', function() {
-    var dropdownLinks = document.querySelectorAll('.dropdown-content a');
-    var dropdown = document.querySelector('.dropdown');
+    var categoryLinks = document.querySelectorAll('.category-link');
     
-    dropdownLinks.forEach(function(link) {
+    categoryLinks.forEach(function(link) {
       link.addEventListener('click', function(e) {
         e.preventDefault(); // 페이지 새로고침 방지
         
-        // URL에서 카테고리 추출
-        var href = this.getAttribute('href');
-        var category = href.split('=')[1];
+        // 데이터 속성에서 카테고리 추출
+        var category = this.getAttribute('data-category');
         
         // URL 변경 (페이지 새로고침 없이)
         var newUrl = window.location.pathname + (category ? '?category=' + category : '');
         window.history.pushState({category: category}, '', newUrl);
         
-        // 드롭다운 즉시 닫기
-        dropdown.classList.remove('active');
+        // 사이드바에서 현재 카테고리 활성화
+        categoryLinks.forEach(function(l) {
+          l.classList.remove('active');
+        });
+        this.classList.add('active');
         
         // 필터링 실행
         filterPostsByCategory(category);
