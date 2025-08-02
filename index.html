@@ -3,28 +3,14 @@ layout: default
 ---
 
 <div class="posts">
-  {% assign category = page.category | default: 'all' %}
-  
-  {% if category == 'all' %}
-    {% assign filtered_posts = site.posts %}
-  {% else %}
-    {% assign filtered_posts = site.posts | where: 'category', category %}
-  {% endif %}
-  
-  {% for post in filtered_posts %}
-    <article class="post">
+  {% for post in site.posts %}
+    <article class="post" data-category="{{ post.category | default: 'all' }}">
 
       <span class="date">{{ post.date | date: "%Y-%m-%d" }}</span>
       <h1><a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a></h1>
 
     </article>
   {% endfor %}
-  
-  {% if filtered_posts.size == 0 %}
-    <div class="no-posts">
-      <p>해당 카테고리의 포스트가 없습니다.</p>
-    </div>
-  {% endif %}
 </div>
 
 <script>
@@ -46,7 +32,7 @@ layout: default
     return categoryNames[category] || category;
   }
 
-  // 페이지 로드 시 카테고리 설정
+  // 페이지 로드 시 카테고리 설정 및 필터링
   document.addEventListener('DOMContentLoaded', function() {
     var category = getUrlParameter('category');
     
@@ -60,5 +46,32 @@ layout: default
         link.classList.add('active');
       }
     });
+    
+    // 동적 필터링 실행
+    filterPostsByCategory(category);
   });
+
+  // 카테고리별 포스트 필터링
+  function filterPostsByCategory(category) {
+    var posts = document.querySelectorAll('.post');
+    var hasVisiblePosts = false;
+    
+    posts.forEach(function(post) {
+      var postCategory = post.getAttribute('data-category');
+      
+      if (category === 'all' || category === postCategory) {
+        post.style.display = 'block';
+        hasVisiblePosts = true;
+      } else {
+        post.style.display = 'none';
+      }
+    });
+    
+    // 포스트가 하나도 없을 경우 전체 숨김
+    if (!hasVisiblePosts && category !== 'all') {
+      document.querySelector('.posts').style.display = 'none';
+    } else {
+      document.querySelector('.posts').style.display = 'block';
+    }
+  }
 </script>
