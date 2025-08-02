@@ -50,15 +50,6 @@ layout: default
   document.addEventListener('DOMContentLoaded', function() {
     var category = getUrlParameter('category');
     
-    // 현재 카테고리 표시
-    var categoryIndicator = document.createElement('span');
-    categoryIndicator.className = 'category-indicator';
-    
-    if (category) {
-      categoryIndicator.textContent = getCategoryName(category);
-      document.querySelector('.site-name').appendChild(categoryIndicator);
-    }
-    
     // 드롭다운 메뉴에서 현재 카테고리 활성화
     var dropdownLinks = document.querySelectorAll('.dropdown-content a');
     dropdownLinks.forEach(function(link) {
