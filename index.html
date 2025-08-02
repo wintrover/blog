@@ -35,6 +35,10 @@ layout: default
   // 페이지 로드 시 카테고리 설정 및 필터링
   document.addEventListener('DOMContentLoaded', function() {
     var category = getUrlParameter('category');
+    // URL 파라미터가 없을 때 기본값으로 'all' 설정
+    if (!category) {
+      category = 'all';
+    }
     
     // 드롭다운 메뉴에서 현재 카테고리 활성화
     var dropdownLinks = document.querySelectorAll('.dropdown-content a');
@@ -59,7 +63,8 @@ layout: default
     posts.forEach(function(post) {
       var postCategory = post.getAttribute('data-category');
       
-      if (category === 'all' || category === postCategory) {
+      // 대소문자 무시 비교
+      if (category === 'all' || category.toLowerCase() === postCategory.toLowerCase()) {
         post.style.display = 'block';
         hasVisiblePosts = true;
       } else {
