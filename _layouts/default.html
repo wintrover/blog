@@ -278,8 +278,8 @@
           const mainContentWidth = mainContent ? mainContent.clientWidth : layoutWrapperWidth;
           
           // 사이드바가 메인 콘텐츠를 침범할 것으로 예상되면 미리 닫기
-          // 더 적은 여유 공간(10px)으로 조정하여 더 민감하게 반응
-          if (sidebarWidth + 10 >= mainContentWidth) {
+          // 더 많은 여유 공간(50px)으로 조정하여 더 예방적으로 반응
+          if (sidebarWidth + 50 >= mainContentWidth) {
             sidebar.classList.remove('active');
           }
         }
@@ -294,14 +294,14 @@
           
           const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
-              // 요소가 사이드바와 겹치면 사이드바 닫기
-              if (entry.intersectionRatio < 1) {
+              // 요소가 사이드바와 겹치면 사이드바 닫기 - 더 예방적으로
+              if (entry.intersectionRatio < 0.95) {
                 sidebar.classList.remove('active');
               }
             });
           }, {
             root: layoutWrapper,
-            threshold: [0.1, 0.5, 0.9] // 다양한 임계값으로 테스트
+            threshold: [0.05, 0.1, 0.5, 0.9, 0.95] // 더 예방적인 임계값 추가
           });
           
           // 메인 콘텐츠의 첫 번째 자식 요소를 감시
