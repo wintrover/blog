@@ -798,11 +798,61 @@ div[class^="language-"] pre, div[class*=" language-"] pre {
   font-weight: 500;
 }
 
+// 사이드바 토글 버튼
+.sidebar-toggle {
+  display: none; /* 기본적으로 숨김 */
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  margin-left: 10px;
+  color: $darkGray;
+  transition: color 0.2s ease;
+  
+  &:hover {
+    color: $blue;
+  }
+  
+  svg {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+// 반응형 스타일 개선
+@media (max-width: 1024px) {
+  .sidebar-toggle {
+    display: block; /* 태블릿 이하에서 표시 */
+  }
+  
+  nav {
+    .site-avatar,
+    .site-info {
+      display: none; /* 태블릿 이하에서 사이트 정보 숨김 */
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .sidebar-toggle {
+    display: block; /* 모바일에서 표시 */
+  }
+  
+  nav {
+    .site-avatar,
+    .site-info {
+      display: none; /* 모바일에서 사이트 정보 숨김 */
+    }
+  }
+}
+
 // 플렉스박스 레이아웃 래퍼
 .layout-wrapper {
   display: flex;
   height: auto; /* 콘텐츠 크기에 맞는 동적 높이 */
   min-height: 0; /* 플렉스 아이템 오버플로우 방지 */
+  position: relative; /* 자식 요소의 포지셔닝 기준 */
+  overflow: hidden; /* 자식 요소 오버플로우 방지 */
 }
 
 // 메인 콘텐츠 영역
@@ -810,6 +860,9 @@ div[class^="language-"] pre, div[class*=" language-"] pre {
   flex: 1 0 auto;
   padding: 0; /* 패딩 제거 */
   min-height: 0; /* 플렉스 아이템의 최소 높이 제한 */
+  width: 100%; /* 전체 너비 차지 */
+  box-sizing: border-box; /* 패딩/마진이 너비에 포함되도록 */
+  overflow-x: hidden; /* 가로 스크롤 방지 */
 }
 
 // Posts 영역
@@ -818,7 +871,30 @@ div[class^="language-"] pre, div[class*=" language-"] pre {
   margin: 0 auto;
 }
 
-// Mobile responsive styles
+// 반응형 스타일 개선
+@media (max-width: 1024px) {
+  .sidebar {
+    width: 16rem;
+    left: -16rem; /* 화면 밖으로 숨김 */
+  }
+  
+  .sidebar.active {
+    left: 0; /* 활성화 시 화면에 표시 */
+  }
+  
+  .layout-wrapper {
+    margin-left: 0; /* 태블릿에서는 마진 제거 */
+  }
+  
+  .main-content {
+    padding: 1rem;
+  }
+  
+  .posts {
+    padding: 0;
+  }
+}
+
 @media (max-width: 768px) {
   .sidebar {
     width: 16rem;
