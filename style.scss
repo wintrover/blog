@@ -156,7 +156,7 @@ img {
 //
 
 .wrapper-masthead {
-  margin-bottom: 50px;
+  margin-bottom: 0; // 아랫마진 제거
 }
 
 .masthead {
@@ -292,7 +292,7 @@ nav {
 }
 
 .wrapper-footer {
-  margin-top: 5em;
+  margin-top: 0; // 윗마진 제거
   border-top: 1px solid #ddd;
   background-color: $lightGray;
 }
@@ -863,6 +863,7 @@ div[class^="language-"] pre, div[class*=" language-"] pre {
   width: 100%; /* 전체 너비 차지 */
   box-sizing: border-box; /* 패딩/마진이 너비에 포함되도록 */
   overflow-x: hidden; /* 가로 스크롤 방지 */
+  @include hide-scrollbar; /* 스크롤바 숨김 */
 }
 
 // Posts 영역
