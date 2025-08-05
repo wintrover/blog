@@ -272,10 +272,42 @@
           
           const sidebarWidth = sidebar.offsetWidth;
           const layoutWrapperWidth = layoutWrapper.offsetWidth;
+          const mainContent = document.querySelector('.main-content');
           
-          // 사이드바가 레이아웃 래퍼를 침범하기 전에 미리 닫기 (여유 공간 20px 확보)
-          if (sidebarWidth + 20 >= layoutWrapperWidth) {
+          // 메인 콘텐츠의 실제 보이는 너비 계산
+          const mainContentWidth = mainContent ? mainContent.clientWidth : layoutWrapperWidth;
+          
+          // 사이드바가 메인 콘텐츠를 침범할 것으로 예상되면 미리 닫기
+          // 더 적은 여유 공간(10px)으로 조정하여 더 민감하게 반응
+          if (sidebarWidth + 10 >= mainContentWidth) {
             sidebar.classList.remove('active');
+          }
+        }
+        
+        // Intersection Observer를 사용한 실시간 감지
+        function setupIntersectionObserver() {
+          if (!sidebar || !layoutWrapper) return;
+          
+          // 메인 콘텐츠의 첫 번째 요소를 감시
+          const mainContent = document.querySelector('.main-content');
+          if (!mainContent) return;
+          
+          const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+              // 요소가 사이드바와 겹치면 사이드바 닫기
+              if (entry.intersectionRatio < 1) {
+                sidebar.classList.remove('active');
+              }
+            });
+          }, {
+            root: layoutWrapper,
+            threshold: [0.1, 0.5, 0.9] // 다양한 임계값으로 테스트
+          });
+          
+          // 메인 콘텐츠의 첫 번째 자식 요소를 감시
+          const firstChild = mainContent.firstElementChild;
+          if (firstChild) {
+            observer.observe(firstChild);
           }
         }
         
@@ -301,6 +333,9 @@
         
         // 초기 체크
         checkSidebarOverflow();
+        
+        // Intersection Observer 설정
+        setupIntersectionObserver();
         
         // 카테고리 링크 클릭 시 사이드바 닫기 (모바일에서)
         const categoryLinks = document.querySelectorAll('.category-link');
