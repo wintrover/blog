@@ -273,8 +273,8 @@
           const sidebarWidth = sidebar.offsetWidth;
           const layoutWrapperWidth = layoutWrapper.offsetWidth;
           
-          // 사이드바가 레이아웃 래퍼를 침범하면 자동으로 닫기
-          if (sidebarWidth >= layoutWrapperWidth) {
+          // 사이드바가 레이아웃 래퍼를 침범하기 전에 미리 닫기 (여유 공간 20px 확보)
+          if (sidebarWidth + 20 >= layoutWrapperWidth) {
             sidebar.classList.remove('active');
           }
         }
