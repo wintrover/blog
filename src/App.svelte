@@ -82,8 +82,7 @@
   #content {
     flex: 1;
     max-width: 800px;
-    margin: 0 auto;
-    padding: 40px 20px;
+    margin: 40px auto;
     width: 100%;
   }
   
@@ -113,7 +112,7 @@
     }
     
     #content {
-      padding: 20px;
+      margin: 20px auto;
     }
   }
 </style>

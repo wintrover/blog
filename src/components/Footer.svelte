@@ -54,7 +54,6 @@
 
 <style>
   .wrapper-footer {
-    margin-top: 50px;
     border-top: 1px solid #ddd;
     background-color: #f8f9fa;
   }

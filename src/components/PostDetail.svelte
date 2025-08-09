@@ -71,7 +71,8 @@
   .post-detail {
     max-width: 800px;
     margin: 0 auto;
-    padding: 0;
+    margin-top: 20px;
+    margin-bottom: 20px;
   }
 
   .post-header {
