@@ -16,13 +16,9 @@
   let intersectionObserver
   let manualToggle = false // 수동 토글 상태
 
-  // 사이드바 상태 변화 감지 (상태 변경 시에만)
-  let lastLoggedState = { sidebarCollapsed: null, manualToggle: null }
+  // 사이드바 상태 변화 감지
   $: {
-    if (lastLoggedState.sidebarCollapsed !== sidebarCollapsed || lastLoggedState.manualToggle !== manualToggle) {
-      console.log('[SIDEBAR DEBUG] State updated:', { sidebarCollapsed, manualToggle })
-      lastLoggedState = { sidebarCollapsed, manualToggle }
-    }
+    // 상태 변화 로직 (필요시 여기에 추가)
   }
   
   $: {
@@ -56,24 +52,13 @@
       return
     }
 
-    const sidebarRect = sidebarElement.getBoundingClientRect()
-    const contentRect = mainContentElement.getBoundingClientRect()
-
-    // 요소가 아직 렌더링되지 않은 경우 (너비가 0) 사이드바 표시
-    if (sidebarRect.width === 0 || contentRect.width === 0) {
-      sidebarCollapsed = false
-      return
+    // 화면 너비 기반으로 사이드바 표시/숨김 결정
+    const windowWidth = window.innerWidth
+    const shouldCollapse = windowWidth < 768 // 768px 미만에서 사이드바 숨김
+    
+    if (sidebarCollapsed !== shouldCollapse) {
+      sidebarCollapsed = shouldCollapse
     }
-
-    // 사이드바와 콘텐츠가 겹치는지 확인
-    const isOverlapping = (
-      sidebarRect.left < contentRect.right &&
-      sidebarRect.right > contentRect.left &&
-      sidebarRect.top < contentRect.bottom &&
-      sidebarRect.bottom > contentRect.top
-    )
-
-    sidebarCollapsed = isOverlapping
   }
 
   function debouncedCheckSidebarCollision() {
@@ -90,25 +75,16 @@
   }
 
   function toggleSidebar() {
-    const previousState = sidebarCollapsed
     manualToggle = true
     sidebarCollapsed = !sidebarCollapsed
-    console.log('[SIDEBAR DEBUG] Manual toggle clicked:', {
-      previousState,
-      newState: sidebarCollapsed,
-      manualToggle: true
-    })
   }
 
   onMount(() => {
-    console.log('[SIDEBAR DEBUG] Component mounted')
-    
     // 초기 체크를 여러 번 시도 (배포 환경에서 DOM 로딩 지연 대응)
     const checkWithRetry = () => {
       checkSidebarCollision()
       // 요소가 아직 준비되지 않았으면 다시 시도
-      if (!sidebarElement || !mainContentElement || 
-          sidebarElement.getBoundingClientRect().width === 0) {
+      if (!sidebarElement || !mainContentElement) {
         setTimeout(checkWithRetry, 200)
       }
     }
