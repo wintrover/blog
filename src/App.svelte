@@ -19,7 +19,13 @@
 
   // 사이드바 상태 변화 감지
   $: {
-    // 상태 변화 로직 (필요시 여기에 추가)
+    if (typeof document !== 'undefined') {
+      if (sidebarCollapsed) {
+        document.body.classList.add('sidebar-collapsed')
+      } else {
+        document.body.classList.remove('sidebar-collapsed')
+      }
+    }
   }
   
   $: {
@@ -217,7 +223,7 @@
     transition: margin-left 0.3s ease;
   }
   
-  #sidebar.collapsed + #main-content {
+  .sidebar-collapsed #main-content {
     margin-left: 0;
   }
   
