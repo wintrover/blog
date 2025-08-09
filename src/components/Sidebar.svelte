@@ -24,8 +24,13 @@
     ]
   }
   
-  function selectCategory(categorySlug) {
-    selectedCategory.set(categorySlug)
+  function selectCategory(categorySlug, categoryName) {
+    // slug 대신 실제 카테고리 이름을 저장
+    if (categorySlug === 'all') {
+      selectedCategory.set('all')
+    } else {
+      selectedCategory.set(categoryName)
+    }
   }
 </script>
 
@@ -47,8 +52,8 @@
     {#each categories as category}
       <li>
         <button 
-          class="category-link {$selectedCategory === category.slug ? 'active' : ''}"
-          on:click={() => selectCategory(category.slug)}
+          class="category-link {($selectedCategory === 'all' && category.slug === 'all') || ($selectedCategory === category.name) ? 'active' : ''}"
+          on:click={() => selectCategory(category.slug, category.name)}
         >
           {category.name} ({category.count})
         </button>

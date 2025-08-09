@@ -14,6 +14,7 @@
     if ($selectedCategory === 'all') {
       filteredPosts = $posts
     } else {
+      // 실제 카테고리 이름으로 필터링
       filteredPosts = $posts.filter(post => post.category === $selectedCategory)
     }
   }

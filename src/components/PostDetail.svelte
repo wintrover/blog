@@ -6,15 +6,15 @@
   export let post;
 
   const dispatch = createEventDispatcher();
-  let markdownContent = null
-  let loading = true
+  let markdownContent = null;
+  let loading = true;
 
   onMount(async () => {
     if (post && post.slug) {
-      markdownContent = await loadPost(post.slug)
-      loading = false
+      markdownContent = await loadPost(post.slug);
+      loading = false;
     }
-  })
+  });
 
   function goBack() {
     dispatch("backToList");
