@@ -355,13 +355,13 @@
     clear: both;
     direction: ltr !important;
     display: block;
-    margin: var(--devsite-code-margin, 16px 0);
+    margin: 16px 0;
     min-height: var(--devsite-code-button-size);
     overflow: hidden;
     position: relative;
     background: var(--devsite-code-background);
     color: var(--devsite-code-color);
-    padding: 0;
+    padding: var(--devsite-code-padding-block) var(--devsite-code-padding-inline);
     font-family: 'Roboto Mono', 'Courier New', monospace;
     font-size: 14px;
     line-height: 1.5;
@@ -371,8 +371,8 @@
 
   .markdown-content :global(.devsite-code-buttons-container) {
     position: absolute;
-    right: var(--devsite-code-buttons-container-right, 0);
-    top: 8px;
+    right: 10px;
+    top: 10px;
     z-index: 1;
     margin: 0;
     padding: 0;
