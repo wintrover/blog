@@ -15,6 +15,15 @@
   let mainContentElement
   let intersectionObserver
   let manualToggle = false // 수동 토글 상태
+
+  // 사이드바 상태 변화 감지
+  $: {
+    console.log('[SIDEBAR DEBUG] Sidebar state changed:', {
+      sidebarCollapsed,
+      manualToggle,
+      timestamp: new Date().toISOString()
+    })
+  }
   
   $: {
     if ($selectedCategory === 'all') {
@@ -36,56 +45,112 @@
   }
 
   function checkSidebarCollision() {
-    if (!sidebarElement || !mainContentElement) return
-    
-    // 수동 토글 상태일 때는 자동 감지 비활성화
-    if (manualToggle) return
-    
+    if (!sidebarElement || !mainContentElement) {
+      console.warn('[SIDEBAR DEBUG] Sidebar or main content element not found')
+      return
+    }
+
+    // manualToggle 상태일 때는 자동 충돌 감지 비활성화
+    if (manualToggle) {
+      console.log('[SIDEBAR DEBUG] Manual toggle active - skipping auto collision detection')
+      return
+    }
+
     const sidebarRect = sidebarElement.getBoundingClientRect()
     const contentRect = mainContentElement.getBoundingClientRect()
-    
-    // 요소가 아직 렌더링되지 않은 경우 (width나 height가 0)
+
+    console.log('[SIDEBAR DEBUG] Element dimensions:', {
+      sidebar: {
+        width: sidebarRect.width,
+        height: sidebarRect.height,
+        left: sidebarRect.left,
+        right: sidebarRect.right,
+        top: sidebarRect.top,
+        bottom: sidebarRect.bottom
+      },
+      content: {
+        width: contentRect.width,
+        height: contentRect.height,
+        left: contentRect.left,
+        right: contentRect.right,
+        top: contentRect.top,
+        bottom: contentRect.bottom
+      },
+      contentLeftDistance: contentRect.left
+    })
+
+    // 요소가 아직 렌더링되지 않은 경우 (너비가 0) 사이드바 표시
     if (sidebarRect.width === 0 || contentRect.width === 0) {
+      console.log('[SIDEBAR DEBUG] Elements not rendered yet (width = 0) - showing sidebar')
       sidebarCollapsed = false
       return
     }
-    
-    // 사이드바와 콘텐츠가 실제로 겹치는지 확인
-    const isOverlapping = sidebarRect.right > contentRect.left && 
-                         sidebarRect.left < contentRect.right &&
-                         sidebarRect.bottom > contentRect.top &&
-                         sidebarRect.top < contentRect.bottom
-    
-    // 겹치면 사이드바를 접고, 겹치지 않으면 펼침
+
+    // 사이드바와 콘텐츠가 겹치는지 확인
+    const isOverlapping = (
+      sidebarRect.left < contentRect.right &&
+      sidebarRect.right > contentRect.left &&
+      sidebarRect.top < contentRect.bottom &&
+      sidebarRect.bottom > contentRect.top
+    )
+
+    const previousState = sidebarCollapsed
     sidebarCollapsed = isOverlapping
+
+    console.log('[SIDEBAR DEBUG] Collision check result:', {
+      isOverlapping,
+      previousState,
+      newState: sidebarCollapsed,
+      stateChanged: previousState !== sidebarCollapsed
+    })
   }
 
   function handleResize() {
+    console.log('[SIDEBAR DEBUG] Window resized - resetting manual toggle state')
     // 리사이즈 시 수동 토글 상태 리셋
     manualToggle = false
     checkSidebarCollision()
   }
 
   function toggleSidebar() {
+    const previousState = sidebarCollapsed
     manualToggle = true
     sidebarCollapsed = !sidebarCollapsed
+    console.log('[SIDEBAR DEBUG] Manual toggle clicked:', {
+      previousState,
+      newState: sidebarCollapsed,
+      manualToggle: true
+    })
   }
 
   onMount(() => {
+    console.log('[SIDEBAR DEBUG] Component mounted - starting initialization')
+    
     // 초기 체크를 여러 번 시도 (배포 환경에서 DOM 로딩 지연 대응)
     const checkWithRetry = () => {
+      console.log('[SIDEBAR DEBUG] Checking element readiness:', {
+        sidebarElement: !!sidebarElement,
+        mainContentElement: !!mainContentElement,
+        sidebarWidth: sidebarElement ? sidebarElement.getBoundingClientRect().width : 0
+      })
+      
       checkSidebarCollision()
       // 요소가 아직 준비되지 않았으면 다시 시도
       if (!sidebarElement || !mainContentElement || 
           sidebarElement.getBoundingClientRect().width === 0) {
+        console.log('[SIDEBAR DEBUG] Elements not ready - retrying in 200ms')
         setTimeout(checkWithRetry, 200)
+      } else {
+        console.log('[SIDEBAR DEBUG] Elements ready - initial collision check complete')
       }
     }
     
     setTimeout(checkWithRetry, 100)
     
     // ResizeObserver로 요소 크기 변화 감지
+    console.log('[SIDEBAR DEBUG] Setting up ResizeObserver')
     const resizeObserver = new ResizeObserver(() => {
+      console.log('[SIDEBAR DEBUG] ResizeObserver triggered')
       checkSidebarCollision()
     })
     
@@ -95,6 +160,7 @@
     window.addEventListener('resize', handleResize)
     
     return () => {
+      console.log('[SIDEBAR DEBUG] Cleaning up observers and event listeners')
       resizeObserver.disconnect()
       window.removeEventListener('resize', handleResize)
     }
