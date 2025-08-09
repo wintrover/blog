@@ -16,6 +16,8 @@
   let contentElement
   let intersectionObserver
   let manualToggle = false // 수동 토글 상태
+  let manualToggleTimeout
+  let resizeTimeout // 리사이즈 디바운스용
 
   // 사이드바 상태 변화 감지
   $: {
@@ -61,32 +63,52 @@
       return
     }
 
-    // 요소가 아직 렌더링되지 않았다면 사이드바를 표시
-    const sidebarRect = sidebarElement.getBoundingClientRect()
-    const contentRect = contentElement.getBoundingClientRect()
-    
-    if (sidebarRect.width === 0 || contentRect.width === 0) {
-      if (sidebarCollapsed) {
+    // 디바운스: 이전 타이머 취소하고 새로 설정
+    clearTimeout(resizeTimeout)
+    resizeTimeout = setTimeout(() => {
+      // 요소가 아직 렌더링되지 않았다면 사이드바를 표시
+      const sidebarRect = sidebarElement.getBoundingClientRect()
+      const contentRect = contentElement.getBoundingClientRect()
+      
+      if (sidebarRect.width === 0 || contentRect.width === 0) {
+        if (sidebarCollapsed) {
+          sidebarCollapsed = false
+        }
+        return
+      }
+
+      // 화면이 너무 작으면 자동으로 접기
+      if (window.innerWidth < 768) {
+        if (!sidebarCollapsed) {
+          sidebarCollapsed = true
+        }
+        return
+      }
+      
+      // 화면이 충분히 크고 사이드바가 접혀있으면 펼치기
+      if (window.innerWidth >= 1200 && sidebarCollapsed) {
+        if (contentRect.left > 240) {
+          sidebarCollapsed = false
+        }
+        return
+      }
+
+      // 사이드바와 콘텐츠가 겹치는지 확인 (사이드바 오른쪽 끝이 콘텐츠 왼쪽 시작점을 넘어가면 겹침)
+      console.log('사이드바 오른쪽 끝 x좌표:', sidebarRect.right)
+      console.log('콘텐츠 왼쪽 시작 x좌표:', contentRect.left)
+      console.log('겹침 여부:', sidebarRect.right >= contentRect.left)
+      const isOverlapping = sidebarRect.right >= contentRect.left
+
+      // 무한 루프 방지: 현재 상태와 다를 때만 변경
+      // 겹치면서 현재 펼쳐져 있으면 접기
+      if (isOverlapping && !sidebarCollapsed) {
+        sidebarCollapsed = true
+      }
+      // 콘텐츠의 왼쪽 x좌표가 240보다 크고 현재 접혀져 있으면 펼치기
+      else if (contentRect.left > 240 && sidebarCollapsed) {
         sidebarCollapsed = false
       }
-      return
-    }
-
-    // 사이드바와 콘텐츠가 겹치는지 확인 (사이드바 오른쪽 끝이 콘텐츠 왼쪽 시작점을 넘어가면 겹침)
-    console.log('사이드바 오른쪽 끝 x좌표:', sidebarRect.right)
-    console.log('콘텐츠 왼쪽 시작 x좌표:', contentRect.left)
-    console.log('겹침 여부:', sidebarRect.right >= contentRect.left)
-    const isOverlapping = sidebarRect.right >= contentRect.left
-
-    // 무한 루프 방지: 현재 상태와 다를 때만 변경
-    // 겹치면서 현재 펼쳐져 있으면 접기
-    if (isOverlapping && !sidebarCollapsed) {
-      sidebarCollapsed = true
-    }
-    // 콘텐츠의 왼쪽 x좌표가 240보다 크고 현재 접혀져 있으면 펼치기
-    else if (contentRect.left > 240 && sidebarCollapsed) {
-      sidebarCollapsed = false
-    }
+    }, 100) // 100ms 디바운스
   }
 
   function debouncedCheckSidebarCollision() {
