@@ -4,6 +4,7 @@
   import { loadPost } from "../lib/markdown.js";
   import { push } from 'svelte-spa-router';
   import { postsData } from '../lib/posts.js';
+  import mermaid from 'mermaid';
 
   export let params = {};
   let post = null;
@@ -47,6 +48,7 @@
     if (!loading && markdownContent) {
       setTimeout(() => {
         setupCodeBlockButtons();
+        setupMermaidDiagrams();
       }, 100);
     }
   });
@@ -113,6 +115,33 @@
             });
           }
         });
+      }
+    });
+  }
+
+  function setupMermaidDiagrams() {
+    const mermaidElements = document.querySelectorAll('.mermaid-diagram');
+    
+    mermaidElements.forEach(async (element) => {
+      if (element.hasAttribute('data-rendered')) return;
+      
+      const code = decodeURIComponent(element.getAttribute('data-mermaid-code'));
+      const id = element.id;
+      
+      try {
+        mermaid.initialize({
+          startOnLoad: false,
+          theme: 'default',
+          securityLevel: 'loose'
+        });
+        
+        const { svg } = await mermaid.render(id + '-svg', code);
+        element.innerHTML = svg;
+        element.setAttribute('data-rendered', 'true');
+      } catch (error) {
+        console.error('Mermaid rendering error:', error);
+        element.innerHTML = '<div class="mermaid-error">Mermaid diagram rendering failed</div>';
+        element.setAttribute('data-rendered', 'true');
       }
     });
   }
@@ -332,7 +361,7 @@
     position: relative;
     background: var(--devsite-code-background);
     color: var(--devsite-code-color);
-    padding: var(--devsite-code-padding-block) var(--devsite-code-padding-inline);
+    padding: 0;
     font-family: 'Roboto Mono', 'Courier New', monospace;
     font-size: 14px;
     line-height: 1.5;

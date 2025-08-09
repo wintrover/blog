@@ -1,4 +1,5 @@
 import { marked } from 'marked'
+import mermaid from 'mermaid'
 
 // 마크다운 파일 경로 매핑
 const postFiles = {
@@ -85,8 +86,22 @@ function parseFrontMatter(str) {
 // 마크다운 렌더러 설정
 const renderer = new marked.Renderer()
 
+// Mermaid 초기화
+mermaid.initialize({
+  startOnLoad: false,
+  theme: 'default',
+  securityLevel: 'loose'
+})
+
 // 코드 블록 렌더러 커스터마이징
 renderer.code = function(code, language) {
+  // Mermaid 다이어그램 처리
+  if (language === 'mermaid') {
+    const id = `mermaid-${Math.random().toString(36).substr(2, 9)}`
+    return `<div class="mermaid-diagram" data-mermaid-code="${encodeURIComponent(code)}" id="${id}">${code}</div>`
+  }
+  
+  // 일반 코드 블록 처리
   const escapedCode = code
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
