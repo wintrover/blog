@@ -29,11 +29,11 @@
     
     categories = [
       { name: 'All Posts', slug: 'all', count: $posts.length },
-      ...Object.entries(tagCount).map(([name, count]) => ({
+      ...Object.entries(categoryCount).map(([name, count]) => ({
         name,
         slug: slugify(name),
         count,
-        isTag: true
+        isCategory: true
       }))
     ]
   }
