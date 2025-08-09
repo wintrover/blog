@@ -24,12 +24,11 @@
         <a href="{{ site.baseurl }}/" class="site-avatar"><img src="{{ site.avatar | prepend: site.baseurl }}" /></a>
 
         <div class="site-info">
-          <h1 class="site-name"><a href="{{ site.baseurl }}/">{{ site.name }}</a></h1>
+          <h1 class="site-name">{{ site.name }}</h1>
           <p class="site-description">{{ site.description }}</p>
         </div>
 
         <nav>
-          <a href="{{ site.baseurl }}/">Blog</a>
           <a href="{{ site.baseurl }}/about">About</a>
           <!-- 사이드바 토글 버튼 -->
           <button class="sidebar-toggle" aria-label="Toggle sidebar">
@@ -49,6 +48,7 @@
     <aside class="sidebar">
       <div class="sidebar-content">
         <ul class="category-list">
+          <li><a href="#" data-category="all" class="category-link active">All</a></li>
           <li><a href="#" data-category="company-work" class="category-link">Company Work</a></li>
           <li><a href="#" data-category="project" class="category-link">Project</a></li>
         </ul>
