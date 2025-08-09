@@ -96,9 +96,8 @@ renderer.code = function(code, language) {
   
   const buttonsContainer = `
     <div class="devsite-code-buttons-container" role="group" aria-label="Action buttons">
-      <button type="button" class="material-icons devsite-icon-code-dark devsite-toggle-dark" aria-label="Dark code theme" data-title="Dark code theme"></button>
-      <button type="button" class="material-icons devsite-icon-code-light devsite-toggle-light" aria-label="Light code theme" data-title="Light code theme"></button>
-      <button type="button" class="material-icons devsite-icon-copy" aria-label="Copy code sample" data-title="Copy code sample"></button>
+      <button type="button" class="devsite-icon-theme-toggle" aria-label="Toggle theme" data-title="Toggle theme"></button>
+      <button type="button" class="devsite-icon-copy" aria-label="Copy code sample" data-title="Copy code sample"></button>
     </div>
   `
   

@@ -13,8 +13,48 @@
     if (post && post.slug) {
       markdownContent = await loadPost(post.slug);
       loading = false;
+      
+      // 버튼 이벤트 리스너 추가
+      setTimeout(() => {
+        setupCodeBlockButtons();
+      }, 100);
     }
   });
+
+  function setupCodeBlockButtons() {
+    const codeBlocks = document.querySelectorAll('.markdown-content pre');
+    
+    codeBlocks.forEach(pre => {
+      const themeToggle = pre.querySelector('.devsite-icon-theme-toggle');
+      const copyButton = pre.querySelector('.devsite-icon-copy');
+      
+      if (themeToggle) {
+        themeToggle.addEventListener('click', () => {
+          pre.classList.toggle('dark-theme');
+          themeToggle.classList.toggle('light-mode');
+        });
+      }
+      
+      if (copyButton) {
+        copyButton.addEventListener('click', () => {
+          const code = pre.querySelector('code');
+          if (code) {
+            const text = code.textContent || code.innerText;
+            navigator.clipboard.writeText(text).then(() => {
+              // 복사 성공 피드백
+              const originalContent = copyButton.innerHTML;
+              copyButton.innerHTML = '✅';
+              setTimeout(() => {
+                copyButton.innerHTML = originalContent;
+              }, 1000);
+            }).catch(err => {
+              console.error('복사 실패:', err);
+            });
+          }
+        });
+      }
+    });
+  }
 
   function goBack() {
     dispatch("backToList");
@@ -242,12 +282,13 @@
   .markdown-content :global(.devsite-code-buttons-container) {
     position: absolute;
     right: var(--devsite-code-buttons-container-right, 0);
-    top: 0;
+    top: 8px;
     z-index: 1;
     margin: 0;
     padding: 0;
     box-sizing: inherit;
-    display: block;
+    display: flex;
+    gap: 4px;
   }
 
   .markdown-content :global(.devsite-code-buttons-container button) {
@@ -269,16 +310,28 @@
     color: #202124;
   }
 
-  .markdown-content :global(.devsite-icon-code-dark)::before {
+  .markdown-content :global(.devsite-icon-theme-toggle)::before {
     content: '🌙';
   }
 
-  .markdown-content :global(.devsite-icon-code-light)::before {
+  .markdown-content :global(.devsite-icon-theme-toggle.light-mode)::before {
     content: '☀️';
   }
 
   .markdown-content :global(.devsite-icon-copy)::before {
     content: '📋';
+  }
+
+  /* 다크 테마 스타일 */
+  .markdown-content :global(pre.dark-theme) {
+    --devsite-code-background: #1e1e1e;
+    --devsite-code-color: #d4d4d4;
+    background: var(--devsite-code-background);
+    color: var(--devsite-code-color);
+  }
+
+  .markdown-content :global(pre.dark-theme code) {
+    color: var(--devsite-code-color);
   }
 
   .markdown-content :global(pre code) {
