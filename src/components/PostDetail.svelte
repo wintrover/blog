@@ -196,55 +196,58 @@
     font-family: 'Roboto Mono', 'Courier New', monospace;
   }
 
-  .markdown-content :global(pre) {
-    --devsite-code-background: #f1f3f4;
-    --devsite-code-color: #37474f;
+  /* Google Developer 사이트 CSS 변수 정의 */
+  .markdown-content {
+    --devsite-code-buttons-container-right: 40px;
     --devsite-code-margin: 16px -40px;
     --devsite-code-padding-block: 24px;
     --devsite-code-padding-inline: 40px;
-    --devsite-code-border-radius: 8px;
     --devsite-code-border: 0;
-    --devsite-code-buttons-container-right: 40px;
-    --devsite-code-font-family: 'Roboto Mono', 'Courier New', monospace;
+    --devsite-code-border-radius: 0;
+    --devsite-code-button-size: 32px;
+    --devsite-code-buttons-toggle-dark-display: inline-block;
+    --devsite-code-buttons-toggle-light-display: none;
     --devsite-code-comments-color: #b80672;
-    
-    background: var(--devsite-code-background);
-    color: var(--devsite-code-color);
+    --devsite-code-keywords-color: #1967d2;
+    --devsite-code-numbers-color: #c5221f;
+    --devsite-code-strings-color: #188038;
+    --devsite-code-types-color: #9334e6;
+    --devsite-code-background: #f1f3f4;
+    --devsite-code-color: #37474f;
+    --devsite-var-color: #d01884;
+    --devsite-primary-font-family: 'Google Sans', 'Noto Sans', 'Noto Sans JP', 'Noto Sans KR', 'Noto Naskh Arabic', 'Noto Sans Thai', 'Noto Sans Hebrew', 'Noto Sans Bengali', sans-serif;
+    --devsite-headline-font-family: 'Google Sans', 'Noto Sans', 'Noto Sans JP', 'Noto Sans KR', 'Noto Naskh Arabic', 'Noto Sans Thai', 'Noto Sans Hebrew', 'Noto Sans Bengali', sans-serif;
+  }
+
+  .markdown-content :global(pre) {
     border: var(--devsite-code-border, 0);
     border-radius: var(--devsite-code-border-radius, 0);
     clear: both;
     direction: ltr !important;
     display: block;
-    margin: var(--devsite-code-margin);
-    min-height: 32px;
+    margin: var(--devsite-code-margin, 16px 0);
+    min-height: var(--devsite-code-button-size);
     overflow: hidden;
     position: relative;
+    background: var(--devsite-code-background);
+    color: var(--devsite-code-color);
     padding: var(--devsite-code-padding-block) var(--devsite-code-padding-inline);
-    font-family: var(--devsite-code-font-family);
+    font-family: 'Roboto Mono', 'Courier New', monospace;
     font-size: 14px;
     line-height: 1.5;
     overflow-x: auto;
-    box-shadow: 0 1px 2px 0 rgba(60,64,67,.3), 0 1px 3px 1px rgba(60,64,67,.15);
-  }
-
-  .markdown-content :global(pre)::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: var(--devsite-code-buttons-container-right);
-    height: 100%;
-    background: linear-gradient(90deg, transparent, var(--devsite-code-background) 20%);
-    pointer-events: none;
+    box-sizing: inherit;
   }
 
   .markdown-content :global(.devsite-code-buttons-container) {
     position: absolute;
-    top: 8px;
-    right: var(--devsite-code-buttons-container-right);
-    display: flex;
-    gap: 4px;
+    right: var(--devsite-code-buttons-container-right, 0);
+    top: 0;
     z-index: 1;
+    margin: 0;
+    padding: 0;
+    box-sizing: inherit;
+    display: block;
   }
 
   .markdown-content :global(.devsite-code-buttons-container button) {
@@ -257,6 +260,8 @@
     font-size: 18px;
     line-height: 1;
     transition: background-color 0.2s, color 0.2s;
+    margin: 0;
+    box-sizing: inherit;
   }
 
   .markdown-content :global(.devsite-code-buttons-container button:hover) {
