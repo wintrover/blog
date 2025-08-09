@@ -13,6 +13,7 @@
   let sidebarCollapsed = false
   let sidebarElement
   let mainContentElement
+  let contentElement
   let intersectionObserver
   let manualToggle = false // 수동 토글 상태
 
@@ -54,7 +55,7 @@
 
     // 요소가 아직 렌더링되지 않았다면 사이드바를 표시
     const sidebarRect = sidebarElement.getBoundingClientRect()
-    const contentRect = mainContentElement.getBoundingClientRect()
+    const contentRect = contentElement.getBoundingClientRect()
     
     if (sidebarRect.width === 0 || contentRect.width === 0) {
       if (sidebarCollapsed) {
@@ -142,7 +143,7 @@
   {/if}
   
   <main id="main-content" bind:this={mainContentElement}>
-    <div id="content">
+    <div id="content" bind:this={contentElement}>
       {#if currentView === 'list'}
         <BlogList posts={filteredPosts} on:selectPost={(e) => showPost(e.detail)} />
       {:else if currentView === 'post' && selectedPost}
