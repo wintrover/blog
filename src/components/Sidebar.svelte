@@ -42,10 +42,10 @@
     // slug 대신 실제 카테고리 이름을 저장
     if (categorySlug === 'all') {
       selectedCategory.set('all')
-      dispatch('showList')
     } else {
       selectedCategory.set(categoryName)
     }
+    dispatch('showList')
   }
 
   function goHome(event) {
