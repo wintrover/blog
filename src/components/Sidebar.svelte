@@ -60,7 +60,7 @@
       <img src={siteConfig.avatar} alt={siteConfig.name} class="avatar" />
     </a>
     <h1 class="site-name">
-      <a href={siteConfig.baseUrl + '/'} on:click={goHome}>{siteConfig.name}</a>
+      {siteConfig.name}
     </h1>
     <p class="site-description">{siteConfig.description}</p>
   </div>
