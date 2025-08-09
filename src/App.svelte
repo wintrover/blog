@@ -14,6 +14,7 @@
   let sidebarElement
   let mainContentElement
   let intersectionObserver
+  let manualToggle = false // 수동 토글 상태
   
   $: {
     if ($selectedCategory === 'all') {
@@ -37,8 +38,17 @@
   function checkSidebarCollision() {
     if (!sidebarElement || !mainContentElement) return
     
+    // 수동 토글 상태일 때는 자동 감지 비활성화
+    if (manualToggle) return
+    
     const sidebarRect = sidebarElement.getBoundingClientRect()
     const contentRect = mainContentElement.getBoundingClientRect()
+    
+    // 요소가 아직 렌더링되지 않은 경우 (width나 height가 0)
+    if (sidebarRect.width === 0 || contentRect.width === 0) {
+      sidebarCollapsed = false
+      return
+    }
     
     // 사이드바와 콘텐츠가 실제로 겹치는지 확인
     const isOverlapping = sidebarRect.right > contentRect.left && 
@@ -51,14 +61,28 @@
   }
 
   function handleResize() {
+    // 리사이즈 시 수동 토글 상태 리셋
+    manualToggle = false
     checkSidebarCollision()
   }
 
+  function toggleSidebar() {
+    manualToggle = true
+    sidebarCollapsed = !sidebarCollapsed
+  }
+
   onMount(() => {
-    // 초기 체크를 위한 지연
-    setTimeout(() => {
+    // 초기 체크를 여러 번 시도 (배포 환경에서 DOM 로딩 지연 대응)
+    const checkWithRetry = () => {
       checkSidebarCollision()
-    }, 100)
+      // 요소가 아직 준비되지 않았으면 다시 시도
+      if (!sidebarElement || !mainContentElement || 
+          sidebarElement.getBoundingClientRect().width === 0) {
+        setTimeout(checkWithRetry, 200)
+      }
+    }
+    
+    setTimeout(checkWithRetry, 100)
     
     // ResizeObserver로 요소 크기 변화 감지
     const resizeObserver = new ResizeObserver(() => {
@@ -83,7 +107,7 @@
   </aside>
   
   {#if sidebarCollapsed}
-    <button id="sidebar-toggle" on:click={() => sidebarCollapsed = !sidebarCollapsed}>
+    <button id="sidebar-toggle" on:click={toggleSidebar}>
       ☰
     </button>
   {/if}
