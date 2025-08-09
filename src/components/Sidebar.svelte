@@ -3,9 +3,7 @@
   import { posts } from '../stores/posts.js'
   import { slugify } from '../lib/utils.js'
   import { siteConfig } from '../lib/config.js'
-  import { createEventDispatcher } from 'svelte'
-  
-  const dispatch = createEventDispatcher()
+  import { push } from 'svelte-spa-router'
   
   let categories = []
   
@@ -42,16 +40,17 @@
     // slug 대신 실제 카테고리 이름을 저장
     if (categorySlug === 'all') {
       selectedCategory.set('all')
+      push('/')
     } else {
       selectedCategory.set(categoryName)
+      push(`/category/${categorySlug}`)
     }
-    dispatch('showList')
   }
 
   function goHome(event) {
     event.preventDefault()
     selectedCategory.set('all')
-    dispatch('showList')
+    push('/')
   }
 </script>
 

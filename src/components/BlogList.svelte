@@ -1,21 +1,60 @@
 <script>
-  import { createEventDispatcher } from 'svelte'
   import { formatDate, truncateText, slugify } from '../lib/utils.js'
   import { siteConfig } from '../lib/config.js'
+  import { push } from 'svelte-spa-router'
+  import { selectedCategory } from '../stores/category.js'
+  import { onMount } from 'svelte'
   
-  export let posts = []
-  
-  const dispatch = createEventDispatcher()
+  export let params = {}
+  let posts = []
+  let filteredPosts = []
   
   function selectPost(post) {
-    dispatch('selectPost', post)
+    push(`/post/${post.slug}`)
+  }
+  
+  async function loadPosts() {
+    try {
+      const modules = import.meta.glob('../posts/*.md')
+      const postPromises = Object.entries(modules).map(async ([path, resolver]) => {
+        const module = await resolver()
+        const slug = path.split('/').pop().replace('.md', '')
+        return {
+          ...module.metadata,
+          slug,
+          content: module.default
+        }
+      })
+      
+      posts = await Promise.all(postPromises)
+      posts.sort((a, b) => new Date(b.date) - new Date(a.date))
+      
+      // URL 파라미터에 따라 필터링
+      if (params.category) {
+        filteredPosts = posts.filter(post => slugify(post.category) === params.category)
+        selectedCategory.set(posts.find(p => slugify(p.category) === params.category)?.category || 'all')
+      } else {
+        filteredPosts = posts
+        selectedCategory.set('all')
+      }
+    } catch (error) {
+      console.error('포스트 로딩 실패:', error)
+    }
+  }
+  
+  onMount(() => {
+    loadPosts()
+  })
+  
+  $: if (params) {
+    loadPosts()
   }
 </script>
 
 <div class="blog-page">
-  {#if posts.length > 0}
+  {#if filteredPosts.length > 0}
     <div class="posts">
-      {#each posts as post}
+      {#each filteredPosts as post}
         <article class="post">
           <div class="post-meta">
             <span class="date">{formatDate(post.date)}</span>

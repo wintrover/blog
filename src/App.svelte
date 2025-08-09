@@ -4,20 +4,23 @@
   import PostDetail from './components/PostDetail.svelte'
   import Footer from './components/Footer.svelte'
   import { posts } from './stores/posts.js'
-  import { selectedCategory } from './stores/category.js'
   import { onMount } from 'svelte'
+  import Router from 'svelte-spa-router'
   
-  let filteredPosts = []
-  let currentView = 'list' // 'list' or 'post'
-  let selectedPost = null
   let sidebarCollapsed = false
   let sidebarElement
   let mainContentElement
   let contentElement
-  let intersectionObserver
   let manualToggle = false // 수동 토글 상태
   let manualToggleTimeout
   let resizeTimeout // 리사이즈 디바운스용
+
+  // 라우트 정의
+  const routes = {
+    '/': () => import('./components/BlogList.svelte'),
+    '/category/:category': () => import('./components/BlogList.svelte'),
+    '/post/:slug': () => import('./components/PostDetail.svelte')
+  }
 
   // 사이드바 상태 변화 감지
   $: {
@@ -32,31 +35,7 @@
     }
   }
   
-  $: {
-    if ($selectedCategory === 'all') {
-      filteredPosts = $posts
-    } else if ($selectedCategory.includes(' - ')) {
-      // 태그 기반 필터링 (예: "Company Work - facial-recognition")
-      const [category, tag] = $selectedCategory.split(' - ')
-      filteredPosts = $posts.filter(post => 
-        post.category === category && post.tags.includes(tag)
-      )
-    } else {
-      // 실제 카테고리 이름으로 필터링
-      filteredPosts = $posts.filter(post => post.category === $selectedCategory)
-    }
-  }
-  
-  function showPost(post) {
-    selectedPost = post
-    currentView = 'post'
-  }
-  
-  function showList() {
-    currentView = 'list'
-    selectedPost = null
-    selectedCategory.set('all')
-  }
+
 
   let checkTimeout = null
 
@@ -175,7 +154,7 @@
 
 <div id="app-container" class:sidebar-collapsed={sidebarCollapsed}>
   <aside id="sidebar" class:collapsed={sidebarCollapsed} bind:this={sidebarElement}>
-    <Sidebar on:showList={showList} />
+    <Sidebar />
   </aside>
   
   {#if sidebarCollapsed}
@@ -186,11 +165,7 @@
   
   <main id="main-content" bind:this={mainContentElement}>
     <div id="content" bind:this={contentElement}>
-      {#if currentView === 'list'}
-        <BlogList posts={filteredPosts} on:selectPost={(e) => showPost(e.detail)} />
-      {:else if currentView === 'post' && selectedPost}
-        <PostDetail post={selectedPost} on:backToList={showList} />
-      {/if}
+      <Router {routes} />
     </div>
     <Footer />
   </main>

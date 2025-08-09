@@ -1,25 +1,48 @@
 <script>
-  import { createEventDispatcher, onMount } from "svelte";
+  import { onMount } from "svelte";
   import { formatDate, slugify } from "../lib/utils.js";
   import { loadPost } from "../lib/markdown.js";
+  import { push } from 'svelte-spa-router';
 
-  export let post;
-
-  const dispatch = createEventDispatcher();
+  export let params = {};
+  let post = null;
   let markdownContent = null;
   let loading = true;
 
-  onMount(async () => {
-    if (post && post.slug) {
-      markdownContent = await loadPost(post.slug);
-      loading = false;
-      
-      // 버튼 이벤트 리스너 추가
-      setTimeout(() => {
-        setupCodeBlockButtons();
-      }, 100);
+  async function loadPostData() {
+    if (params.slug) {
+      try {
+        // 포스트 메타데이터 로드
+        const modules = import.meta.glob('../posts/*.md');
+        const postModule = await modules[`../posts/${params.slug}.md`]();
+        post = {
+          ...postModule.metadata,
+          slug: params.slug,
+          content: postModule.default
+        };
+        
+        // 마크다운 콘텐츠 로드
+        markdownContent = await loadPost(params.slug);
+        loading = false;
+        
+        // 버튼 이벤트 리스너 추가
+        setTimeout(() => {
+          setupCodeBlockButtons();
+        }, 100);
+      } catch (error) {
+        console.error('포스트 로딩 실패:', error);
+        loading = false;
+      }
     }
+  }
+
+  onMount(() => {
+    loadPostData();
   });
+  
+  $: if (params.slug) {
+    loadPostData();
+  }
 
   function showCopyToast(codeBlock) {
     // 기존 토스트 제거
@@ -86,7 +109,7 @@
   }
 
   function goBack() {
-    dispatch("backToList");
+    push('/');
   }
 </script>
 
