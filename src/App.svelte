@@ -49,6 +49,7 @@
   function showList() {
     currentView = 'list'
     selectedPost = null
+    selectedCategory.set('all')
   }
 
   let checkTimeout = null
