@@ -311,15 +311,37 @@
   }
 
   .markdown-content :global(.devsite-icon-theme-toggle)::before {
-    content: '🌙';
-  }
-
-  .markdown-content :global(.devsite-icon-theme-toggle.light-mode)::before {
-    content: '☀️';
+    content: '\e3a6'; /* material-symbols:brightness-6 */
+    font-family: 'Material Symbols Outlined';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 18px;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    -webkit-font-feature-settings: 'liga';
+    -webkit-font-smoothing: antialiased;
   }
 
   .markdown-content :global(.devsite-icon-copy)::before {
-    content: '📋';
+    content: '\e14d'; /* material-symbols:content-copy */
+    font-family: 'Material Symbols Outlined';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 18px;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    -webkit-font-feature-settings: 'liga';
+    -webkit-font-smoothing: antialiased;
   }
 
   /* 다크 테마 스타일 */
