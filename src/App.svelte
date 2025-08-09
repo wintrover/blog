@@ -66,6 +66,11 @@
     // 디바운스: 이전 타이머 취소하고 새로 설정
     clearTimeout(resizeTimeout)
     resizeTimeout = setTimeout(() => {
+      // 요소가 null이면 리턴
+      if (!sidebarElement || !contentElement) {
+        return
+      }
+      
       // 요소가 아직 렌더링되지 않았다면 사이드바를 표시
       const sidebarRect = sidebarElement.getBoundingClientRect()
       const contentRect = contentElement.getBoundingClientRect()
