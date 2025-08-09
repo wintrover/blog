@@ -52,12 +52,33 @@
       return
     }
 
-    // 화면 너비 기반으로 사이드바 표시/숨김 결정
-    const windowWidth = window.innerWidth
-    const shouldCollapse = windowWidth < 768 // 768px 미만에서 사이드바 숨김
+    // 요소가 아직 렌더링되지 않았다면 사이드바를 표시
+    const sidebarRect = sidebarElement.getBoundingClientRect()
+    const contentRect = mainContentElement.getBoundingClientRect()
     
-    if (sidebarCollapsed !== shouldCollapse) {
-      sidebarCollapsed = shouldCollapse
+    if (sidebarRect.width === 0 || contentRect.width === 0) {
+      if (sidebarCollapsed) {
+        sidebarCollapsed = false
+      }
+      return
+    }
+
+    // 사이드바와 콘텐츠가 겹치는지 확인
+    const isOverlapping = (
+      sidebarRect.right > contentRect.left &&
+      sidebarRect.left < contentRect.right &&
+      sidebarRect.bottom > contentRect.top &&
+      sidebarRect.top < contentRect.bottom
+    )
+
+    // 무한 루프 방지: 현재 상태와 다를 때만 변경
+    // 겹치면서 현재 펼쳐져 있으면 접기
+    if (isOverlapping && !sidebarCollapsed) {
+      sidebarCollapsed = true
+    }
+    // 겹치지 않으면서 현재 접혀져 있고, 화면이 충분히 크면 펼치기
+    else if (!isOverlapping && sidebarCollapsed && window.innerWidth >= 768) {
+      sidebarCollapsed = false
     }
   }
 
