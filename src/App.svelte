@@ -17,9 +17,9 @@
 
   // 라우트 정의
   const routes = {
-    '/': () => import('./components/BlogList.svelte'),
-    '/category/:category': () => import('./components/BlogList.svelte'),
-    '/post/:slug': () => import('./components/PostDetail.svelte')
+    '/': BlogList,
+    '/category/:category': BlogList,
+    '/post/:slug': PostDetail
   }
 
   // 사이드바 상태 변화 감지
@@ -27,10 +27,8 @@
     if (typeof document !== 'undefined') {
       if (sidebarCollapsed) {
         document.body.classList.add('sidebar-collapsed')
-        console.log('사이드바 접힘: sidebar-collapsed 클래스 추가됨')
       } else {
         document.body.classList.remove('sidebar-collapsed')
-        console.log('사이드바 펼침: sidebar-collapsed 클래스 제거됨')
       }
     }
   }
@@ -85,9 +83,6 @@
       }
 
       // 사이드바와 콘텐츠가 겹치는지 확인 (사이드바 오른쪽 끝이 콘텐츠 왼쪽 시작점을 넘어가면 겹침)
-       console.log('사이드바 오른쪽 끝 x좌표:', Math.round(sidebarRect.right))
-       console.log('콘텐츠 왼쪽 시작 x좌표:', Math.round(contentRect.left))
-       console.log('겹침 여부:', sidebarRect.right >= contentRect.left)
       const isOverlapping = sidebarRect.right >= contentRect.left
 
       // 무한 루프 방지: 현재 상태와 다를 때만 변경
