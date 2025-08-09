@@ -6,5 +6,6 @@ export default defineConfig({
   base: '/blog/',
   build: {
     outDir: 'dist'
-  }
+  },
+  assetsInclude: ['**/*.md']
 })
