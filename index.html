@@ -5,9 +5,9 @@ layout: default
 <!-- 왼쪽 고정 사이드바 -->
 <aside class="sidebar">
   <div class="sidebar-content">
-    <h3>카테고리</h3>
+    <h3>Categories</h3>
     <ul class="category-list">
-      <li><a href="#" data-category="all" class="category-link">전체</a></li>
+      <li><a href="#" data-category="all" class="category-link">All</a></li>
       <li><a href="#" data-category="ai" class="category-link">AI</a></li>
       <li><a href="#" data-category="backend" class="category-link">Backend</a></li>
       <li><a href="#" data-category="frontend" class="category-link">Frontend</a></li>
@@ -45,12 +45,12 @@ layout: default
     return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
   }
 
-  // 카테고리 이름 한글화
+  // 카테고리 이름 영어화
   function getCategoryName(category) {
     var categoryNames = {
       'cvfactory': 'CVFactory',
       'company-work': 'Company Work',
-      'all': '전체'
+      'all': 'All'
     };
     return categoryNames[category] || category;
   }

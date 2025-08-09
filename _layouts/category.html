@@ -7,15 +7,15 @@ layout: default
     <h1>{{ page.category_name }}</h1>
     <div class="category-description">
       {% if page.category_name == "CVFactory" %}
-        개인 프로젝트 관련 포스트
+        Personal project related posts
       {% elsif page.category_name == "Company Work" %}
-        회사 업무 일지 관련 포스트
+        Company work diary related posts
       {% else %}
-        모든 카테고리의 포스트
+        Posts from all categories
       {% endif %}
     </div>
     <div class="category-stats">
-      총 {{ page.posts.size }}개의 포스트
+      Total {{ page.posts.size }} posts
     </div>
   </div>
 
@@ -51,7 +51,7 @@ layout: default
 
   {% if page.posts.size == 0 %}
     <div class="no-posts">
-      <p>이 카테고리에 포스트가 아직 없습니다.</p>
+      <p>No posts in this category yet.</p>
     </div>
   {% endif %}
 </div>
