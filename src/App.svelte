@@ -48,7 +48,6 @@
 
   function checkSidebarCollision() {
     if (!sidebarElement || !mainContentElement) {
-      console.warn('[SIDEBAR DEBUG] Sidebar or main content element not found')
       return
     }
 
@@ -74,26 +73,14 @@
       sidebarRect.bottom > contentRect.top
     )
 
-    const previousState = sidebarCollapsed
     sidebarCollapsed = isOverlapping
-
-    // 상태가 변경된 경우에만 로그 출력
-    if (previousState !== sidebarCollapsed) {
-      console.log('[SIDEBAR DEBUG] State changed:', {
-        isOverlapping,
-        previousState,
-        newState: sidebarCollapsed,
-        contentLeftDistance: contentRect.left,
-        sidebarWidth: sidebarRect.width
-      })
-    }
   }
 
   function debouncedCheckSidebarCollision() {
     if (checkTimeout) {
       clearTimeout(checkTimeout)
     }
-    checkTimeout = setTimeout(checkSidebarCollision, 16) // ~60fps
+    checkTimeout = setTimeout(checkSidebarCollision, 300)
   }
 
   function handleResize() {
