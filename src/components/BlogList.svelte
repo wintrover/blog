@@ -1,8 +1,15 @@
 <script>
+  import { createEventDispatcher } from 'svelte'
   import { formatDate, truncateText, slugify } from '../lib/utils.js'
   import { siteConfig } from '../lib/config.js'
   
   export let posts = []
+  
+  const dispatch = createEventDispatcher()
+  
+  function selectPost(post) {
+    dispatch('selectPost', post)
+  }
 </script>
 
 <div class="blog-page">
@@ -19,7 +26,9 @@
             {/if}
           </div>
           <h1>
-            <a href="{siteConfig.baseUrl}/posts/{post.slug}/">{post.title}</a>
+            <button class="post-link" on:click={() => selectPost(post)}>
+              {post.title}
+            </button>
           </h1>
           {#if post.excerpt}
             <div class="post-excerpt">
@@ -87,13 +96,20 @@
     line-height: 1.3;
   }
   
-  .post h1 a {
+  .post-link {
+    background: none;
+    border: none;
     color: #333;
-    text-decoration: none;
+    cursor: pointer;
+    font-size: inherit;
+    font-weight: inherit;
+    text-align: left;
+    padding: 0;
     transition: color 0.2s;
+    width: 100%;
   }
   
-  .post h1 a:hover {
+  .post-link:hover {
     color: #0366d6;
   }
   

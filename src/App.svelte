@@ -1,11 +1,14 @@
 <script>
   import Sidebar from './components/Sidebar.svelte'
   import BlogList from './components/BlogList.svelte'
+  import PostDetail from './components/PostDetail.svelte'
   import Footer from './components/Footer.svelte'
   import { posts } from './stores/posts.js'
   import { selectedCategory } from './stores/category.js'
   
   let filteredPosts = []
+  let currentView = 'list' // 'list' or 'post'
+  let selectedPost = null
   
   $: {
     if ($selectedCategory === 'all') {
@@ -13,6 +16,16 @@
     } else {
       filteredPosts = $posts.filter(post => post.category === $selectedCategory)
     }
+  }
+  
+  function showPost(post) {
+    selectedPost = post
+    currentView = 'post'
+  }
+  
+  function showList() {
+    currentView = 'list'
+    selectedPost = null
   }
 </script>
 
@@ -23,7 +36,11 @@
   
   <main id="main-content">
     <div id="content">
-      <BlogList posts={filteredPosts} />
+      {#if currentView === 'list'}
+        <BlogList posts={filteredPosts} on:selectPost={(e) => showPost(e.detail)} />
+      {:else if currentView === 'post' && selectedPost}
+        <PostDetail post={selectedPost} on:backToList={showList} />
+      {/if}
     </div>
     <Footer />
   </main>
