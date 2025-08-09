@@ -22,18 +22,11 @@
   // 사이드바 상태 변화 감지
   $: {
     if (typeof document !== 'undefined') {
-      const mainContent = document.getElementById('main-content')
       if (sidebarCollapsed) {
         document.body.classList.add('sidebar-collapsed')
-        if (mainContent) {
-          mainContent.style.marginLeft = '0px'
-        }
         console.log('사이드바 접힘: sidebar-collapsed 클래스 추가됨')
       } else {
         document.body.classList.remove('sidebar-collapsed')
-        if (mainContent) {
-          mainContent.style.marginLeft = '240px'
-        }
         console.log('사이드바 펼침: sidebar-collapsed 클래스 제거됨')
       }
     }
@@ -266,6 +259,10 @@
     max-width: 800px;
     margin: 40px auto;
     width: 100%;
+  }
+  
+  .sidebar-collapsed #main-content {
+    margin-left: 0;
   }
   
   @media (max-width: 480px) {
