@@ -367,6 +367,9 @@
     line-height: 1.5;
     overflow-x: auto;
     box-sizing: inherit;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    word-break: break-all;
   }
 
   .markdown-content :global(.devsite-code-buttons-container) {
