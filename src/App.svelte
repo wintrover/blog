@@ -40,16 +40,14 @@
     const sidebarRect = sidebarElement.getBoundingClientRect()
     const contentRect = mainContentElement.getBoundingClientRect()
     
-    // 사이드바와 콘텐츠가 겹치는지 확인
+    // 사이드바와 콘텐츠가 실제로 겹치는지 확인
     const isOverlapping = sidebarRect.right > contentRect.left && 
-                         sidebarRect.left < contentRect.right
+                         sidebarRect.left < contentRect.right &&
+                         sidebarRect.bottom > contentRect.top &&
+                         sidebarRect.top < contentRect.bottom
     
-    // 화면이 너무 좁아서 겹치는 경우 사이드바를 접음
-    if (isOverlapping && window.innerWidth < 1100) {
-      sidebarCollapsed = true
-    } else if (window.innerWidth >= 1100) {
-      sidebarCollapsed = false
-    }
+    // 겹치면 사이드바를 접고, 겹치지 않으면 펼침
+    sidebarCollapsed = isOverlapping
   }
 
   function handleResize() {
