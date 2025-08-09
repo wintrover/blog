@@ -92,7 +92,7 @@
       
       // 화면이 충분히 크고 사이드바가 접혀있으면 펼치기
       if (window.innerWidth >= 1200 && sidebarCollapsed) {
-        if (contentRect.left > 240) {
+        if (contentRect.left > 120) {
           sidebarCollapsed = false
         }
         return
@@ -109,8 +109,8 @@
       if (isOverlapping && !sidebarCollapsed) {
         sidebarCollapsed = true
       }
-      // 콘텐츠의 왼쪽 x좌표가 240보다 크고 현재 접혀져 있으면 펼치기
-      else if (contentRect.left > 240 && sidebarCollapsed) {
+      // 콘텐츠의 왼쪽 x좌표가 120보다 크고 현재 접혀져 있으면 펼치기
+      else if (contentRect.left > 120 && sidebarCollapsed) {
         sidebarCollapsed = false
       }
     }, 50) // 50ms 디바운스
