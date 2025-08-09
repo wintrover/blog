@@ -304,7 +304,7 @@
 
         // 패딩과 여유 공간 추가 (좌우 패딩 2rem + 여유 공간 1rem)
         const finalWidth = maxWidth + 48; // 3rem = 48px
-        
+
         // 최소/최대 너비 제한
         const minWidth = 120; // 최소 120px
         const maxWidthLimit = 300; // 최대 300px
@@ -312,7 +312,7 @@
 
         // CSS 변수로 너비 설정
         document.documentElement.style.setProperty('--sidebar-width', adjustedWidth + 'px');
-        
+
         console.log('사이드바 너비 조정:', adjustedWidth + 'px', '(최대 텍스트 너비:', maxWidth + 'px)');
       }
 
@@ -373,7 +373,7 @@
         let resizeTimeout;
         window.addEventListener('resize', function () {
           clearTimeout(resizeTimeout);
-          resizeTimeout = setTimeout(function() {
+          resizeTimeout = setTimeout(function () {
             adjustSidebarWidth();
             checkSidebarOverflow();
           }, 50);
@@ -406,8 +406,13 @@
         });
       }
 
-      // 사이드바 너비 조정
+      // 사이드바 너비 조정 (즉시 실행)
       adjustSidebarWidth();
+
+      // 로딩 완료 후 transition 활성화
+      setTimeout(function() {
+        document.body.classList.add('sidebar-loaded');
+      }, 100);
 
       // 초기 체크
       checkSidebarOverflow();

@@ -745,7 +745,7 @@ div[class^="language-"] pre, div[class*=" language-"] pre {
 
 // 왼쪽 고정 사이드바
 :root {
-  --sidebar-width: 16rem; /* 기본값 */
+  --sidebar-width: 10rem; /* Company Work 기준으로 계산된 초기값 */
 }
 
 .sidebar {
@@ -757,8 +757,13 @@ div[class^="language-"] pre, div[class*=" language-"] pre {
   background-color: #f4f4f6;
   border-right: 1px solid #e0e0e0;
   z-index: 40;
-  transition: left 150ms cubic-bezier(0.4, 0, 0.2, 1), width 150ms ease;
+  transition: left 150ms cubic-bezier(0.4, 0, 0.2, 1);
   overflow-y: auto;
+}
+
+/* 페이지 로드 완료 후에만 width transition 적용 */
+.sidebar-loaded .sidebar {
+  transition: left 150ms cubic-bezier(0.4, 0, 0.2, 1), width 150ms ease;
 }
 
 .sidebar-content {
