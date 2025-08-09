@@ -279,10 +279,10 @@
 
         const sidebarRect = sidebar.getBoundingClientRect();
         const sidebarRight = sidebarRect.right;
-        
+
         // 현재 사이드바가 활성화되어 있는지 확인
         const isActive = sidebar.classList.contains('active');
-        
+
         let shouldCollapse = false;
         let minDistance = Infinity;
 
@@ -291,11 +291,11 @@
           const elementRect = element.getBoundingClientRect();
           const elementLeft = elementRect.left;
           const distance = elementLeft - sidebarRight;
-          
+
           if (distance < minDistance) {
             minDistance = distance;
           }
-          
+
           // 사이드바가 콘텐츠와 겹치거나 너무 가까우면 접어야 함
           if (distance < 10) {
             shouldCollapse = true;
@@ -330,10 +330,10 @@
         });
 
         // DOM 변경 감지 (동적 콘텐츠 로딩 대응)
-        const observer = new MutationObserver(function() {
+        const observer = new MutationObserver(function () {
           setTimeout(checkSidebarOverflow, 100);
         });
-        
+
         observer.observe(document.body, {
           childList: true,
           subtree: true,
