@@ -32,15 +32,20 @@
       selectedCategory.set(categoryName)
     }
   }
+
+  function goHome(event) {
+    event.preventDefault()
+    selectedCategory.set('all')
+  }
 </script>
 
 <div class="sidebar-header">
   <div class="profile-section">
-    <a href={siteConfig.baseUrl + '/'} class="avatar-link">
+    <a href={siteConfig.baseUrl + '/'} class="avatar-link" on:click={goHome}>
       <img src={siteConfig.avatar} alt={siteConfig.name} class="avatar" />
     </a>
     <h1 class="site-name">
-      <a href={siteConfig.baseUrl + '/'}>{siteConfig.name}</a>
+      <a href={siteConfig.baseUrl + '/'} on:click={goHome}>{siteConfig.name}</a>
     </h1>
     <p class="site-description">{siteConfig.description}</p>
   </div>
