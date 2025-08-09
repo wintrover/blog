@@ -216,7 +216,7 @@
     transition: margin-left 0.3s ease;
   }
   
-  .sidebar-collapsed #main-content {
+  #sidebar.collapsed + #main-content {
     margin-left: 0;
   }
   
