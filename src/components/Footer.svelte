@@ -60,7 +60,7 @@
   }
   
   .container {
-    padding: 30px 0;
+    margin: 30px 0;
     text-align: center;
   }
   
@@ -68,7 +68,6 @@
     display: flex;
     justify-content: center;
     gap: 20px;
-    margin-bottom: 20px;
   }
   
   .footer-links a {

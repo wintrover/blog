@@ -44,7 +44,7 @@
   }
   
   #sidebar {
-    width: 320px;
+    width: 240px;
     background: #f8f9fa;
     border-right: 1px solid #e1e4e8;
     position: fixed;
@@ -55,7 +55,7 @@
   
   #main-content {
     flex: 1;
-    margin-left: 320px;
+    margin-left: 240px;
     display: flex;
     flex-direction: column;
     min-height: 100vh;
@@ -71,11 +71,11 @@
   
   @media (max-width: 1024px) {
     #sidebar {
-      width: 280px;
+      width: 210px;
     }
     
     #main-content {
-      margin-left: 280px;
+      margin-left: 210px;
     }
   }
   
