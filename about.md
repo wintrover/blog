@@ -30,3 +30,5 @@ Python · PyTorch · TensorFlow · LangChain · Playwright · Splash · Scrapy
 ### Contact & Collaboration
 
 If you'd like to discuss AI services, LLM applications, or collaborate on related projects, feel free to reach out via email.
+
+For more detailed information about my background and experience, please check out my resume at [wintrover.github.io](https://wintrover.github.io).
