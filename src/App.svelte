@@ -22,8 +22,10 @@
     if (typeof document !== 'undefined') {
       if (sidebarCollapsed) {
         document.body.classList.add('sidebar-collapsed')
+        console.log('사이드바 접힘: sidebar-collapsed 클래스 추가됨')
       } else {
         document.body.classList.remove('sidebar-collapsed')
+        console.log('사이드바 펼침: sidebar-collapsed 클래스 제거됨')
       }
     }
   }
@@ -224,7 +226,7 @@
   }
   
   .sidebar-collapsed #main-content {
-    margin-left: 0;
+    margin-left: 0 !important;
   }
   
   #content {
