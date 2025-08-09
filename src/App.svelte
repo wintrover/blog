@@ -66,6 +66,11 @@
     // 디바운스: 이전 타이머 취소하고 새로 설정
     clearTimeout(resizeTimeout)
     resizeTimeout = setTimeout(() => {
+      // 사이드바가 접혀있으면 겹침 감지를 하지 않음
+      if (sidebarCollapsed) {
+        return
+      }
+
       // 요소가 아직 렌더링되지 않았다면 사이드바를 표시
       const sidebarRect = sidebarElement.getBoundingClientRect()
       const contentRect = contentElement.getBoundingClientRect()
@@ -94,9 +99,9 @@
       }
 
       // 사이드바와 콘텐츠가 겹치는지 확인 (사이드바 오른쪽 끝이 콘텐츠 왼쪽 시작점을 넘어가면 겹침)
-      console.log('사이드바 오른쪽 끝 x좌표:', sidebarRect.right)
-      console.log('콘텐츠 왼쪽 시작 x좌표:', contentRect.left)
-      console.log('겹침 여부:', sidebarRect.right >= contentRect.left)
+       console.log('사이드바 오른쪽 끝 x좌표:', Math.round(sidebarRect.right))
+       console.log('콘텐츠 왼쪽 시작 x좌표:', Math.round(contentRect.left))
+       console.log('겹침 여부:', sidebarRect.right >= contentRect.left)
       const isOverlapping = sidebarRect.right >= contentRect.left
 
       // 무한 루프 방지: 현재 상태와 다를 때만 변경
