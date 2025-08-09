@@ -75,10 +75,6 @@
     if (isOverlapping && !sidebarCollapsed) {
       sidebarCollapsed = true
     }
-    // 겹치지 않으면서 현재 접혀져 있고, 화면이 충분히 크면 펼치기
-    else if (!isOverlapping && sidebarCollapsed && window.innerWidth >= 768) {
-      sidebarCollapsed = false
-    }
   }
 
   function debouncedCheckSidebarCollision() {
