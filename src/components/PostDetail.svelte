@@ -31,7 +31,9 @@
     // 새 토스트 생성
     const toast = document.createElement('div');
     toast.className = 'copy-toast';
-    toast.textContent = '코드가 복사되었습니다';
+    toast.textContent = 'code has been copied';
+
+
     
     // 코드 블록에 토스트 추가
     codeBlock.appendChild(toast);
