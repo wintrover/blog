@@ -30,9 +30,7 @@
       {/if}
     </div>
     
-    <p class="copyright">
-      © 2025 {siteConfig.name}. Built with Svelte & ❤️
-    </p>
+
   </div>
 </footer>
 
@@ -88,9 +86,5 @@
     fill: currentColor;
   }
   
-  .copyright {
-    color: #666;
-    font-size: 14px;
-    margin: 0;
-  }
+
 </style>
