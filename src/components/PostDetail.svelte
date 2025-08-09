@@ -311,7 +311,7 @@
   }
 
   .markdown-content :global(.devsite-icon-theme-toggle)::before {
-    content: '\e3a6'; /* material-symbols:brightness-6 */
+    content: '\e3a7'; /* material-symbols:brightness-6-outline */
     font-family: 'Material Symbols Outlined';
     font-weight: normal;
     font-style: normal;
