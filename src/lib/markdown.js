@@ -83,7 +83,30 @@ function parseFrontMatter(str) {
 }
 
 // 마크다운 렌더러 설정
+const renderer = new marked.Renderer()
+
+// 코드 블록 렌더러 커스터마이징
+renderer.code = function(code, language) {
+  const escapedCode = code
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+  
+  const buttonsContainer = `
+    <div class="devsite-code-buttons-container" role="group" aria-label="Action buttons">
+      <button type="button" class="material-icons devsite-icon-code-dark devsite-toggle-dark" aria-label="Dark code theme" data-title="Dark code theme"></button>
+      <button type="button" class="material-icons devsite-icon-code-light devsite-toggle-light" aria-label="Light code theme" data-title="Light code theme"></button>
+      <button type="button" class="material-icons devsite-icon-copy" aria-label="Copy code sample" data-title="Copy code sample"></button>
+    </div>
+  `
+  
+  return `<pre>${buttonsContainer}<code${language ? ` class="language-${language}"` : ''}>${escapedCode}</code></pre>`
+}
+
 marked.setOptions({
   breaks: true,
-  gfm: true
+  gfm: true,
+  renderer: renderer
 })

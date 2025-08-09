@@ -227,6 +227,55 @@
     box-shadow: 0 1px 2px 0 rgba(60,64,67,.3), 0 1px 3px 1px rgba(60,64,67,.15);
   }
 
+  .markdown-content :global(pre)::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: var(--devsite-code-buttons-container-right);
+    height: 100%;
+    background: linear-gradient(90deg, transparent, var(--devsite-code-background) 20%);
+    pointer-events: none;
+  }
+
+  .markdown-content :global(.devsite-code-buttons-container) {
+    position: absolute;
+    top: 8px;
+    right: var(--devsite-code-buttons-container-right);
+    display: flex;
+    gap: 4px;
+    z-index: 1;
+  }
+
+  .markdown-content :global(.devsite-code-buttons-container button) {
+    background: none;
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+    border-radius: 4px;
+    color: #5f6368;
+    font-size: 18px;
+    line-height: 1;
+    transition: background-color 0.2s, color 0.2s;
+  }
+
+  .markdown-content :global(.devsite-code-buttons-container button:hover) {
+    background-color: rgba(95, 99, 104, 0.1);
+    color: #202124;
+  }
+
+  .markdown-content :global(.devsite-icon-code-dark)::before {
+    content: '🌙';
+  }
+
+  .markdown-content :global(.devsite-icon-code-light)::before {
+    content: '☀️';
+  }
+
+  .markdown-content :global(.devsite-icon-copy)::before {
+    content: '📋';
+  }
+
   .markdown-content :global(pre code) {
     background: none;
     padding: 0;
