@@ -269,6 +269,53 @@
       const layoutWrapper = document.querySelector('.layout-wrapper');
       const sidebarToggle = document.querySelector('.sidebar-toggle');
 
+      // 사이드바 너비를 동적으로 조정
+      function adjustSidebarWidth() {
+        if (!sidebar) return;
+
+        const categoryLinks = sidebar.querySelectorAll('.category-link');
+        const sidebarTitle = sidebar.querySelector('h3');
+        let maxWidth = 0;
+
+        // 임시 측정용 요소 생성
+        const measurer = document.createElement('div');
+        measurer.style.position = 'absolute';
+        measurer.style.visibility = 'hidden';
+        measurer.style.whiteSpace = 'nowrap';
+        measurer.style.fontSize = window.getComputedStyle(categoryLinks[0] || sidebarTitle).fontSize;
+        measurer.style.fontFamily = window.getComputedStyle(categoryLinks[0] || sidebarTitle).fontFamily;
+        measurer.style.fontWeight = window.getComputedStyle(categoryLinks[0] || sidebarTitle).fontWeight;
+        document.body.appendChild(measurer);
+
+        // 제목 너비 측정
+        if (sidebarTitle) {
+          measurer.textContent = sidebarTitle.textContent;
+          maxWidth = Math.max(maxWidth, measurer.offsetWidth);
+        }
+
+        // 각 카테고리 링크의 너비 측정
+        categoryLinks.forEach(link => {
+          measurer.textContent = link.textContent;
+          maxWidth = Math.max(maxWidth, measurer.offsetWidth);
+        });
+
+        // 측정용 요소 제거
+        document.body.removeChild(measurer);
+
+        // 패딩과 여유 공간 추가 (좌우 패딩 2rem + 여유 공간 1rem)
+        const finalWidth = maxWidth + 48; // 3rem = 48px
+        
+        // 최소/최대 너비 제한
+        const minWidth = 120; // 최소 120px
+        const maxWidthLimit = 300; // 최대 300px
+        const adjustedWidth = Math.min(Math.max(finalWidth, minWidth), maxWidthLimit);
+
+        // CSS 변수로 너비 설정
+        document.documentElement.style.setProperty('--sidebar-width', adjustedWidth + 'px');
+        
+        console.log('사이드바 너비 조정:', adjustedWidth + 'px', '(최대 텍스트 너비:', maxWidth + 'px)');
+      }
+
       // 사이드바와 콘텐츠 충돌 감지 및 자동 제어
       function checkSidebarOverflow() {
         if (!sidebar || !layoutWrapper) return;
@@ -326,7 +373,10 @@
         let resizeTimeout;
         window.addEventListener('resize', function () {
           clearTimeout(resizeTimeout);
-          resizeTimeout = setTimeout(checkSidebarOverflow, 50);
+          resizeTimeout = setTimeout(function() {
+            adjustSidebarWidth();
+            checkSidebarOverflow();
+          }, 50);
         });
 
         // DOM 변경 감지 (동적 콘텐츠 로딩 대응)
@@ -355,6 +405,9 @@
           setTimeout(checkSidebarOverflow, 100);
         });
       }
+
+      // 사이드바 너비 조정
+      adjustSidebarWidth();
 
       // 초기 체크
       checkSidebarOverflow();
