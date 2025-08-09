@@ -745,6 +745,7 @@ div[class^="language-"] pre, div[class*=" language-"] pre {
 }
 
 // 왼쪽 고정 사이드바
+/* stylelint-disable-next-line */
 :root {
   --sidebar-width: 10rem; /* Company Work 기준으로 계산된 초기값 */
 }
