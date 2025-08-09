@@ -63,13 +63,8 @@
       return
     }
 
-    // 사이드바와 콘텐츠가 겹치는지 확인
-    const isOverlapping = (
-      sidebarRect.right > contentRect.left &&
-      sidebarRect.left < contentRect.right &&
-      sidebarRect.bottom > contentRect.top &&
-      sidebarRect.top < contentRect.bottom
-    )
+    // 사이드바와 콘텐츠가 겹치는지 확인 (사이드바 오른쪽 끝이 콘텐츠 왼쪽 시작점을 넘어가면 겹침)
+    const isOverlapping = sidebarRect.right > contentRect.left
 
     // 무한 루프 방지: 현재 상태와 다를 때만 변경
     // 겹치면서 현재 펼쳐져 있으면 접기
