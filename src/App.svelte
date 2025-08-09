@@ -11,7 +11,9 @@
   let currentView = 'list' // 'list' or 'post'
   let selectedPost = null
   let sidebarCollapsed = false
-  let windowWidth = 0
+  let sidebarElement
+  let mainContentElement
+  let intersectionObserver
   
   $: {
     if ($selectedCategory === 'all') {
@@ -32,36 +34,53 @@
     selectedPost = null
   }
 
-  function checkSidebarCollapse() {
-    const sidebarWidth = 240
-    const minContentWidth = 400
-    const totalRequiredWidth = sidebarWidth + minContentWidth
+  function checkSidebarCollision() {
+    if (!sidebarElement || !mainContentElement) return
     
-    sidebarCollapsed = windowWidth < totalRequiredWidth
+    const sidebarRect = sidebarElement.getBoundingClientRect()
+    const contentRect = mainContentElement.getBoundingClientRect()
+    
+    // 사이드바와 콘텐츠가 겹치는지 확인
+    const isOverlapping = sidebarRect.right > contentRect.left && 
+                         sidebarRect.left < contentRect.right
+    
+    // 화면이 너무 좁아서 겹치는 경우 사이드바를 접음
+    if (isOverlapping && window.innerWidth < 1100) {
+      sidebarCollapsed = true
+    } else if (window.innerWidth >= 1100) {
+      sidebarCollapsed = false
+    }
   }
 
   function handleResize() {
-    windowWidth = window.innerWidth
-    checkSidebarCollapse()
+    checkSidebarCollision()
   }
 
   onMount(() => {
-    windowWidth = window.innerWidth
-    checkSidebarCollapse()
+    // 초기 체크를 위한 지연
+    setTimeout(() => {
+      checkSidebarCollision()
+    }, 100)
+    
+    // ResizeObserver로 요소 크기 변화 감지
+    const resizeObserver = new ResizeObserver(() => {
+      checkSidebarCollision()
+    })
+    
+    if (sidebarElement) resizeObserver.observe(sidebarElement)
+    if (mainContentElement) resizeObserver.observe(mainContentElement)
+    
     window.addEventListener('resize', handleResize)
     
     return () => {
+      resizeObserver.disconnect()
       window.removeEventListener('resize', handleResize)
     }
   })
-
-  $: if (windowWidth) {
-    checkSidebarCollapse()
-  }
 </script>
 
 <div id="app-container" class:sidebar-collapsed={sidebarCollapsed}>
-  <aside id="sidebar" class:collapsed={sidebarCollapsed}>
+  <aside id="sidebar" class:collapsed={sidebarCollapsed} bind:this={sidebarElement}>
     <Sidebar />
   </aside>
   
@@ -71,7 +90,7 @@
     </button>
   {/if}
   
-  <main id="main-content">
+  <main id="main-content" bind:this={mainContentElement}>
     <div id="content">
       {#if currentView === 'list'}
         <BlogList posts={filteredPosts} on:selectPost={(e) => showPost(e.detail)} />
