@@ -113,14 +113,14 @@
       else if (contentRect.left > 240 && sidebarCollapsed) {
         sidebarCollapsed = false
       }
-    }, 100) // 100ms 디바운스
+    }, 50) // 50ms 디바운스
   }
 
   function debouncedCheckSidebarCollision() {
     if (checkTimeout) {
       clearTimeout(checkTimeout)
     }
-    checkTimeout = setTimeout(checkSidebarCollision, 300)
+    checkTimeout = setTimeout(checkSidebarCollision, 150)
   }
 
   function handleResize() {
@@ -203,7 +203,7 @@
   #app-container {
     display: flex;
     min-height: 100vh;
-    transition: all 0.3s ease;
+    transition: all 0.1s ease;
   }
   
   #sidebar {
@@ -215,7 +215,7 @@
     overflow-y: auto;
     padding: 0;
     transform: translateX(0);
-    transition: transform 0.3s ease;
+    transition: transform 0.1s ease;
     z-index: 1000;
   }
   
@@ -249,7 +249,7 @@
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    transition: margin-left 0.3s ease;
+    transition: margin-left 0.1s ease;
   }
   
   .sidebar-collapsed #main-content {
