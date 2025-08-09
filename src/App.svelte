@@ -170,7 +170,7 @@
   #sidebar {
     width: 240px;
     background: #f8f9fa;
-    border-right: 1px solid #e1e4e8;
+    border-right: 0;
     position: fixed;
     height: 100vh;
     overflow-y: auto;
