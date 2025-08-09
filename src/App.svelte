@@ -34,7 +34,7 @@
 
   function checkSidebarCollapse() {
     const sidebarWidth = 240
-    const minContentWidth = 600
+    const minContentWidth = 400
     const totalRequiredWidth = sidebarWidth + minContentWidth
     
     sidebarCollapsed = windowWidth < totalRequiredWidth
