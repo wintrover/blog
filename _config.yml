@@ -9,7 +9,7 @@ name: wintrover
 description: ML / AI Application Developer
 
 # URL of your avatar or profile pic (you could use your GitHub profile pic)
-avatar: /images/profile.png
+avatar: /assets/images/profile.png
 
 #
 # Flags below are optional
@@ -73,10 +73,9 @@ sass:
   style: :expanded # You might prefer to minify using :compressed
 
 # Use the following plug-ins
-gems:
+plugins:
   - jekyll-sitemap # Create a sitemap using the official Jekyll sitemap gem
   - jekyll-feed # Create an Atom feed using the official Jekyll feed gem
-  - jekyll-category-generator # Generate category pages
 
 # Category settings
 categories:
@@ -86,8 +85,11 @@ categories:
 
 # Exclude these files from your production _site
 exclude:
-  - Gemfile
-  - Gemfile.lock
+  - assets/config/Gemfile
+  - assets/config/Gemfile.lock
   - LICENSE
   - README.md
   - CNAME
+  - assets/config/
+  - tools/scripts/
+  - assets/data/

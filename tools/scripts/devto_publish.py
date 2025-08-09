@@ -253,7 +253,7 @@ class MarkdownPost:
 
             # raw.githubusercontent.com 경로를 사용하여 dev.to 가 직접 PNG 를 로드할 수 있게 함
             raw_url = (
-                f"https://raw.githubusercontent.com/{owner}/{repo}/{branch}/images/{filename}"
+                f"https://raw.githubusercontent.com/{owner}/{repo}/{branch}/assets/images/{filename}"
             )
             return f"![mermaid diagram]({raw_url})"
 
