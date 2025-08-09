@@ -48,16 +48,9 @@
   <div class="layout-wrapper">
     <aside class="sidebar">
       <div class="sidebar-content">
-        <h3>Categories</h3>
         <ul class="category-list">
-          <li><a href="#" data-category="all" class="category-link active">All</a></li>
-          <li><a href="#" data-category="ai" class="category-link">AI</a></li>
-          <li><a href="#" data-category="backend" class="category-link">Backend</a></li>
-          <li><a href="#" data-category="frontend" class="category-link">Frontend</a></li>
           <li><a href="#" data-category="company-work" class="category-link">Company Work</a></li>
-          <li><a href="#" data-category="career" class="category-link">Career</a></li>
           <li><a href="#" data-category="project" class="category-link">Project</a></li>
-          <li><a href="#" data-category="study" class="category-link">Study</a></li>
         </ul>
       </div>
     </aside>
@@ -274,7 +267,6 @@
         if (!sidebar) return;
 
         const categoryLinks = sidebar.querySelectorAll('.category-link');
-        const sidebarTitle = sidebar.querySelector('h3');
         let maxWidth = 0;
 
         // 임시 측정용 요소 생성
@@ -282,16 +274,10 @@
         measurer.style.position = 'absolute';
         measurer.style.visibility = 'hidden';
         measurer.style.whiteSpace = 'nowrap';
-        measurer.style.fontSize = window.getComputedStyle(categoryLinks[0] || sidebarTitle).fontSize;
-        measurer.style.fontFamily = window.getComputedStyle(categoryLinks[0] || sidebarTitle).fontFamily;
-        measurer.style.fontWeight = window.getComputedStyle(categoryLinks[0] || sidebarTitle).fontWeight;
+        measurer.style.fontSize = window.getComputedStyle(categoryLinks[0]).fontSize;
+        measurer.style.fontFamily = window.getComputedStyle(categoryLinks[0]).fontFamily;
+        measurer.style.fontWeight = window.getComputedStyle(categoryLinks[0]).fontWeight;
         document.body.appendChild(measurer);
-
-        // 제목 너비 측정
-        if (sidebarTitle) {
-          measurer.textContent = sidebarTitle.textContent;
-          maxWidth = Math.max(maxWidth, measurer.offsetWidth);
-        }
 
         // 각 카테고리 링크의 너비 측정
         categoryLinks.forEach(link => {
