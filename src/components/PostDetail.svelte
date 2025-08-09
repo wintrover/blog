@@ -199,15 +199,19 @@
   .markdown-content :global(pre) {
     --devsite-code-background: #f1f3f4;
     --devsite-code-color: #37474f;
-    --devsite-code-margin: 16px 0;
+    --devsite-code-margin: 16px -40px;
     --devsite-code-padding-block: 24px;
     --devsite-code-padding-inline: 40px;
     --devsite-code-border-radius: 8px;
+    --devsite-code-border: 0;
+    --devsite-code-buttons-container-right: 40px;
+    --devsite-code-font-family: 'Roboto Mono', 'Courier New', monospace;
+    --devsite-code-comments-color: #b80672;
     
     background: var(--devsite-code-background);
     color: var(--devsite-code-color);
-    border: 0;
-    border-radius: var(--devsite-code-border-radius);
+    border: var(--devsite-code-border, 0);
+    border-radius: var(--devsite-code-border-radius, 0);
     clear: both;
     direction: ltr !important;
     display: block;
@@ -216,7 +220,7 @@
     overflow: hidden;
     position: relative;
     padding: var(--devsite-code-padding-block) var(--devsite-code-padding-inline);
-    font-family: 'Roboto Mono', 'Courier New', monospace;
+    font-family: var(--devsite-code-font-family);
     font-size: 14px;
     line-height: 1.5;
     overflow-x: auto;
