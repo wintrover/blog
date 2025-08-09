@@ -1,5 +1,5 @@
 <script>
-  import { onMount } from "svelte";
+  import { onMount, afterUpdate } from "svelte";
   import { formatDate, slugify } from "../lib/utils.js";
   import { loadPost } from "../lib/markdown.js";
   import { push } from 'svelte-spa-router';
@@ -27,7 +27,7 @@
         // 버튼 이벤트 리스너 추가
         setTimeout(() => {
           setupCodeBlockButtons();
-        }, 100);
+        }, 500);
       } catch (error) {
         console.error('포스트 로딩 실패:', error);
         loading = false;
@@ -42,6 +42,14 @@
   $: if (params.slug) {
     loadPostData();
   }
+
+  afterUpdate(() => {
+    if (!loading && markdownContent) {
+      setTimeout(() => {
+        setupCodeBlockButtons();
+      }, 100);
+    }
+  });
 
   function showCopyToast(codeBlock) {
     // 기존 토스트 제거
@@ -79,12 +87,15 @@
   function setupCodeBlockButtons() {
     const codeBlocks = document.querySelectorAll('.markdown-content pre');
     
-    codeBlocks.forEach(pre => {
+    codeBlocks.forEach((pre) => {
       const themeToggle = pre.querySelector('.devsite-icon-theme-toggle');
       const copyButton = pre.querySelector('.devsite-icon-copy');
       
-      if (themeToggle) {
-        themeToggle.addEventListener('click', () => {
+      if (themeToggle && !themeToggle.hasAttribute('data-listener-added')) {
+        themeToggle.setAttribute('data-listener-added', 'true');
+        themeToggle.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
           pre.classList.toggle('dark-theme');
           themeToggle.classList.toggle('light-mode');
         });
@@ -96,7 +107,6 @@
           if (code) {
             const text = code.textContent || code.innerText;
             navigator.clipboard.writeText(text).then(() => {
-              // 복사 성공 팝업 표시
               showCopyToast(pre);
             }).catch(err => {
               console.error('복사 실패:', err);
