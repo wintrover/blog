@@ -169,7 +169,7 @@
 
 <div id="app-container" class:sidebar-collapsed={sidebarCollapsed}>
   <aside id="sidebar" class:collapsed={sidebarCollapsed} bind:this={sidebarElement}>
-    <Sidebar />
+    <Sidebar on:showList={showList} />
   </aside>
   
   {#if sidebarCollapsed}
