@@ -21,6 +21,37 @@
     }
   });
 
+  function showCopyToast(codeBlock) {
+    // 기존 토스트 제거
+    const existingToast = codeBlock.querySelector('.copy-toast');
+    if (existingToast) {
+      existingToast.remove();
+    }
+
+    // 새 토스트 생성
+    const toast = document.createElement('div');
+    toast.className = 'copy-toast';
+    toast.textContent = '코드가 복사되었습니다';
+    
+    // 코드 블록에 토스트 추가
+    codeBlock.appendChild(toast);
+    
+    // 애니메이션을 위한 지연
+    setTimeout(() => {
+      toast.classList.add('show');
+    }, 10);
+    
+    // 3초 후 제거
+    setTimeout(() => {
+      toast.classList.remove('show');
+      setTimeout(() => {
+        if (toast.parentNode) {
+          toast.remove();
+        }
+      }, 300);
+    }, 3000);
+  }
+
   function setupCodeBlockButtons() {
     const codeBlocks = document.querySelectorAll('.markdown-content pre');
     
@@ -41,12 +72,8 @@
           if (code) {
             const text = code.textContent || code.innerText;
             navigator.clipboard.writeText(text).then(() => {
-              // 복사 성공 피드백
-              const originalContent = copyButton.innerHTML;
-              copyButton.innerHTML = '✅';
-              setTimeout(() => {
-                copyButton.innerHTML = originalContent;
-              }, 1000);
+              // 복사 성공 팝업 표시
+              showCopyToast(pre);
             }).catch(err => {
               console.error('복사 실패:', err);
             });
@@ -369,6 +396,30 @@
     padding-left: 16px;
     margin: 16px 0;
     color: #6a737d;
+  }
+
+  /* 복사 토스트 팝업 스타일 */
+  .markdown-content :global(.copy-toast) {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    background: #2d3748;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s ease;
+    z-index: 10;
+    pointer-events: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .markdown-content :global(.copy-toast.show) {
+    opacity: 1;
+    transform: translateY(0);
   }
 
   .post-footer {
