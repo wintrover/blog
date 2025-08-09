@@ -66,11 +66,6 @@
     // 디바운스: 이전 타이머 취소하고 새로 설정
     clearTimeout(resizeTimeout)
     resizeTimeout = setTimeout(() => {
-      // 사이드바가 접혀있으면 겹침 감지를 하지 않음
-      if (sidebarCollapsed) {
-        return
-      }
-
       // 요소가 아직 렌더링되지 않았다면 사이드바를 표시
       const sidebarRect = sidebarElement.getBoundingClientRect()
       const contentRect = contentElement.getBoundingClientRect()
