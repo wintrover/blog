@@ -11,9 +11,19 @@
   
   $: {
     const categoryCount = {}
+    const tagCount = {}
+    
     $posts.forEach(post => {
       if (post.category) {
         categoryCount[post.category] = (categoryCount[post.category] || 0) + 1
+        
+        // Company Work과 Project 카테고리의 태그별 카운트
+        if (post.category === 'Company Work' || post.category === 'Project') {
+          post.tags.forEach(tag => {
+            const tagKey = `${post.category} - ${tag}`
+            tagCount[tagKey] = (tagCount[tagKey] || 0) + 1
+          })
+        }
       }
     })
     
@@ -22,7 +32,14 @@
       ...Object.entries(categoryCount).map(([name, count]) => ({
         name,
         slug: slugify(name),
-        count
+        count,
+        isCategory: true
+      })),
+      ...Object.entries(tagCount).map(([name, count]) => ({
+        name,
+        slug: slugify(name),
+        count,
+        isTag: true
       }))
     ]
   }
@@ -62,7 +79,7 @@
     {#each categories as category}
       <li>
         <button 
-          class="category-link {($selectedCategory === 'all' && category.slug === 'all') || ($selectedCategory === category.name) ? 'active' : ''}"
+          class="category-link {category.isTag ? 'tag-item' : ''} {($selectedCategory === 'all' && category.slug === 'all') || ($selectedCategory === category.name) ? 'active' : ''}"
           on:click={() => selectCategory(category.slug, category.name)}
         >
           {category.name} ({category.count})
@@ -175,10 +192,37 @@
   }
   
   .category-link.active {
-    color: #24292e;
+    color: #0256cc;
     font-weight: 600;
-    background: #e1f5fe;
+    background: #f1f8ff;
     padding-left: 8px;
+  }
+  
+  .category-link.tag-item {
+    font-size: 13px;
+    color: #6a737d;
+    padding-left: 16px;
+    position: relative;
+  }
+  
+  .category-link.tag-item:before {
+    content: "#";
+    position: absolute;
+    left: 8px;
+    color: #6a737d;
+  }
+  
+  .category-link.tag-item:hover {
+    color: #0366d6;
+    background: #f6f8fa;
+    padding-left: 16px;
+  }
+  
+  .category-link.tag-item.active {
+    color: #0366d6;
+    font-weight: 500;
+    background: #f6f8fa;
+    padding-left: 16px;
   }
   
   .sidebar-module p {

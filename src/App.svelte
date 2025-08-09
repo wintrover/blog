@@ -35,6 +35,12 @@
   $: {
     if ($selectedCategory === 'all') {
       filteredPosts = $posts
+    } else if ($selectedCategory.includes(' - ')) {
+      // 태그 기반 필터링 (예: "Company Work - facial-recognition")
+      const [category, tag] = $selectedCategory.split(' - ')
+      filteredPosts = $posts.filter(post => 
+        post.category === category && post.tags.includes(tag)
+      )
     } else {
       // 실제 카테고리 이름으로 필터링
       filteredPosts = $posts.filter(post => post.category === $selectedCategory)
