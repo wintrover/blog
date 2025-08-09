@@ -188,23 +188,47 @@
   }
 
   .markdown-content :global(code) {
-    background: #f6f8fa;
+    background: #f1f3f4;
+    color: #37474f;
     padding: 2px 4px;
-    border-radius: 3px;
+    border-radius: 4px;
     font-size: 14px;
+    font-family: 'Roboto Mono', 'Courier New', monospace;
   }
 
   .markdown-content :global(pre) {
-    background: #f6f8fa;
-    padding: 16px;
-    border-radius: 6px;
+    --devsite-code-background: #f1f3f4;
+    --devsite-code-color: #37474f;
+    --devsite-code-margin: 16px 0;
+    --devsite-code-padding-block: 24px;
+    --devsite-code-padding-inline: 40px;
+    --devsite-code-border-radius: 8px;
+    
+    background: var(--devsite-code-background);
+    color: var(--devsite-code-color);
+    border: 0;
+    border-radius: var(--devsite-code-border-radius);
+    clear: both;
+    direction: ltr !important;
+    display: block;
+    margin: var(--devsite-code-margin);
+    min-height: 32px;
+    overflow: hidden;
+    position: relative;
+    padding: var(--devsite-code-padding-block) var(--devsite-code-padding-inline);
+    font-family: 'Roboto Mono', 'Courier New', monospace;
+    font-size: 14px;
+    line-height: 1.5;
     overflow-x: auto;
-    margin: 16px 0;
+    box-shadow: 0 1px 2px 0 rgba(60,64,67,.3), 0 1px 3px 1px rgba(60,64,67,.15);
   }
 
   .markdown-content :global(pre code) {
     background: none;
     padding: 0;
+    color: inherit;
+    font-size: inherit;
+    border-radius: 0;
   }
 
   .markdown-content :global(blockquote) {
