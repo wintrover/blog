@@ -3,6 +3,7 @@
   import { formatDate, slugify } from "../lib/utils.js";
   import { loadPost } from "../lib/markdown.js";
   import { push } from 'svelte-spa-router';
+  import { postsData } from '../lib/posts.js';
 
   export let params = {};
   let post = null;
@@ -13,13 +14,11 @@
     if (params.slug) {
       try {
         // 포스트 메타데이터 로드
-        const modules = import.meta.glob('../posts/*.md');
-        const postModule = await modules[`../posts/${params.slug}.md`]();
-        post = {
-          ...postModule.metadata,
-          slug: params.slug,
-          content: postModule.default
-        };
+        post = postsData.find(p => p.slug === params.slug);
+        
+        if (!post) {
+          throw new Error('포스트를 찾을 수 없습니다.');
+        }
         
         // 마크다운 콘텐츠 로드
         markdownContent = await loadPost(params.slug);
