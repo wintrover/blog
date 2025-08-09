@@ -75,6 +75,10 @@
     if (isOverlapping && !sidebarCollapsed) {
       sidebarCollapsed = true
     }
+    // 콘텐츠의 왼쪽 x좌표가 240보다 크고 현재 접혀져 있으면 펼치기
+    else if (contentRect.left > 240 && sidebarCollapsed) {
+      sidebarCollapsed = false
+    }
   }
 
   function debouncedCheckSidebarCollision() {
