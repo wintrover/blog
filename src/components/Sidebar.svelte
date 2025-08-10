@@ -85,6 +85,7 @@
 <div class="sidebar-module">
   <h4>About</h4>
   <p>Working as a Fullstack AI Application Architect, sharing the latest tech trends and development experiences.</p>
+  <br>
   <p>Check my resume <a href="https://wintrover.github.io" target="_blank" rel="noopener noreferrer">wintrover.github.io</a></p>
 </div>
 
