@@ -1,8 +1,0 @@
-name: blog-devto
-channels:
-  - conda-forge
-dependencies:
-  - python=3.11
-  - pyyaml
-  - requests
-  - python-dotenv 
