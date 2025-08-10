@@ -96,6 +96,21 @@ mermaid.initialize({
   securityLevel: 'loose'
 })
 
+// 이미지 렌더러 커스터마이징 - 상대 경로를 절대 경로로 변환
+renderer.image = function(href, title, text) {
+  // 상대 경로인 경우 절대 경로로 변환
+  if (href.startsWith('../')) {
+    href = href.replace('../', '/blog/')
+  }
+  
+  let out = `<img src="${href}" alt="${text}"`
+  if (title) {
+    out += ` title="${title}"`
+  }
+  out += ' />'
+  return out
+}
+
 // 코드 블록 렌더러 커스터마이징
 renderer.code = function(code, language) {
   // Mermaid 다이어그램 처리

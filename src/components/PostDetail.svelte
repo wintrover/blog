@@ -46,9 +46,9 @@
 
   afterUpdate(() => {
     if (!loading && markdownContent) {
-      setTimeout(() => {
+      setTimeout(async () => {
         setupCodeBlockButtons();
-        setupMermaidDiagrams();
+        await setupMermaidDiagrams();
       }, 100);
     }
   });
@@ -119,22 +119,16 @@
     });
   }
 
-  function setupMermaidDiagrams() {
+  async function setupMermaidDiagrams() {
     const mermaidElements = document.querySelectorAll('.mermaid-diagram');
     
-    mermaidElements.forEach(async (element) => {
-      if (element.hasAttribute('data-rendered')) return;
+    for (const element of mermaidElements) {
+      if (element.hasAttribute('data-rendered')) continue;
       
       const code = decodeURIComponent(element.getAttribute('data-mermaid-code'));
       const id = element.id;
       
       try {
-        mermaid.initialize({
-          startOnLoad: false,
-          theme: 'default',
-          securityLevel: 'loose'
-        });
-        
         const { svg } = await mermaid.render(id + '-svg', code);
         element.innerHTML = svg;
         element.setAttribute('data-rendered', 'true');
@@ -143,7 +137,7 @@
         element.innerHTML = '<div class="mermaid-error">Mermaid diagram rendering failed</div>';
         element.setAttribute('data-rendered', 'true');
       }
-    });
+    }
   }
 
   function goBack() {

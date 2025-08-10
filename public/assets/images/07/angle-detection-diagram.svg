@@ -1,0 +1,86 @@
+<svg viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="faceGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFE4B5;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#DEB887;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="eyeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#87CEEB;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#4682B4;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="800" height="600" fill="#f8f9fa"/>
+  
+  <!-- Title -->
+  <text x="400" y="30" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="#2c3e50">MediaPipe Angle Detection System</text>
+  
+  <!-- Face outline -->
+  <ellipse cx="400" cy="300" rx="120" ry="150" fill="url(#faceGradient)" stroke="#8B4513" stroke-width="3"/>
+  
+  <!-- Eyes -->
+  <ellipse cx="360" cy="260" rx="20" ry="15" fill="url(#eyeGradient)" stroke="#2F4F4F" stroke-width="2"/>
+  <ellipse cx="440" cy="260" rx="20" ry="15" fill="url(#eyeGradient)" stroke="#2F4F4F" stroke-width="2"/>
+  
+  <!-- Eye pupils -->
+  <circle cx="360" cy="260" r="8" fill="#000"/>
+  <circle cx="440" cy="260" r="8" fill="#000"/>
+  
+  <!-- Nose -->
+  <polygon points="400,280 390,310 400,320 410,310" fill="#CD853F" stroke="#8B4513" stroke-width="2"/>
+  
+  <!-- Mouth -->
+  <ellipse cx="400" cy="350" rx="25" ry="10" fill="#DC143C" stroke="#8B0000" stroke-width="2"/>
+  
+  <!-- MediaPipe Landmarks -->
+  <circle cx="360" cy="260" r="4" fill="#FF6B6B" stroke="#FF0000" stroke-width="2"/>
+  <circle cx="440" cy="260" r="4" fill="#FF6B6B" stroke="#FF0000" stroke-width="2"/>
+  <circle cx="400" cy="285" r="4" fill="#FF6B6B" stroke="#FF0000" stroke-width="2"/>
+  
+  <!-- Landmark labels -->
+  <text x="320" y="250" font-family="Arial, sans-serif" font-size="12" fill="#FF0000">L Eye (33)</text>
+  <text x="460" y="250" font-family="Arial, sans-serif" font-size="12" fill="#FF0000">R Eye (263)</text>
+  <text x="420" y="280" font-family="Arial, sans-serif" font-size="12" fill="#FF0000">Nose (1)</text>
+  
+  <!-- Angle measurement lines -->
+  <line x1="360" y1="260" x2="440" y2="260" stroke="#4CAF50" stroke-width="3" stroke-dasharray="5,5"/>
+  <line x1="400" y1="260" x2="400" y2="285" stroke="#2196F3" stroke-width="3" stroke-dasharray="5,5"/>
+  
+  <!-- Yaw angle arc -->
+  <path d="M 380 260 A 20 20 0 0 1 420 260" fill="none" stroke="#FF9800" stroke-width="3"/>
+  <text x="400" y="240" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#FF9800">Yaw Angle</text>
+  
+  <!-- Calculation formula -->
+  <rect x="50" y="450" width="300" height="120" fill="#E8F5E8" stroke="#4CAF50" stroke-width="2" rx="10"/>
+  <text x="60" y="470" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#2E7D32">Yaw Angle Calculation:</text>
+  <text x="60" y="490" font-family="monospace" font-size="12" fill="#1B5E20">eyeDistance = |leftEye.x - rightEye.x|</text>
+  <text x="60" y="510" font-family="monospace" font-size="12" fill="#1B5E20">noseOffset = noseTip.x - (leftEye.x + rightEye.x)/2</text>
+  <text x="60" y="530" font-family="monospace" font-size="12" fill="#1B5E20">yaw = atan2(noseOffset, eyeDistance) * 180/π</text>
+  <text x="60" y="550" font-family="Arial, sans-serif" font-size="12" fill="#2E7D32">Range: -30° to +30° for detection</text>
+  
+  <!-- Angle ranges -->
+  <rect x="450" y="450" width="300" height="120" fill="#FFF3E0" stroke="#FF9800" stroke-width="2" rx="10"/>
+  <text x="460" y="470" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#E65100">Detection Ranges:</text>
+  <text x="460" y="490" font-family="Arial, sans-serif" font-size="12" fill="#BF360C">• Front: ±10° (Center position)</text>
+  <text x="460" y="510" font-family="Arial, sans-serif" font-size="12" fill="#BF360C">• Left: -30° to -15° (Turn left)</text>
+  <text x="460" y="530" font-family="Arial, sans-serif" font-size="12" fill="#BF360C">• Right: +15° to +30° (Turn right)</text>
+  <text x="460" y="550" font-family="Arial, sans-serif" font-size="12" fill="#E65100">Real-time angle measurement</text>
+  
+  <!-- Coordinate system -->
+  <g transform="translate(650, 150)">
+    <circle cx="0" cy="0" r="3" fill="#333"/>
+    <line x1="-30" y1="0" x2="30" y2="0" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+    <line x1="0" y1="-30" x2="0" y2="30" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+    <text x="35" y="5" font-family="Arial, sans-serif" font-size="12" fill="#666">X</text>
+    <text x="5" y="-35" font-family="Arial, sans-serif" font-size="12" fill="#666">Y</text>
+    <text x="10" y="50" font-family="Arial, sans-serif" font-size="10" fill="#666">MediaPipe Coordinates</text>
+  </g>
+  
+  <!-- Arrow marker definition -->
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#666"/>
+    </marker>
+  </defs>
+</svg>

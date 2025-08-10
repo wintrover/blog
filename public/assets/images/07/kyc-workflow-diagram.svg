@@ -1,0 +1,131 @@
+<svg width="1000" height="600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .title { font-family: Arial, sans-serif; font-size: 20px; font-weight: bold; fill: #2c3e50; }
+      .step-title { font-family: Arial, sans-serif; font-size: 14px; font-weight: bold; fill: #2c3e50; }
+      .component { font-family: Arial, sans-serif; font-size: 12px; fill: #34495e; }
+      .small-text { font-family: Arial, sans-serif; font-size: 10px; fill: #7f8c8d; }
+      .arrow { stroke: #3498db; stroke-width: 3; fill: none; marker-end: url(#arrowhead); }
+      .box { fill: #ecf0f1; stroke: #34495e; stroke-width: 2; rx: 10; }
+      .step1 { fill: #e8f5e8; stroke: #27ae60; }
+      .step2 { fill: #fff2e8; stroke: #e67e22; }
+      .step3 { fill: #e8f2ff; stroke: #3498db; }
+      .step4 { fill: #f8e8ff; stroke: #9b59b6; }
+      .decision { fill: #fff8e8; stroke: #f39c12; }
+    </style>
+    <marker id="arrowhead" markerWidth="12" markerHeight="8" refX="11" refY="4" orient="auto">
+      <polygon points="0 0, 12 4, 0 8" fill="#3498db" />
+    </marker>
+  </defs>
+  
+  <!-- Title -->
+  <text x="500" y="30" text-anchor="middle" class="title">KYC Process Workflow</text>
+  
+  <!-- Step 1: Initialize -->
+  <rect x="50" y="80" width="150" height="80" class="box step1" />
+  <text x="125" y="105" text-anchor="middle" class="step-title">1. Initialize</text>
+  <text x="125" y="125" text-anchor="middle" class="component">Start KYC Process</text>
+  <text x="125" y="140" text-anchor="middle" class="component">Setup Camera</text>
+  <text x="125" y="155" text-anchor="middle" class="small-text">MediaPipe Ready</text>
+  
+  <!-- Step 2: Front Face -->
+  <rect x="250" y="80" width="150" height="80" class="box step2" />
+  <text x="325" y="105" text-anchor="middle" class="step-title">2. Front Face</text>
+  <text x="325" y="125" text-anchor="middle" class="component">Look Forward</text>
+  <text x="325" y="140" text-anchor="middle" class="component">Yaw: ±10°</text>
+  <text x="325" y="155" text-anchor="middle" class="small-text">Capture 3 seconds</text>
+  
+  <!-- Decision Diamond -->
+  <polygon points="500,80 550,120 500,160 450,120" class="box decision" />
+  <text x="500" y="115" text-anchor="middle" class="component">Angle</text>
+  <text x="500" y="130" text-anchor="middle" class="component">OK?</text>
+  
+  <!-- Step 3: Left Turn -->
+  <rect x="600" y="80" width="150" height="80" class="box step3" />
+  <text x="675" y="105" text-anchor="middle" class="step-title">3. Left Turn</text>
+  <text x="675" y="125" text-anchor="middle" class="component">Look Left</text>
+  <text x="675" y="140" text-anchor="middle" class="component">Yaw: -30° ~ -15°</text>
+  <text x="675" y="155" text-anchor="middle" class="small-text">Capture 3 seconds</text>
+  
+  <!-- Step 4: Right Turn -->
+  <rect x="800" y="80" width="150" height="80" class="box step4" />
+  <text x="875" y="105" text-anchor="middle" class="step-title">4. Right Turn</text>
+  <text x="875" y="125" text-anchor="middle" class="component">Look Right</text>
+  <text x="875" y="140" text-anchor="middle" class="component">Yaw: +15° ~ +30°</text>
+  <text x="875" y="155" text-anchor="middle" class="small-text">Capture 3 seconds</text>
+  
+  <!-- Video Processing -->
+  <rect x="250" y="220" width="500" height="80" class="box" fill="#f8f9fa" stroke="#6c757d" />
+  <text x="500" y="245" text-anchor="middle" class="step-title">Video Processing Pipeline</text>
+  
+  <!-- FFmpeg Splitting -->
+  <rect x="280" y="260" width="120" height="30" class="box step2" />
+  <text x="340" y="280" text-anchor="middle" class="component">FFmpeg Split</text>
+  
+  <!-- File Storage -->
+  <rect x="440" y="260" width="120" height="30" class="box step3" />
+  <text x="500" y="280" text-anchor="middle" class="component">File Storage</text>
+  
+  <!-- Database -->
+  <rect x="600" y="260" width="120" height="30" class="box step4" />
+  <text x="660" y="280" text-anchor="middle" class="component">MariaDB</text>
+  
+  <!-- Quality Assessment -->
+  <rect x="350" y="350" width="300" height="100" class="box" fill="#fff3cd" stroke="#856404" />
+  <text x="500" y="375" text-anchor="middle" class="step-title">Quality Assessment</text>
+  
+  <text x="380" y="400" class="component">• Face Detection Quality</text>
+  <text x="380" y="415" class="component">• Lighting Conditions</text>
+  <text x="380" y="430" class="component">• Angle Accuracy</text>
+  <text x="380" y="445" class="component">• Video Duration Check</text>
+  
+  <!-- Final Result -->
+  <rect x="400" y="480" width="200" height="60" class="box" fill="#d4edda" stroke="#155724" />
+  <text x="500" y="505" text-anchor="middle" class="step-title">KYC Complete</text>
+  <text x="500" y="525" text-anchor="middle" class="component">All videos processed</text>
+  
+  <!-- Arrows -->
+  <line x1="200" y1="120" x2="240" y2="120" class="arrow" />
+  <line x1="400" y1="120" x2="440" y2="120" class="arrow" />
+  <line x1="550" y1="120" x2="590" y2="120" class="arrow" />
+  <line x1="750" y1="120" x2="790" y2="120" class="arrow" />
+  
+  <!-- Vertical arrows to processing -->
+  <line x1="325" y1="160" x2="325" y2="210" class="arrow" />
+  <line x1="675" y1="160" x2="675" y2="210" class="arrow" />
+  <line x1="875" y1="160" x2="875" y2="210" class="arrow" />
+  
+  <!-- Processing pipeline arrows -->
+  <line x1="400" y1="275" x2="430" y2="275" class="arrow" />
+  <line x1="560" y1="275" x2="590" y2="275" class="arrow" />
+  
+  <!-- To quality assessment -->
+  <line x1="500" y1="300" x2="500" y2="340" class="arrow" />
+  
+  <!-- To final result -->
+  <line x1="500" y1="450" x2="500" y2="470" class="arrow" />
+  
+  <!-- Feedback loop for failed angle detection -->
+  <path d="M 500 80 Q 520 60 540 80" stroke="#e74c3c" stroke-width="2" fill="none" marker-end="url(#arrowhead)" stroke-dasharray="5,5" />
+  <text x="530" y="55" class="small-text" fill="#e74c3c">Retry if angle incorrect</text>
+  
+  <!-- Angle Configuration Box -->
+  <rect x="50" y="350" width="250" height="120" class="box" fill="#e3f2fd" stroke="#1976d2" />
+  <text x="175" y="375" text-anchor="middle" class="step-title">Angle Configuration</text>
+  
+  <text x="70" y="400" class="component">Front Face: Yaw ±10°</text>
+  <text x="70" y="415" class="component">Left Turn: Yaw -30° ~ -15°</text>
+  <text x="70" y="430" class="component">Right Turn: Yaw +15° ~ +30°</text>
+  <text x="70" y="450" class="small-text">Auto-capture when conditions met</text>
+  <text x="70" y="465" class="small-text">3-second video per step</text>
+  
+  <!-- Performance Metrics -->
+  <rect x="750" y="350" width="200" height="120" class="box" fill="#f3e5f5" stroke="#7b1fa2" />
+  <text x="850" y="375" text-anchor="middle" class="step-title">Performance</text>
+  
+  <text x="770" y="400" class="component">Processing: 5.5 FPS</text>
+  <text x="770" y="415" class="component">Landmarks: 478 points</text>
+  <text x="770" y="430" class="component">Real-time detection</text>
+  <text x="770" y="445" class="component">Browser compatible</text>
+  <text x="770" y="460" class="small-text">WebRTC + MediaPipe</text>
+</svg>

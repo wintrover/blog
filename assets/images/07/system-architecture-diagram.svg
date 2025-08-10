@@ -1,0 +1,177 @@
+<svg viewBox="0 0 1000 700" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="clientGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#E3F2FD;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#BBDEFB;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="serverGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#E8F5E8;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#C8E6C9;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="dbGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFF3E0;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FFE0B2;stop-opacity:1" />
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="3" dy="3" stdDeviation="3" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1000" height="700" fill="#f8f9fa"/>
+  
+  <!-- Title -->
+  <text x="500" y="30" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="#2c3e50">KYC System Architecture</text>
+  
+  <!-- Client Side -->
+  <g>
+    <rect x="50" y="80" width="280" height="200" fill="url(#clientGradient)" stroke="#1976D2" stroke-width="2" rx="10" filter="url(#shadow)"/>
+    <text x="190" y="105" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#1976D2">Client Side (Browser)</text>
+    
+    <!-- Webcam -->
+    <rect x="70" y="120" width="80" height="60" fill="#42A5F5" stroke="#1976D2" stroke-width="2" rx="5"/>
+    <text x="110" y="140" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="white">Webcam</text>
+    <text x="110" y="155" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="white">Stream</text>
+    <text x="110" y="170" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="white">Real-time</text>
+    
+    <!-- MediaPipe -->
+    <rect x="170" y="120" width="80" height="60" fill="#66BB6A" stroke="#388E3C" stroke-width="2" rx="5"/>
+    <text x="210" y="140" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="white">MediaPipe</text>
+    <text x="210" y="155" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="white">Face</text>
+    <text x="210" y="170" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="white">Detection</text>
+    
+    <!-- Angle Detection -->
+    <rect x="70" y="200" width="80" height="60" fill="#FF7043" stroke="#D84315" stroke-width="2" rx="5"/>
+    <text x="110" y="220" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="white">Angle</text>
+    <text x="110" y="235" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="white">Detection</text>
+    <text x="110" y="250" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="white">Yaw/Pitch</text>
+    
+    <!-- Video Capture -->
+    <rect x="170" y="200" width="80" height="60" fill="#AB47BC" stroke="#7B1FA2" stroke-width="2" rx="5"/>
+    <text x="210" y="220" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="white">Video</text>
+    <text x="210" y="235" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="white">Capture</text>
+    <text x="210" y="250" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="white">Multi-stage</text>
+  </g>
+  
+  <!-- Server Side -->
+  <g>
+    <rect x="400" y="80" width="280" height="280" fill="url(#serverGradient)" stroke="#388E3C" stroke-width="2" rx="10" filter="url(#shadow)"/>
+    <text x="540" y="105" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#388E3C">Server Side (Node.js)</text>
+    
+    <!-- API Gateway -->
+    <rect x="420" y="120" width="100" height="50" fill="#4CAF50" stroke="#2E7D32" stroke-width="2" rx="5"/>
+    <text x="470" y="140" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="white">API Gateway</text>
+    <text x="470" y="155" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="white">Express.js</text>
+    
+    <!-- FFmpeg Processing -->
+    <rect x="540" y="120" width="120" height="50" fill="#8BC34A" stroke="#689F38" stroke-width="2" rx="5"/>
+    <text x="600" y="140" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="white">FFmpeg</text>
+    <text x="600" y="155" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="white">Video Processing</text>
+    
+    <!-- Authentication -->
+    <rect x="420" y="190" width="100" height="50" fill="#FFC107" stroke="#F57C00" stroke-width="2" rx="5"/>
+    <text x="470" y="210" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#333">Auth Service</text>
+    <text x="470" y="225" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#333">JWT/Session</text>
+    
+    <!-- File Storage -->
+    <rect x="540" y="190" width="120" height="50" fill="#FF9800" stroke="#E65100" stroke-width="2" rx="5"/>
+    <text x="600" y="210" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="white">File Storage</text>
+    <text x="600" y="225" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="white">Video Segments</text>
+    
+    <!-- Business Logic -->
+    <rect x="420" y="260" width="240" height="80" fill="#4CAF50" stroke="#2E7D32" stroke-width="2" rx="5"/>
+    <text x="540" y="280" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="white">KYC Business Logic</text>
+    <text x="540" y="300" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="white">• Video Validation & Processing</text>
+    <text x="540" y="315" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="white">• Stage Management (Front/Left/Right)</text>
+    <text x="540" y="330" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="white">• Data Persistence & Retrieval</text>
+  </g>
+  
+  <!-- Database -->
+  <g>
+    <rect x="750" y="80" width="200" height="200" fill="url(#dbGradient)" stroke="#F57C00" stroke-width="2" rx="10" filter="url(#shadow)"/>
+    <text x="850" y="105" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#F57C00">Database Layer</text>
+    
+    <!-- MariaDB -->
+    <rect x="770" y="120" width="160" height="60" fill="#FF9800" stroke="#E65100" stroke-width="2" rx="5"/>
+    <text x="850" y="140" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="white">MariaDB</text>
+    <text x="850" y="155" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="white">• User Data</text>
+    <text x="850" y="170" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="white">• KYC Records</text>
+    
+    <!-- File System -->
+    <rect x="770" y="200" width="160" height="60" fill="#FFC107" stroke="#F57C00" stroke-width="2" rx="5"/>
+    <text x="850" y="220" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#333">File System</text>
+    <text x="850" y="235" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#333">• Video Files</text>
+    <text x="850" y="250" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#333">• Metadata</text>
+  </g>
+  
+  <!-- Data Flow Arrows -->
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#666"/>
+    </marker>
+  </defs>
+  
+  <!-- Client to Server -->
+  <line x1="330" y1="180" x2="400" y2="180" stroke="#2196F3" stroke-width="3" marker-end="url(#arrowhead)"/>
+  <text x="365" y="170" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#2196F3">HTTP/WebSocket</text>
+  
+  <!-- Server to Database -->
+  <line x1="680" y1="180" x2="750" y2="180" stroke="#4CAF50" stroke-width="3" marker-end="url(#arrowhead)"/>
+  <text x="715" y="170" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#4CAF50">SQL/ORM</text>
+  
+  <!-- Process Flow -->
+  <g transform="translate(50, 450)">
+    <rect x="0" y="0" width="900" height="200" fill="#F5F5F5" stroke="#BDBDBD" stroke-width="2" rx="10"/>
+    <text x="450" y="25" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#424242">KYC Process Flow</text>
+    
+    <!-- Step 1 -->
+    <rect x="20" y="40" width="120" height="60" fill="#E3F2FD" stroke="#1976D2" stroke-width="2" rx="5"/>
+    <text x="80" y="60" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#1976D2">1. Face Detection</text>
+    <text x="80" y="75" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#1976D2">MediaPipe landmarks</text>
+    <text x="80" y="90" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#1976D2">Real-time tracking</text>
+    
+    <!-- Step 2 -->
+    <rect x="160" y="40" width="120" height="60" fill="#E8F5E8" stroke="#388E3C" stroke-width="2" rx="5"/>
+    <text x="220" y="60" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#388E3C">2. Angle Calculation</text>
+    <text x="220" y="75" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#388E3C">Yaw angle measurement</text>
+    <text x="220" y="90" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#388E3C">±30° range detection</text>
+    
+    <!-- Step 3 -->
+    <rect x="300" y="40" width="120" height="60" fill="#FFF3E0" stroke="#F57C00" stroke-width="2" rx="5"/>
+    <text x="360" y="60" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#F57C00">3. Stage Capture</text>
+    <text x="360" y="75" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#F57C00">Front/Left/Right</text>
+    <text x="360" y="90" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#F57C00">Video recording</text>
+    
+    <!-- Step 4 -->
+    <rect x="440" y="40" width="120" height="60" fill="#F3E5F5" stroke="#7B1FA2" stroke-width="2" rx="5"/>
+    <text x="500" y="60" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#7B1FA2">4. Video Processing</text>
+    <text x="500" y="75" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#7B1FA2">FFmpeg splitting</text>
+    <text x="500" y="90" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#7B1FA2">Server processing</text>
+    
+    <!-- Step 5 -->
+    <rect x="580" y="40" width="120" height="60" fill="#FFEBEE" stroke="#C62828" stroke-width="2" rx="5"/>
+    <text x="640" y="60" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#C62828">5. Data Storage</text>
+    <text x="640" y="75" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#C62828">MariaDB insert</text>
+    <text x="640" y="90" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#C62828">File system save</text>
+    
+    <!-- Step 6 -->
+    <rect x="720" y="40" width="120" height="60" fill="#E0F2F1" stroke="#00695C" stroke-width="2" rx="5"/>
+    <text x="780" y="60" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#00695C">6. Verification</text>
+    <text x="780" y="75" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#00695C">Quality check</text>
+    <text x="780" y="90" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#00695C">Completion status</text>
+    
+    <!-- Flow arrows -->
+    <line x1="140" y1="70" x2="160" y2="70" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+    <line x1="280" y1="70" x2="300" y2="70" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+    <line x1="420" y1="70" x2="440" y2="70" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+    <line x1="560" y1="70" x2="580" y2="70" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+    <line x1="700" y1="70" x2="720" y2="70" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+    
+    <!-- Performance metrics -->
+    <text x="450" y="130" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#424242">Performance Metrics</text>
+    <text x="200" y="150" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#666">• Real-time processing: 5.5 FPS</text>
+    <text x="200" y="165" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#666">• Angle detection accuracy: ±2°</text>
+    <text x="700" y="150" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#666">• Video processing: <2s per stage</text>
+    <text x="700" y="165" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#666">• Database response: <100ms</text>
+  </g>
+</svg>

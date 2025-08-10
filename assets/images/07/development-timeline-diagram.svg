@@ -1,0 +1,172 @@
+<svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="timelineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#E3F2FD;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#BBDEFB;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#90CAF9;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="phaseGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1976D2;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1565C0;stop-opacity:1" />
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="3" dy="3" stdDeviation="3" flood-opacity="0.3"/>
+    </filter>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge> 
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/> 
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="800" fill="#f8f9fa"/>
+  
+  <!-- Title -->
+  <text x="600" y="40" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="#2c3e50">KYC System Development Timeline</text>
+  
+  <!-- Main Timeline Line -->
+  <line x1="100" y1="400" x2="1100" y2="400" stroke="url(#timelineGradient)" stroke-width="8" filter="url(#shadow)"/>
+  
+  <!-- Phase 1: Planning & Design (Week 1-2) -->
+  <g>
+    <circle cx="200" cy="400" r="15" fill="#FF6B6B" stroke="#E55353" stroke-width="3" filter="url(#glow)"/>
+    <rect x="120" y="200" width="160" height="120" fill="#FFE5E5" stroke="#FF6B6B" stroke-width="2" rx="10" filter="url(#shadow)"/>
+    <rect x="120" y="200" width="160" height="30" fill="#FF6B6B" rx="10 10 0 0"/>
+    <text x="200" y="220" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="white">Phase 1: Planning</text>
+    <text x="200" y="240" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#333">Week 1-2</text>
+    <text x="130" y="260" font-family="Arial, sans-serif" font-size="11" fill="#555">• Requirements Analysis</text>
+    <text x="130" y="275" font-family="Arial, sans-serif" font-size="11" fill="#555">• System Architecture</text>
+    <text x="130" y="290" font-family="Arial, sans-serif" font-size="11" fill="#555">• Database Design</text>
+    <text x="130" y="305" font-family="Arial, sans-serif" font-size="11" fill="#555">• UI/UX Mockups</text>
+    <line x1="200" y1="320" x2="200" y2="385" stroke="#FF6B6B" stroke-width="2" stroke-dasharray="5,5"/>
+  </g>
+  
+  <!-- Phase 2: Backend Development (Week 3-5) -->
+  <g>
+    <circle cx="400" cy="400" r="15" fill="#4ECDC4" stroke="#45B7B8" stroke-width="3" filter="url(#glow)"/>
+    <rect x="320" y="450" width="160" height="140" fill="#E5F9F6" stroke="#4ECDC4" stroke-width="2" rx="10" filter="url(#shadow)"/>
+    <rect x="320" y="450" width="160" height="30" fill="#4ECDC4" rx="10 10 0 0"/>
+    <text x="400" y="470" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="white">Phase 2: Backend</text>
+    <text x="400" y="490" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#333">Week 3-5</text>
+    <text x="330" y="510" font-family="Arial, sans-serif" font-size="11" fill="#555">• Database Setup</text>
+    <text x="330" y="525" font-family="Arial, sans-serif" font-size="11" fill="#555">• API Development</text>
+    <text x="330" y="540" font-family="Arial, sans-serif" font-size="11" fill="#555">• Authentication System</text>
+    <text x="330" y="555" font-family="Arial, sans-serif" font-size="11" fill="#555">• File Upload Handler</text>
+    <text x="330" y="570" font-family="Arial, sans-serif" font-size="11" fill="#555">• Video Processing</text>
+    <line x1="400" y1="415" x2="400" y2="450" stroke="#4ECDC4" stroke-width="2" stroke-dasharray="5,5"/>
+  </g>
+  
+  <!-- Phase 3: Computer Vision (Week 4-6) -->
+  <g>
+    <circle cx="600" cy="400" r="15" fill="#45B7D1" stroke="#3498DB" stroke-width="3" filter="url(#glow)"/>
+    <rect x="520" y="180" width="160" height="160" fill="#E5F3FF" stroke="#45B7D1" stroke-width="2" rx="10" filter="url(#shadow)"/>
+    <rect x="520" y="180" width="160" height="30" fill="#45B7D1" rx="10 10 0 0"/>
+    <text x="600" y="200" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="white">Phase 3: CV</text>
+    <text x="600" y="220" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#333">Week 4-6</text>
+    <text x="530" y="240" font-family="Arial, sans-serif" font-size="11" fill="#555">• Face Detection Setup</text>
+    <text x="530" y="255" font-family="Arial, sans-serif" font-size="11" fill="#555">• Angle Calculation</text>
+    <text x="530" y="270" font-family="Arial, sans-serif" font-size="11" fill="#555">• MediaPipe Integration</text>
+    <text x="530" y="285" font-family="Arial, sans-serif" font-size="11" fill="#555">• Real-time Processing</text>
+    <text x="530" y="300" font-family="Arial, sans-serif" font-size="11" fill="#555">• Quality Assessment</text>
+    <text x="530" y="315" font-family="Arial, sans-serif" font-size="11" fill="#555">• Validation Logic</text>
+    <line x1="600" y1="340" x2="600" y2="385" stroke="#45B7D1" stroke-width="2" stroke-dasharray="5,5"/>
+  </g>
+  
+  <!-- Phase 4: Frontend Development (Week 5-7) -->
+  <g>
+    <circle cx="800" cy="400" r="15" fill="#96CEB4" stroke="#85C1A3" stroke-width="3" filter="url(#glow)"/>
+    <rect x="720" y="450" width="160" height="140" fill="#F0F9F4" stroke="#96CEB4" stroke-width="2" rx="10" filter="url(#shadow)"/>
+    <rect x="720" y="450" width="160" height="30" fill="#96CEB4" rx="10 10 0 0"/>
+    <text x="800" y="470" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="white">Phase 4: Frontend</text>
+    <text x="800" y="490" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#333">Week 5-7</text>
+    <text x="730" y="510" font-family="Arial, sans-serif" font-size="11" fill="#555">• React Components</text>
+    <text x="730" y="525" font-family="Arial, sans-serif" font-size="11" fill="#555">• Camera Integration</text>
+    <text x="730" y="540" font-family="Arial, sans-serif" font-size="11" fill="#555">• Real-time Feedback</text>
+    <text x="730" y="555" font-family="Arial, sans-serif" font-size="11" fill="#555">• Progress Tracking</text>
+    <text x="730" y="570" font-family="Arial, sans-serif" font-size="11" fill="#555">• Responsive Design</text>
+    <line x1="800" y1="415" x2="800" y2="450" stroke="#96CEB4" stroke-width="2" stroke-dasharray="5,5"/>
+  </g>
+  
+  <!-- Phase 5: Testing & Deployment (Week 8) -->
+  <g>
+    <circle cx="1000" cy="400" r="15" fill="#FECA57" stroke="#FF9F43" stroke-width="3" filter="url(#glow)"/>
+    <rect x="920" y="200" width="160" height="140" fill="#FFF8E1" stroke="#FECA57" stroke-width="2" rx="10" filter="url(#shadow)"/>
+    <rect x="920" y="200" width="160" height="30" fill="#FECA57" rx="10 10 0 0"/>
+    <text x="1000" y="220" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="white">Phase 5: Deploy</text>
+    <text x="1000" y="240" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#333">Week 8</text>
+    <text x="930" y="260" font-family="Arial, sans-serif" font-size="11" fill="#555">• Unit Testing</text>
+    <text x="930" y="275" font-family="Arial, sans-serif" font-size="11" fill="#555">• Integration Testing</text>
+    <text x="930" y="290" font-family="Arial, sans-serif" font-size="11" fill="#555">• Performance Testing</text>
+    <text x="930" y="305" font-family="Arial, sans-serif" font-size="11" fill="#555">• Security Audit</text>
+    <text x="930" y="320" font-family="Arial, sans-serif" font-size="11" fill="#555">• Production Deploy</text>
+    <line x1="1000" y1="340" x2="1000" y2="385" stroke="#FECA57" stroke-width="2" stroke-dasharray="5,5"/>
+  </g>
+  
+  <!-- Week Labels -->
+  <g>
+    <text x="150" y="430" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#666">Week 1</text>
+    <text x="250" y="430" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#666">Week 2</text>
+    <text x="350" y="430" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#666">Week 3</text>
+    <text x="450" y="430" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#666">Week 4</text>
+    <text x="550" y="430" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#666">Week 5</text>
+    <text x="650" y="430" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#666">Week 6</text>
+    <text x="750" y="430" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#666">Week 7</text>
+    <text x="850" y="430" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#666">Week 8</text>
+  </g>
+  
+  <!-- Milestones -->
+  <g>
+    <rect x="100" y="620" width="1000" height="120" fill="#F5F5F5" stroke="#BDBDBD" stroke-width="2" rx="10" filter="url(#shadow)"/>
+    <text x="600" y="645" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#424242">Key Milestones</text>
+    
+    <circle cx="150" cy="670" r="8" fill="#FF6B6B"/>
+    <text x="170" y="675" font-family="Arial, sans-serif" font-size="12" fill="#333">System Architecture Complete (Week 2)</text>
+    
+    <circle cx="150" cy="690" r="8" fill="#4ECDC4"/>
+    <text x="170" y="695" font-family="Arial, sans-serif" font-size="12" fill="#333">Core API Endpoints Ready (Week 4)</text>
+    
+    <circle cx="150" cy="710" r="8" fill="#45B7D1"/>
+    <text x="170" y="715" font-family="Arial, sans-serif" font-size="12" fill="#333">Face Detection Working (Week 5)</text>
+    
+    <circle cx="600" cy="670" r="8" fill="#96CEB4"/>
+    <text x="620" y="675" font-family="Arial, sans-serif" font-size="12" fill="#333">Frontend MVP Complete (Week 6)</text>
+    
+    <circle cx="600" cy="690" r="8" fill="#FECA57"/>
+    <text x="620" y="695" font-family="Arial, sans-serif" font-size="12" fill="#333">Full Integration Testing (Week 7)</text>
+    
+    <circle cx="600" cy="710" r="8" fill="#A8E6CF"/>
+    <text x="620" y="715" font-family="Arial, sans-serif" font-size="12" fill="#333">Production Deployment (Week 8)</text>
+  </g>
+  
+  <!-- Technology Stack Info -->
+  <g>
+    <rect x="100" y="60" width="300" height="100" fill="#E8F5E8" stroke="#4CAF50" stroke-width="2" rx="10" filter="url(#shadow)"/>
+    <text x="250" y="85" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#2E7D32">Technology Stack</text>
+    <text x="120" y="105" font-family="Arial, sans-serif" font-size="12" fill="#333">Backend: Node.js, Express, MySQL</text>
+    <text x="120" y="120" font-family="Arial, sans-serif" font-size="12" fill="#333">Frontend: React, TypeScript, Tailwind</text>
+    <text x="120" y="135" font-family="Arial, sans-serif" font-size="12" fill="#333">CV: MediaPipe, OpenCV, FFmpeg</text>
+    <text x="120" y="150" font-family="Arial, sans-serif" font-size="12" fill="#333">Deploy: Docker, AWS/GCP</text>
+  </g>
+  
+  <!-- Team Info -->
+  <g>
+    <rect x="800" y="60" width="300" height="100" fill="#FFF3E0" stroke="#FF9800" stroke-width="2" rx="10" filter="url(#shadow)"/>
+    <text x="950" y="85" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#E65100">Team Structure</text>
+    <text x="820" y="105" font-family="Arial, sans-serif" font-size="12" fill="#333">Full-Stack Developer (Lead)</text>
+    <text x="820" y="120" font-family="Arial, sans-serif" font-size="12" fill="#333">Computer Vision Specialist</text>
+    <text x="820" y="135" font-family="Arial, sans-serif" font-size="12" fill="#333">UI/UX Designer</text>
+    <text x="820" y="150" font-family="Arial, sans-serif" font-size="12" fill="#333">DevOps Engineer</text>
+  </g>
+  
+  <!-- Progress Indicators -->
+  <g>
+    <text x="200" y="370" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#FF6B6B">100%</text>
+    <text x="400" y="370" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#4ECDC4">100%</text>
+    <text x="600" y="370" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#45B7D1">95%</text>
+    <text x="800" y="370" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#96CEB4">90%</text>
+    <text x="1000" y="370" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#FECA57">85%</text>
+  </g>
+</svg>
