@@ -171,7 +171,7 @@
     <text x="450" y="130" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#424242">Performance Metrics</text>
     <text x="200" y="150" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#666">• Real-time processing: 5.5 FPS</text>
     <text x="200" y="165" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#666">• Angle detection accuracy: ±2°</text>
-    <text x="700" y="150" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#666">• Video processing: <2s per stage</text>
-    <text x="700" y="165" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#666">• Database response: <100ms</text>
+    <text x="700" y="150" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#666">• Video processing: &lt;2s per stage</text>
+    <text x="700" y="165" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#666">• Database response: &lt;100ms</text>
   </g>
 </svg>
