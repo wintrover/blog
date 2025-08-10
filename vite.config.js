@@ -5,7 +5,9 @@ export default defineConfig({
   plugins: [svelte()],
   base: '/blog/',
   build: {
-    outDir: 'dist'
+    outDir: 'dist',
+    copyPublicDir: true
   },
-  assetsInclude: ['**/*.md']
+  assetsInclude: ['**/*.md'],
+  publicDir: 'public'
 })
