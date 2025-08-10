@@ -112,6 +112,10 @@
     background: #28a745;
   }
   
+  .category-badge.company-work {
+    background: #6f42c1;
+  }
+  
   .post h1 {
     margin: 0 0 15px 0;
     font-size: 24px;
