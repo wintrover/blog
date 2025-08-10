@@ -2,13 +2,16 @@ import { marked } from 'marked'
 import mermaid from 'mermaid'
 
 // 마크다운 파일 경로 매핑
+// ⚠️ 새 포스트 추가 시 여기에 slug: 파일경로 매핑을 추가해야 함!
+// posts.js의 postsData와 함께 업데이트 필수!
 const postFiles = {
   'how-i-built-cvfactory': '/blog/_posts/2025-06-25-1.md',
   'cvfactory-backend-celery-fastapi-playwright': '/blog/_posts/2025-06-29-2.md',
   'svelte-django-practical-checklist': '/blog/_posts/2025-07-01-3.md',
   'sonarqube-community-edition-grade-a-quality': '/blog/_posts/2025-07-06-4.md',
   'junior-developer-google-login-implementation': '/blog/_posts/2025-07-18-5.md',
-  'facial-authentication-system-development': '/blog/_posts/2025-08-05-6.md'
+  'facial-authentication-system-development': '/blog/_posts/2025-08-05-6.md',
+  'kyc-system-completion-and-growth': '/blog/_posts/2025-08-10-7.md'
 }
 
 // 마크다운 파일 로드 및 파싱

@@ -49,6 +49,52 @@ npm run dev
 npm run build
 ```
 
+## 📝 Dev.to 업로드
+
+블로그 포스트를 dev.to에 자동으로 업로드할 수 있는 PowerShell 스크립트가 포함되어 있습니다.
+
+### upload-to-devto.ps1 스크립트 사용법
+
+이 스크립트는 마크다운 파일을 dev.to에 자동으로 업로드합니다.
+
+#### 기본 사용법:
+```powershell
+.\upload-to-devto.ps1 -FilePath "_posts\your-post.md"
+```
+
+#### 매개변수:
+- `-FilePath`: 업로드할 마크다운 파일 경로 (필수)
+- `-Published`: 게시글을 바로 발행할지 여부 (기본값: false, 즉 Draft 상태)
+- `-Tags`: 게시글 태그 (기본값: "webdev,javascript,ai,machinelearning")
+- `-AddTimestamp`: 제목에 현재 시간 추가 (중복 제목 방지용)
+- `-TestMode`: 테스트용 간단한 게시글 생성
+
+#### 사용 예시:
+```powershell
+# 기본 업로드
+.\upload-to-devto.ps1 -FilePath "_posts\2025-08-05-6.md"
+
+# 타임스탬프 추가하여 업로드
+.\upload-to-devto.ps1 -FilePath "_posts\2025-08-05-6.md" -AddTimestamp
+
+# 테스트 모드로 업로드
+.\upload-to-devto.ps1 -FilePath "_posts\2025-08-05-6.md" -TestMode
+```
+
+#### 기능:
+- Jekyll front matter에서 제목 자동 추출
+- Jekyll front matter 자동 제거 (dev.to에서 불필요)
+- 이모지를 HTML 엔티티로 자동 변환
+- UTF-8 인코딩으로 안전한 업로드
+- 업로드 성공 시 Article ID와 URL 출력
+- 상세한 오류 메시지 출력
+
+#### 참고사항:
+- API 키는 스크립트 내부에 하드코딩되어 있습니다
+- 보안을 위해 실제 사용 시에는 환경변수나 별도 설정 파일 사용을 권장합니다
+
+**참고**: 스크립트 사용 전에 `upload-to-devto.ps1` 파일의 `$API_KEY` 변수에 본인의 dev.to API 키를 설정해주세요.
+
 ## 🚀 배포
 
 GitHub에 푸시하면 GitHub Actions가 자동으로 빌드하고 GitHub Pages에 배포합니다.

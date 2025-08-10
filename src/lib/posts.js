@@ -1,5 +1,17 @@
 // Real post data extracted from markdown files (sorted by date descending)
+// ⚠️ 새 포스트 추가 시 주의사항:
+// 1. 이 파일의 postsData 배열에 메타데이터 추가 (날짜 순서대로)
+// 2. markdown.js의 postFiles 객체에 slug와 파일 경로 매핑 추가
+// 3. 두 작업을 모두 해야 블로그에서 포스트가 보임!
 export const postsData = [
+  {
+    title: "Junior Developer's Full-Stack AI Journey: Completing the KYC System and Growing",
+    date: "2025-08-10",
+    category: "Company Work",
+    tags: ["kyc", "facial-recognition", "ffmpeg", "mariadb", "mediapipe"],
+    slug: "kyc-system-completion-and-growth",
+    excerpt: "Based on the Yaw angle measurement technology resolved in the last post, I completed the core functions of the KYC system. From video splitting using FFmpeg and MariaDB integration to performance optimization - I share a junior developer's full-stack challenge."
+  },
   {
     title: "As a New Hire, I'm Leading the Company Platform's Facial Authentication System Development",
     date: "2025-08-05",
