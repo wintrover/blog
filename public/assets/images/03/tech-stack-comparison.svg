@@ -17,13 +17,13 @@
   <!-- Vanilla JS -->
   <rect x="50" y="150" width="120" height="80" rx="10" class="node vanilla"/>
   <text x="110" y="185" class="label" font-weight="bold">Vanilla JS</text>
-  <text x="110" y="205" class="label" font-size="10">Simple & Direct</text>
+  <text x="110" y="205" class="label" font-size="10">Simple &amp; Direct</text>
   
   <!-- Svelte Components -->
   <rect x="300" y="80" width="140" height="80" rx="10" class="node svelte"/>
   <text x="370" y="115" class="label" fill="white" font-weight="bold">Svelte</text>
   <text x="370" y="135" class="label" fill="white" font-weight="bold">Components</text>
-  <text x="370" y="150" class="label" fill="white" font-size="10">Reactive & Efficient</text>
+  <text x="370" y="150" class="label" fill="white" font-size="10">Reactive &amp; Efficient</text>
   
   <!-- SvelteKit -->
   <rect x="300" y="220" width="140" height="80" rx="10" class="node sveltekit"/>

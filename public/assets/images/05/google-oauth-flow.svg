@@ -71,7 +71,7 @@
   
   <!-- 7. Access & Refresh Tokens -->
   <path d="M 560 380 L 400 400" class="edge"/>
-  <text x="480" y="395" class="label" font-size="10">7. Access & Refresh Tokens</text>
+  <text x="480" y="395" class="label" font-size="10">7. Access &amp; Refresh Tokens</text>
   
   <!-- 8. Get User Info -->
   <path d="M 400 420 L 560 440" class="edge"/>

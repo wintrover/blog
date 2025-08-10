@@ -81,9 +81,9 @@
     <!-- Business Logic -->
     <rect x="420" y="260" width="240" height="80" fill="#4CAF50" stroke="#2E7D32" stroke-width="2" rx="5"/>
     <text x="540" y="280" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="white">KYC Business Logic</text>
-    <text x="540" y="300" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="white">• Video Validation & Processing</text>
+    <text x="540" y="300" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="white">• Video Validation &amp; Processing</text>
     <text x="540" y="315" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="white">• Stage Management (Front/Left/Right)</text>
-    <text x="540" y="330" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="white">• Data Persistence & Retrieval</text>
+    <text x="540" y="330" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="white">• Data Persistence &amp; Retrieval</text>
   </g>
   
   <!-- Database -->

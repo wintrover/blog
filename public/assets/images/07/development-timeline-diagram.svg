@@ -30,7 +30,7 @@
   <!-- Main Timeline Line -->
   <line x1="100" y1="400" x2="1100" y2="400" stroke="url(#timelineGradient)" stroke-width="8" filter="url(#shadow)"/>
   
-  <!-- Phase 1: Planning & Design (Week 1-2) -->
+  <!-- Phase 1: Planning &amp; Design (Week 1-2) -->
   <g>
     <circle cx="200" cy="400" r="15" fill="#FF6B6B" stroke="#E55353" stroke-width="3" filter="url(#glow)"/>
     <rect x="120" y="200" width="160" height="120" fill="#FFE5E5" stroke="#FF6B6B" stroke-width="2" rx="10" filter="url(#shadow)"/>
@@ -90,7 +90,7 @@
     <line x1="800" y1="415" x2="800" y2="450" stroke="#96CEB4" stroke-width="2" stroke-dasharray="5,5"/>
   </g>
   
-  <!-- Phase 5: Testing & Deployment (Week 8) -->
+  <!-- Phase 5: Testing &amp; Deployment (Week 8) -->
   <g>
     <circle cx="1000" cy="400" r="15" fill="#FECA57" stroke="#FF9F43" stroke-width="3" filter="url(#glow)"/>
     <rect x="920" y="200" width="160" height="140" fill="#FFF8E1" stroke="#FECA57" stroke-width="2" rx="10" filter="url(#shadow)"/>
