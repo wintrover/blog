@@ -85,7 +85,7 @@
 <div class="sidebar-module">
   <h4>About</h4>
   <p>Working as a Fullstack AI Application Architect, sharing the latest tech trends and development experiences.</p>
-  <p>내 이력서를 확인하고 싶다면 <a href="https://wintrover.github.io" target="_blank" rel="noopener noreferrer">wintrover.github.io</a>를 참고해라</p>
+  <p>Check my resume <a href="https://wintrover.github.io" target="_blank" rel="noopener noreferrer">wintrover.github.io</a></p>
 </div>
 
 <style>
