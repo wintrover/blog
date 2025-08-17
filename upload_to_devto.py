@@ -81,11 +81,16 @@ def extract_frontmatter_and_content(file_path):
     else:
         return {}, content
 
+# 이미지 업로드 관련 함수들 제거됨 - GitHub Pages URL을 그대로 사용
+
 def upload_to_devto(file_path, api_key):
     """Dev.to에 아티클 업로드"""
     try:
         # 파일 읽기 및 파싱
         frontmatter, body_content = extract_frontmatter_and_content(file_path)
+        
+        # 이미지 처리: GitHub Pages URL을 그대로 사용
+        print("🔍 이미지 URL 확인 중...")
         
         # API 요청 데이터 구성 (article 객체로 감싸기)
         article_data = {
