@@ -88,7 +88,6 @@
   
   .post {
     border-bottom: 1px solid #eee;
-    padding-bottom: 30px;
   }
   
   .post:last-child {

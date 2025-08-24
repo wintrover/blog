@@ -28,7 +28,10 @@ function parseFrontMatter(content) {
         const value = trimmed.substring(colonIndex + 1).trim();
         
         // 값이 문자열인지 숫자인지 확인
-        if (value.startsWith('"') && value.endsWith('"')) {
+        if (key === 'tags') {
+          // tags는 공백으로 구분된 문자열이므로 배열로 변환
+          data[key] = value.split(' ');
+        } else if (value.startsWith('"') && value.endsWith('"')) {
           data[key] = value.slice(1, -1);
         } else if (value === 'true') {
           data[key] = true;
