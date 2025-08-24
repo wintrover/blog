@@ -68,8 +68,6 @@ export async function loadAllPosts() {
     // Vite의 import.meta.glob을 사용하여 모든 .md 파일을 동적으로 로드
     const modules = import.meta.glob('../posts/*.md', { eager: true, query: '?raw', import: 'default' });
     
-    console.log('loadAllPosts - 로드된 모듈:', Object.keys(modules));
-    
     const posts = [];
     
     for (const path in modules) {
@@ -109,9 +107,6 @@ export async function loadPostBySlug(slug) {
     // Vite의 import.meta.glob을 사용하여 모든 .md 파일을 동적으로 로드
     const modules = import.meta.glob('../posts/*.md', { eager: true, query: '?raw', import: 'default' });
     
-    console.log('로드된 모듈:', Object.keys(modules));
-    console.log('요청된 slug:', slug);
-    
     // 모든 파일을 순회하며 slug가 일치하는 포스트를 찾음
     let targetContent = null;
     let targetData = null;
@@ -127,8 +122,6 @@ export async function loadPostBySlug(slug) {
       // 제목을 기반으로 slug 생성
       const postSlug = slugifyTitle(data.title || fileName);
       
-      console.log(`파일: ${fileName}, 제목: ${data.title || fileName}, 생성된 slug: ${postSlug}`);
-      
       if (postSlug === slug) {
         targetContent = content;
         targetData = data;
@@ -137,11 +130,7 @@ export async function loadPostBySlug(slug) {
       }
     }
     
-    console.log('찾은 파일명:', targetFileName);
-    console.log('파일 내용 존재:', !!targetContent);
-    
     if (!targetContent) {
-      console.log('파일을 찾을 수 없습니다. 사용 가능한 파일들:', Object.keys(modules));
       return null;
     }
     

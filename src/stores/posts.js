@@ -1,4 +1,8 @@
-import { writable } from 'svelte/store'
-import { postsData } from '../lib/posts.js'
+import { readable } from 'svelte/store'
+import { loadAllPosts } from '../lib/postLoader.js'
 
-export const posts = writable(postsData)
+export const posts = readable([], set => {
+  loadAllPosts().then(data => {
+    set(data)
+  })
+})

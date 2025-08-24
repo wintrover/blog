@@ -160,7 +160,13 @@
   
   <main id="main-content" bind:this={mainContentElement}>
     <div id="content" bind:this={contentElement}>
-      <Router {routes} />
+      {#await $posts}
+        <p>Loading posts...</p>
+      {:then}
+        <Router {routes} />
+      {:catch error}
+        <p>Error loading posts: {error.message}</p>
+      {/await}
     </div>
     <Footer />
   </main>
