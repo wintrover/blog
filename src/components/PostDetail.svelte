@@ -269,7 +269,6 @@
   .content-error {
     background: #fff5f5;
     border: 1px solid #fed7d7;
-    padding: 30px;
     border-radius: 8px;
     color: #c53030;
   }
