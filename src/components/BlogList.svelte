@@ -3,25 +3,33 @@
   import { siteConfig } from '../lib/config.js'
   import { push } from 'svelte-spa-router'
   import { selectedCategory } from '../stores/category.js'
-  import { postsData } from '../lib/posts.js'
+  import { loadAllPosts } from '../lib/postLoader.js'
   import { onMount } from 'svelte'
   
   export let params = {}
-  let posts = postsData
+  let posts = []
   let filteredPosts = []
   
   function selectPost(post) {
     push(`/post/${post.slug}`)
   }
   
-  function loadPosts() {
-    // URL 파라미터에 따라 필터링
-    if (params.category) {
-      filteredPosts = posts.filter(post => slugify(post.category) === params.category)
-      selectedCategory.set(posts.find(p => slugify(p.category) === params.category)?.category || 'all')
-    } else {
-      filteredPosts = posts
-      selectedCategory.set('all')
+  async function loadPosts() {
+    try {
+      // 모든 포스트를 동적으로 로드
+      posts = await loadAllPosts()
+      
+      // URL 파라미터에 따라 필터링
+      if (params.category) {
+        filteredPosts = posts.filter(post => slugify(post.category) === params.category)
+        selectedCategory.set(posts.find(p => slugify(p.category) === params.category)?.category || 'all')
+      } else {
+        filteredPosts = posts
+        selectedCategory.set('all')
+      }
+    } catch (error) {
+      console.error('포스트 로딩 중 오류 발생:', error)
+      filteredPosts = []
     }
   }
   

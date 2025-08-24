@@ -1,9 +1,8 @@
 <script>
   import { onMount, afterUpdate } from "svelte";
   import { formatDate, slugify } from "../lib/utils.js";
-  import { loadPost } from "../lib/markdown.js";
+  import { loadPostBySlug } from "../lib/postLoader.js";
   import { push } from 'svelte-spa-router';
-  import { postsData } from '../lib/posts.js';
   import mermaid from 'mermaid';
 
   export let params = {};
@@ -14,15 +13,15 @@
   async function loadPostData() {
     if (params.slug) {
       try {
-        // 포스트 메타데이터 로드
-        post = postsData.find(p => p.slug === params.slug);
+        // 포스트 데이터 로드
+        const postData = await loadPostBySlug(params.slug);
         
-        if (!post) {
+        if (!postData) {
           throw new Error('포스트를 찾을 수 없습니다.');
         }
         
-        // 마크다운 콘텐츠 로드
-        markdownContent = await loadPost(params.slug);
+        post = postData;
+        markdownContent = postData;
         loading = false;
         
         // 버튼 이벤트 리스너 추가
