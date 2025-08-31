@@ -12,6 +12,31 @@ KYC(Know Your Customer) 프로세스에서 사용자의 얼굴 인식 과정을 
 
 ## 🎯 주요 기능 구현
 
+### 시스템 아키텍처 개요
+
+```mermaid
+graph TB
+    A[사용자] --> B[React Frontend]
+    B --> C[MediaRecorder API]
+    B --> D[FFmpeg.wasm]
+    B --> E[OpenCV.js]
+    
+    C --> F[비디오 녹화]
+    F --> G[타임라인 데이터 수집]
+    G --> D
+    D --> H[비디오 분할]
+    H --> I[분할된 비디오 파일들]
+    I --> J[kyc_workers 서버]
+    
+    E --> K[얼굴 인식]
+    K --> L[KYC 단계 진행]
+    L --> G
+    
+    style B fill:#e1f5fe
+    style D fill:#f3e5f5
+    style J fill:#e8f5e8
+```
+
 ### 1. 비디오 녹화 시스템
 
 **MediaRecorder API**를 활용하여 KYC 미션 시작부터 종료까지 전체 과정을 녹화하는 시스템을 구현했습니다.
@@ -86,6 +111,38 @@ const loadFFmpeg = async () => {
 
 타임라인 데이터를 기반으로 비디오를 단계별로 분할하는 시스템을 구현했습니다.
 
+#### 비디오 처리 플로우
+
+```mermaid
+sequenceDiagram
+    participant U as 사용자
+    participant R as React App
+    participant M as MediaRecorder
+    participant F as FFmpeg
+    participant S as 서버
+    
+    U->>R: KYC 프로세스 시작
+    R->>M: 녹화 시작
+    
+    loop KYC 단계별 진행
+        U->>R: 각 단계 수행
+        R->>R: 타임스탬프 기록
+    end
+    
+    U->>R: KYC 완료
+    R->>M: 녹화 종료
+    M->>R: 전체 비디오 Blob
+    
+    R->>F: 비디오 분할 요청
+    F->>F: 타임라인 기반 분할
+    F->>R: 분할된 비디오들
+    
+    loop 각 분할 비디오
+        R->>S: 비디오 업로드
+        S->>R: 업로드 완료
+    end
+```
+
 ```typescript
 const splitVideo = async (videoBlob: Blob, timeline: KYCTimeline[]) => {
   // 비디오를 FFmpeg 가상 파일 시스템에 쓰기
@@ -132,6 +189,25 @@ const formatTime = (milliseconds: number): string => {
 ```
 
 ## 🔧 주요 시행착오 및 해결 과정
+
+### Cross-Origin 정책 및 보안 헤더 관계도
+
+```mermaid
+graph LR
+    A[HTTPS 필수] --> B[COEP: require-corp]
+    A --> C[COOP: same-origin]
+    B --> D[SharedArrayBuffer 활성화]
+    C --> D
+    D --> E[FFmpeg.wasm 동작]
+    
+    F[외부 CDN 리소스] --> G[CORS 차단]
+    G --> H[로컬 호스팅 필요]
+    H --> I[OpenCV.js 로컬 설치]
+    
+    style A fill:#ffcdd2
+    style D fill:#c8e6c9
+    style I fill:#fff3e0
+```
 
 ### 1. OpenCV.js COEP Cross-Origin 문제
 
@@ -229,6 +305,48 @@ const cleanupFFmpegFiles = async () => {
 
 ## 🚀 기술 스택 및 아키텍처
 
+### 기술 스택 구성도
+
+```mermaid
+graph TB
+    subgraph "Frontend Layer"
+        A[React 19]
+        B[TypeScript]
+        C[Styled Components]
+        D[TailwindCSS]
+    end
+    
+    subgraph "State Management"
+        E[React Query]
+        F[React Router]
+    end
+    
+    subgraph "Video Processing"
+        G[MediaRecorder API]
+        H[FFmpeg.wasm]
+        I[OpenCV.js]
+        J[MediaPipe]
+    end
+    
+    subgraph "Development Tools"
+        K[Vite]
+        L[Jest]
+        M[SonarQube]
+        N[Sentry]
+    end
+    
+    A --> E
+    A --> G
+    B --> A
+    E --> H
+    G --> H
+    H --> I
+    
+    style A fill:#61dafb
+    style H fill:#ff6b6b
+    style K fill:#646cff
+```
+
 ### Frontend 기술 스택
 - **React 19** + **TypeScript**: 컴포넌트 기반 UI 개발
 - **@tanstack/react-query**: 서버 상태 관리
@@ -249,6 +367,17 @@ const cleanupFFmpegFiles = async () => {
 - **Sentry**: 에러 모니터링
 
 ## 📈 성과 및 학습 포인트
+
+### 개발 프로세스 및 성과 지표
+
+```mermaid
+pie title 개발 시간 분배
+    "비디오 녹화 구현" : 25
+    "FFmpeg 환경 구축" : 30
+    "Cross-Origin 이슈 해결" : 20
+    "비디오 분할 로직" : 15
+    "최적화 및 디버깅" : 10
+```
 
 ### 성과
 1. **웹 환경에서의 실시간 비디오 처리** 시스템 구축 완료
