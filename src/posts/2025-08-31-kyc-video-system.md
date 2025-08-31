@@ -1,6 +1,6 @@
 ---
 title: "KYC 비디오 녹화 및 분할 시스템 개발기: React + FFmpeg + MediaRecorder API"
-date: 2025-01-27 00:00:00 -0000
+date: 2025-08-31 00:00:00 -0000
 tags: react typescript ffmpeg mediarecorder kyc video-processing
 category: Frontend Development
 excerpt: "KYC 프로세스에서 사용자 얼굴 인식 과정을 전체 비디오로 녹화하고 단계별로 분할하는 시스템을 React와 FFmpeg를 활용해 개발한 경험을 공유합니다."
