@@ -15,11 +15,30 @@ async function postToDev(filePath) {
     const markdownWithMeta = await fs.readFile(filePath, 'utf-8');
     const { data: frontmatter, content } = matter(markdownWithMeta);
 
+    // Normalize and limit tags to DEV's expected constraints (max 4)
+    const rawTags = frontmatter.tags;
+    const normalizedTags = Array.isArray(rawTags)
+      ? rawTags
+      : typeof rawTags === 'string'
+      ? rawTags.split(/[\,\s]+/).filter(Boolean)
+      : [];
+
+    // Sanitize: lowercase, remove non-alphanumeric, dedupe, drop empty
+    const sanitized = Array.from(
+      new Set(
+        normalizedTags
+          .map((t) => String(t).toLowerCase().replace(/[^a-z0-9]/g, ''))
+          .filter(Boolean)
+      )
+    );
+    const tags = sanitized.slice(0, 4);
+
     const article = {
       title: frontmatter.title,
       published: false,
       body_markdown: content,
-      tags: frontmatter.tags || [],
+      tags,
+      description: frontmatter.excerpt || frontmatter.description || undefined,
     };
 
     const response = await fetch('https://dev.to/api/articles', {
