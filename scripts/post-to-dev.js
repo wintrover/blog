@@ -18,40 +18,37 @@ function absolutizeSrc(src, publicBaseUrl) {
     const trimmed = src.trim().replace(/^['"]|['"]$/g, '');
     if (/^(https?:)?\/\//i.test(trimmed) || trimmed.startsWith('data:')) return trimmed;
 
-    const basePath = '/blog';
-    let p = trimmed;
-    // normalize common variants to site-rooted paths under /blog
-    if (p.startsWith('/blog/')) {
-      // already rooted under /blog
-    } else if (p.startsWith('/assets/')) {
-      p = basePath + p;
-    } else if (p.startsWith('/images/')) {
-      p = basePath + p;
-    } else if (p === '/favicon.ico') {
-      p = basePath + p;
-    } else if (p.startsWith('../assets/')) {
-      p = basePath + p.replace(/^\.\.\//, '');
-    } else if (p.startsWith('./assets/')) {
-      p = basePath + p.replace(/^\.\//, '');
-    } else if (p.startsWith('assets/')) {
-      p = basePath + '/' + p;
-    } else if (p.startsWith('images/')) {
-      p = basePath + '/' + p;
-    } else if (!p.startsWith('/')) {
-      // generic relative like test.jpg
-      p = basePath + '/' + p;
+    const base = new URL(publicBaseUrl);
+    const underBlog = base.pathname.replace(/\/+$/, '').endsWith('/blog');
+
+    // Derive asset path under assets/images
+    let assetPath = trimmed;
+    const mBlogAssets = trimmed.match(/(?:^|\/)(blog\/assets\/[^?#\s)]+)/i);
+    const mAssets = trimmed.match(/(?:^|\/)(assets\/[^?#\s)]+)/i);
+    const mImages = trimmed.match(/(?:^|\/)(images\/[^?#\s)]+)/i);
+    if (mBlogAssets) {
+      assetPath = mBlogAssets[1].replace(/^blog\//i, '');
+    } else if (mAssets) {
+      assetPath = mAssets[1];
+    } else if (mImages) {
+      assetPath = mImages[1];
+    } else {
+      assetPath = trimmed.replace(/^\.{1,2}\//, '').replace(/^blog\//i, '');
     }
 
-    // If path starts with just '/something' (e.g. '/assets/...'), ensure it is under /blog
-    if (/^\/(?!blog\/)/.test(p)) {
-      p = basePath + p;
+    let p;
+    if (underBlog) {
+      // relative to /blog
+      p = assetPath.replace(/^\/+/, '');
+    } else {
+      // absolute under root /blog
+      p = '/blog/' + assetPath.replace(/^\/+/, '');
     }
 
-    const abs = new URL(p, publicBaseUrl).toString();
-    // avoid accidental double slashes except protocol
-    return abs.replace(/([^:]\/)\/+/, '$1/');
+    const abs = new URL(p, base).toString();
+    return abs;
   } catch {
-    return src; // do not break posting on edge inputs
+    return src;
   }
 }
 
