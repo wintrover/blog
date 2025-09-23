@@ -14,6 +14,27 @@ const postFiles = {
   'kyc-system-completion-and-growth': '/blog/_posts/2025-08-10-7.md'
 }
 
+// 이미지 경로 정규화
+function normalizeImageSrc(src) {
+  if (!src || typeof src !== 'string') return src
+  // 절대 경로는 그대로 유지
+  if (src.startsWith('http://') || src.startsWith('https://')) return src
+  // vite base가 /blog/이므로, /assets로 시작하면 /blog/assets로 보정
+  if (src.startsWith('/assets/')) return `/blog${src}`
+  // ../assets 또는 ../../assets -> /blog/assets로 변환
+  if (src.includes('/assets/')) {
+    const idx = src.indexOf('/assets/')
+    return `/blog${src.slice(idx)}`
+  }
+  // 상대경로 "../" -> "/blog/"로 변환
+  if (src.startsWith('../')) return src.replace(/^\.\.+\//, '/blog/')
+  // 루트가 아닌 상대경로인 경우(예: images/09/..), /blog/를 앞에 추가
+  if (!src.startsWith('/')) return `/blog/${src.replace(/^\.\//, '')}`
+  // 이미 /blog/로 시작하지 않는 절대 루트 경로는 /blog를 접두사로 추가
+  if (src.startsWith('/')) return src.startsWith('/blog/') ? src : `/blog${src}`
+  return src
+}
+
 // 마크다운 파일 로드 및 파싱
 export async function loadPost(slug) {
   const filePath = postFiles[slug]
@@ -36,20 +57,28 @@ export async function loadPost(slug) {
 }
 
 // 마크다운 파싱 (front matter + content)
-function parseMarkdown(content) {
+export function parseMarkdown(content) {
   const frontMatterRegex = /^---\s*\n([\s\S]*?)\n---\s*\n([\s\S]*)$/
   const match = content.match(frontMatterRegex)
   
   if (!match) {
+    const htmlRaw = marked(content)
     return {
       frontMatter: {},
-      html: marked(content)
+      html: htmlRaw.replace(/<img\s+[^>]*src=["']([^"']+)["'][^>]*>/g, (m, src) => {
+        const fixed = normalizeImageSrc(src)
+        return m.replace(src, fixed)
+      })
     }
   }
   
   const [, frontMatterStr, markdownContent] = match
   const frontMatter = parseFrontMatter(frontMatterStr)
-  const html = marked(markdownContent)
+  const htmlRaw = marked(markdownContent)
+  const html = htmlRaw.replace(/<img\s+[^>]*src=["']([^"']+)["'][^>]*>/g, (m, src) => {
+    const fixed = normalizeImageSrc(src)
+    return m.replace(src, fixed)
+  })
   
   return {
     frontMatter,
@@ -96,14 +125,10 @@ mermaid.initialize({
   securityLevel: 'loose'
 })
 
-// 이미지 렌더러 커스터마이징 - 상대 경로를 절대 경로로 변환
+// 이미지 렌더러 커스터마이징 - 모든 경로 정규화
 renderer.image = function(href, title, text) {
-  // 상대 경로인 경우 절대 경로로 변환
-  if (href.startsWith('../')) {
-    href = href.replace('../', '/blog/')
-  }
-  
-  let out = `<img src="${href}" alt="${text}"`
+  const normalized = normalizeImageSrc(href)
+  let out = `<img src="${normalized}" alt="${text}"`
   if (title) {
     out += ` title="${title}"`
   }
