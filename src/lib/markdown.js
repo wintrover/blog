@@ -14,25 +14,43 @@ const postFiles = {
   'kyc-system-completion-and-growth': '/blog/_posts/2025-08-10-7.md'
 }
 
+// 런타임 BASE 경로 (Vite 제공). 테스트/노드 환경에선 '/blog/'로 폴백
+const BASE = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.BASE_URL)
+  ? import.meta.env.BASE_URL
+  : '/blog/'
+
+function joinBase(p) {
+  return `${BASE.replace(/\/$/, '')}/${String(p).replace(/^\//, '')}`
+}
+
 // 이미지 경로 정규화
-function normalizeImageSrc(src) {
+export function normalizeImageSrc(src) {
   if (!src || typeof src !== 'string') return src
-  // 절대 경로는 그대로 유지
-  if (src.startsWith('http://') || src.startsWith('https://')) return src
-  // vite base가 /blog/이므로, /assets로 시작하면 /blog/assets로 보정
-  if (src.startsWith('/assets/')) return `/blog${src}`
-  // ../assets 또는 ../../assets -> /blog/assets로 변환
-  if (src.includes('/assets/')) {
-    const idx = src.indexOf('/assets/')
-    return `/blog${src.slice(idx)}`
+  // 1) 원격 URL은 그대로 유지
+  if (/^https?:\/\//i.test(src)) return src
+
+  // 2) 이전 하드코딩 '/blog/'를 현재 BASE로 동기화
+  if (src.startsWith('/blog/')) {
+    return joinBase(src.slice('/blog/'.length))
   }
-  // 상대경로 "../" -> "/blog/"로 변환
-  if (src.startsWith('../')) return src.replace(/^\.\.+\//, '/blog/')
-  // 루트가 아닌 상대경로인 경우(예: images/09/..), /blog/를 앞에 추가
-  if (!src.startsWith('/')) return `/blog/${src.replace(/^\.\//, '')}`
-  // 이미 /blog/로 시작하지 않는 절대 루트 경로는 /blog를 접두사로 추가
-  if (src.startsWith('/')) return src.startsWith('/blog/') ? src : `/blog${src}`
-  return src
+
+  // 3) 이미 BASE로 시작하면 그대로
+  if (src.startsWith(BASE)) return src
+
+  // 4) 루트 기준의 assets
+  if (src.startsWith('/assets/')) return joinBase(src)
+
+  // 5) 상대 경로 내 assets 포함 (../assets, ./assets 등)
+  const assetsIdx = src.indexOf('/assets/')
+  if (assetsIdx !== -1) {
+    return joinBase(src.slice(assetsIdx))
+  }
+
+  // 6) 기타 상대경로 (예: assets/... 또는 images/...) -> BASE 접두
+  if (!src.startsWith('/')) return joinBase(src)
+
+  // 7) 그 외 절대 루트 경로 -> BASE 접두
+  return joinBase(src)
 }
 
 // 마크다운 파일 로드 및 파싱
@@ -118,12 +136,19 @@ function parseFrontMatter(str) {
 // 마크다운 렌더러 설정
 const renderer = new marked.Renderer()
 
-// Mermaid 초기화
-mermaid.initialize({
-  startOnLoad: false,
-  theme: 'default',
-  securityLevel: 'loose'
-})
+// Mermaid 초기화 (브라우저에서만)
+if (typeof window !== 'undefined') {
+  try {
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'default',
+      securityLevel: 'loose'
+    })
+  } catch (e) {
+    // 예외 상황에서만 로깅
+    console.error('Mermaid init error:', e)
+  }
+}
 
 // 이미지 렌더러 커스터마이징 - 모든 경로 정규화
 renderer.image = function(href, title, text) {
@@ -149,7 +174,7 @@ renderer.code = function(code, language) {
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
+    .replace(/\"/g, '&quot;')
     .replace(/'/g, '&#39;')
   
   const buttonsContainer = `
