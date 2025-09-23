@@ -6,6 +6,9 @@ import url from 'node:url'
 // markdown.js의 parseMarkdown을 직접 import
 import { parseMarkdown } from '../src/lib/markdown.js'
 
+// dev.to absolutize 테스트 포함
+import { runDevtoAbsolutizeTests } from '../tests/devto-absolutize.test.js'
+
 function extractImgSrcs(html) {
   const out = []
   const re = /<img\s+[^>]*src=["']([^"']+)["'][^>]*>/g
@@ -35,6 +38,7 @@ async function testImageNormalization() {
   try {
     if (typeof parseMarkdown !== 'function') throw new Error('parseMarkdown not imported')
     await testImageNormalization()
+    await runDevtoAbsolutizeTests()
     console.log('OK: image path normalization tests passed')
   } catch (err) {
     console.error('TEST FAILURE:', err)

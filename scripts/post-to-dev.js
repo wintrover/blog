@@ -3,6 +3,22 @@ import fs from 'fs/promises';
 import path from 'path';
 import matter from 'gray-matter';
 
+// BASE URL 정규화: 디렉터리로 인식되도록 반드시 트레일링 슬래시를 유지
+function normalizePublicBaseUrl(url) {
+  try {
+    if (typeof url !== 'string' || !url) return 'https://wintrover.github.io/blog/';
+    const trimmed = url.trim().replace(/['"]/g, '');
+    // 이미 프로토콜 포함 URL만 허용
+    const u = new URL(trimmed.startsWith('http') ? trimmed : `https://${trimmed.replace(/^\/*/, '')}`);
+    // 디렉터리로 인식되도록 트레일링 슬래시 강제
+    if (!u.pathname.endsWith('/')) u.pathname = u.pathname + '/';
+    return u.toString();
+  } catch {
+    // 실패 시 안전한 기본값
+    return 'https://wintrover.github.io/blog/';
+  }
+}
+
 function slugifyTitle(title) {
   return String(title)
     .toLowerCase()
@@ -12,13 +28,14 @@ function slugifyTitle(title) {
     .trim();
 }
 
-function absolutizeSrc(src, publicBaseUrl) {
+export function absolutizeSrc(src, publicBaseUrl) {
   try {
     if (typeof src !== 'string' || !src) return src;
     const trimmed = src.trim().replace(/^['"]|['"]$/g, '');
     if (/^(https?:)?\/\//i.test(trimmed) || trimmed.startsWith('data:')) return trimmed;
 
-    const base = new URL(publicBaseUrl);
+    const baseUrl = normalizePublicBaseUrl(publicBaseUrl);
+    const base = new URL(baseUrl);
     const underBlog = base.pathname.replace(/\/+$/, '').endsWith('/blog');
 
     // Derive asset path under assets/images
@@ -52,7 +69,7 @@ function absolutizeSrc(src, publicBaseUrl) {
   }
 }
 
-function absolutizeImagesInMarkdown(markdown, publicBaseUrl, firstImageRef) {
+export function absolutizeImagesInMarkdown(markdown, publicBaseUrl, firstImageRef) {
   if (typeof markdown !== 'string') return markdown;
   let out = markdown;
 
@@ -76,7 +93,8 @@ function absolutizeImagesInMarkdown(markdown, publicBaseUrl, firstImageRef) {
 
 async function postToDev(filePath) {
   const devtoApiKey = process.env.DEVTO_API_KEY;
-  const publicBaseUrl = process.env.BLOG_PUBLIC_BASE_URL || 'https://wintrover.github.io/blog';
+  const publicBaseUrlRaw = process.env.BLOG_PUBLIC_BASE_URL || 'https://wintrover.github.io/blog';
+  const publicBaseUrl = normalizePublicBaseUrl(publicBaseUrlRaw);
 
   if (!devtoApiKey) {
     console.error('DEVTO_API_KEY is not set.');
@@ -147,10 +165,12 @@ async function postToDev(filePath) {
   }
 }
 
-const postFilePath = process.argv[2];
-if (!postFilePath) {
-  console.error('Please provide a path to a markdown file.');
-  process.exit(1);
+// CLI 실행 가드: 직접 실행일 때만 동작
+if (process.argv[1] && path.basename(process.argv[1]) === 'post-to-dev.js') {
+  const postFilePath = process.argv[2];
+  if (!postFilePath) {
+    console.error('Please provide a path to a markdown file.');
+    process.exit(1);
+  }
+  postToDev(path.resolve(postFilePath));
 }
-
-postToDev(path.resolve(postFilePath));
