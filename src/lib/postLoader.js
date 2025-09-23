@@ -1,6 +1,5 @@
-import { marked } from 'marked';
+import { parseMarkdown } from './markdown.js'
 
-// 간단한 front matter 파서
 function parseFrontMatter(content) {
   const frontMatterRegex = /^---\s*\n([\s\S]*?)\n---\s*\n([\s\S]*)$/;
   const match = content.match(frontMatterRegex);
@@ -117,7 +116,7 @@ export async function loadPostBySlug(slug) {
       const fileName = path.split('/').pop().replace('.md', '');
       
       // parseFrontMatter로 front matter와 content 분리
-      const { data, content: markdownContent } = parseFrontMatter(content);
+      const { data } = parseFrontMatter(content);
       
       // 제목을 기반으로 slug 생성
       const postSlug = slugifyTitle(data.title || fileName);
@@ -137,8 +136,8 @@ export async function loadPostBySlug(slug) {
     // parseFrontMatter로 front matter와 content 분리
     const { data, content: markdownContent } = parseFrontMatter(targetContent);
     
-    // marked로 markdown을 HTML로 변환
-    const htmlContent = marked(markdownContent);
+    // markdown.js의 parseMarkdown을 통해 이미지 경로 정규화 포함 HTML 생성
+    const { html: htmlContent } = parseMarkdown(markdownContent);
     
     return {
       fileName: targetFileName,
