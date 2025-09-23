@@ -299,6 +299,11 @@
     margin: 0 0 16px 0;
   }
 
+  .markdown-content :global(img) {
+    width: 50%;
+    height: auto;
+  }
+
   .markdown-content :global(ul),
   .markdown-content :global(ol) {
     margin: 0 0 16px 0;
