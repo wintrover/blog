@@ -26,8 +26,9 @@ function joinBase(p) {
 // 이미지 경로 정규화
 export function normalizeImageSrc(src) {
   if (!src || typeof src !== 'string') return src
-  // 1) 원격 URL은 그대로 유지
-  if (/^https?:\/\//i.test(src)) return src
+  
+  // 1) 원격 URL과 data URI는 그대로 유지
+  if (/^(https?:\/\/|data:)/i.test(src)) return src
 
   // 2) 이전 하드코딩 '/blog/'를 현재 BASE로 동기화
   if (src.startsWith('/blog/')) {
@@ -37,19 +38,18 @@ export function normalizeImageSrc(src) {
   // 3) 이미 BASE로 시작하면 그대로
   if (src.startsWith(BASE)) return src
 
-  // 4) 루트 기준의 assets
-  if (src.startsWith('/assets/')) return joinBase(src)
+  // 4) 절대 경로 (/assets/, /images/ 등) -> BASE 접두
+  if (src.startsWith('/')) {
+    return joinBase(src.slice(1)) // 앞의 '/' 제거 후 BASE 접두
+  }
 
   // 5) 상대 경로 내 assets 포함 (../assets, ./assets 등)
   const assetsIdx = src.indexOf('/assets/')
   if (assetsIdx !== -1) {
-    return joinBase(src.slice(assetsIdx))
+    return joinBase(src.slice(assetsIdx + 1)) // '/' 제거 후 BASE 접두
   }
 
   // 6) 기타 상대경로 (예: assets/... 또는 images/...) -> BASE 접두
-  if (!src.startsWith('/')) return joinBase(src)
-
-  // 7) 그 외 절대 루트 경로 -> BASE 접두
   return joinBase(src)
 }
 
