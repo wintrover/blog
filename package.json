@@ -7,7 +7,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "node tests/run-tests.js",
-    "post:devto": "node scripts/post-to-dev.js"
+    "post:devto": "node scripts/post-to-dev.js",
+    "mcp:code-index": "code-index-mcp"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^3.0.0",
