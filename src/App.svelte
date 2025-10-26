@@ -156,6 +156,11 @@
 </script>
 
 <div id="app-container" class:sidebar-collapsed={sidebarCollapsed}>
+  <!-- 토글 버튼을 사이드바 외부로 이동 -->
+  <button class="sidebar-toggle" on:click={toggleSidebar} class:sidebar-shifted={!sidebarCollapsed}>
+    ☰
+  </button>
+
   <aside id="sidebar" class:collapsed={sidebarCollapsed} bind:this={sidebarElement}>
     <Sidebar />
   </aside>
@@ -261,5 +266,54 @@
     padding: 16px;
     margin: 16px 0;
     text-align: center;
+  }
+
+  /* 토글 버튼 스타일 - App.svelte로 이동 */
+  .sidebar-toggle {
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    z-index: 1002; /* 사이드바보다 높은 z-index */
+    background: #0366d6;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 10px;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease; /* 부드러운 전환 */
+  }
+
+  .sidebar-toggle:hover {
+    background: #0256cc;
+  }
+
+  /* 사이드바가 열려있을 때 버튼 위치 조정 */
+  .sidebar-toggle.sidebar-shifted {
+    left: 255px; /* 사이드바 너비(240px) + 여백(15px) */
+  }
+
+  /* 반응형 디자인 */
+  @media (max-width: 768px) {
+    .sidebar-toggle {
+      top: 10px;
+      left: 10px;
+      padding: 6px 8px;
+      font-size: 14px;
+    }
+
+    .sidebar-toggle.sidebar-shifted {
+      left: 10px; /* 모바일에서는 항상 왼쪽에 고정 */
+    }
+  }
+
+  @media (max-width: 480px) {
+    .sidebar-toggle {
+      top: 8px;
+      left: 8px;
+      padding: 5px 7px;
+      font-size: 12px;
+    }
   }
 </style>
