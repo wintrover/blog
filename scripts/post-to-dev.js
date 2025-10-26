@@ -156,7 +156,7 @@ async function postToDev(filePath) {
 
     // Process Mermaid diagrams and convert to images
     console.log('🔄 Processing Mermaid diagrams...');
-    const mermaidOutputDir = path.join('assets', 'images', 'mermaid');
+    const mermaidOutputDir = path.join('public', 'assets', 'images', 'mermaid');
     const { content: processedContent, images: mermaidImages } = await processMermaidDiagrams(
       content,
       publicBaseUrl,
