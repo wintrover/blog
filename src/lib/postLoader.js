@@ -106,7 +106,7 @@ export async function loadAllPosts() {
         date: data.date || new Date().toISOString().split('T')[0],
         category: category || categoryConfig.defaultCategory,
         tags: data.tags || [],
-        excerpt: data.excerpt || '',
+        excerpt: data.excerpt || data.description || '',
         content: markdownContent,
         folder: path.split('/')[path.split('/').length - 2], // 포함된 폴더 정보
         ...data // 다른 front matter 데이터 추가
@@ -169,7 +169,7 @@ export async function loadPostBySlug(slug) {
       date: data.date || new Date().toISOString().split('T')[0],
       category: data.category || 'general',
       tags: data.tags || [],
-      excerpt: data.excerpt || '',
+      excerpt: data.excerpt || data.description || '',
       content: markdownContent,
       html: htmlContent,
       ...data // 다른 front matter 데이터 추가

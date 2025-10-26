@@ -62,7 +62,7 @@
           </h1>
           {#if post.excerpt}
             <div class="post-excerpt">
-              {truncateText(post.excerpt)}
+              {post.excerpt}
             </div>
           {/if}
         </article>

@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "blog-template": {
+      "command": "node",
+      "args": ["mcp/blog-template-server.js"],
+      "cwd": "${workspaceFolder}",
+      "description": "AI 블로그 포스팅용 통합 템플릿 서버"
+    }
+  }
+}
