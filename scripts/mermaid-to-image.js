@@ -178,6 +178,10 @@ export async function processMermaidDiagrams(markdown, publicBaseUrl, outputDir 
       if (urlPath.startsWith('public/')) {
         urlPath = urlPath.substring(7);
       }
+      // Remove 'blog/' prefix if it's already in the baseUrl to avoid duplication
+      if (urlPath.startsWith('blog/')) {
+        urlPath = urlPath.substring(5);
+      }
       const imageUrl = `${baseUrl}/${urlPath.replace(/^\//, '')}/${filename}`;
 
       // Convert Mermaid to image

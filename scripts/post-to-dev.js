@@ -7,25 +7,25 @@ import { processMermaidDiagrams } from './mermaid-to-image.js';
 // BASE URL 정규화: 디렉터리로 인식되도록 반드시 트레일링 슬래시를 유지
 function normalizePublicBaseUrl(url) {
   try {
-    if (typeof url !== 'string' || !url) return 'https://wintrover.github.io/blog/';
+    if (typeof url !== 'string' || !url) return 'https://wintrover.github.io/blog';
     const trimmed = url.trim().replace(/['"]/g, '');
     // 이미 프로토콜 포함 URL만 허용
     const u = new URL(trimmed.startsWith('http') ? trimmed : `https://${trimmed.replace(/^\/*/, '')}`);
     // 디렉터리로 인식되도록 트레일링 슬래시 강제
-    if (!u.pathname.endsWith('/blog/')) {
-      // /blog/로 끝나지 않으면 추가
+    if (!u.pathname.endsWith('/blog')) {
+      // /blog로 끝나지 않으면 추가
       if (u.pathname === '/') {
-        u.pathname = '/blog/';
-      } else if (!u.pathname.includes('/blog/')) {
-        u.pathname = u.pathname + '/blog/';
+        u.pathname = '/blog';
+      } else if (!u.pathname.includes('/blog')) {
+        u.pathname = u.pathname + '/blog';
       } else {
-        // 이미 /blog/가 있는 경로는 그대로 유지
+        // 이미 /blog가 있는 경로는 그대로 유지
       }
     }
     return u.toString();
   } catch {
     // 실패 시 안전한 기본값
-    return 'https://wintrover.github.io/blog/';
+    return 'https://wintrover.github.io/blog';
   }
 }
 
@@ -59,6 +59,10 @@ export function absolutizeSrc(src, publicBaseUrl) {
       assetPath = assetPath.replace(/\\/g, '/');
       // Remove leading slash to avoid double slashes in URL construction
       assetPath = assetPath.replace(/^\//, '');
+      // Remove 'blog/' prefix if already in base pathname to avoid duplication
+      if (assetPath.startsWith('blog/')) {
+        assetPath = assetPath.substring(5);
+      }
       // Construct proper URL by joining base pathname with asset path
       const basePath = base.pathname.replace(/\/$/, ''); // Remove trailing slash
       const abs = `${base.origin}${basePath}/${assetPath}`;
