@@ -2,6 +2,7 @@ import 'dotenv/config';
 import fs from 'fs/promises';
 import path from 'path';
 import matter from 'gray-matter';
+import { processMermaidDiagrams } from './mermaid-to-image.js';
 
 // BASE URL 정규화: 디렉터리로 인식되도록 반드시 트레일링 슬래시를 유지
 function normalizePublicBaseUrl(url) {
@@ -11,7 +12,16 @@ function normalizePublicBaseUrl(url) {
     // 이미 프로토콜 포함 URL만 허용
     const u = new URL(trimmed.startsWith('http') ? trimmed : `https://${trimmed.replace(/^\/*/, '')}`);
     // 디렉터리로 인식되도록 트레일링 슬래시 강제
-    if (!u.pathname.endsWith('/')) u.pathname = u.pathname + '/';
+    if (!u.pathname.endsWith('/blog/')) {
+      // /blog/로 끝나지 않으면 추가
+      if (u.pathname === '/') {
+        u.pathname = '/blog/';
+      } else if (!u.pathname.includes('/blog/')) {
+        u.pathname = u.pathname + '/blog/';
+      } else {
+        // 이미 /blog/가 있는 경로는 그대로 유지
+      }
+    }
     return u.toString();
   } catch {
     // 실패 시 안전한 기본값
@@ -37,6 +47,23 @@ export function absolutizeSrc(src, publicBaseUrl) {
     const baseUrl = normalizePublicBaseUrl(publicBaseUrl);
     const base = new URL(baseUrl);
     const underBlog = base.pathname.replace(/\/+$/, '').endsWith('/blog');
+
+    // Special handling for Mermaid images - ensure they're accessible from GitHub Pages
+    if (trimmed.includes('assets/images/mermaid')) {
+      // Remove 'public/' prefix if present
+      let assetPath = trimmed;
+      if (assetPath.startsWith('public/')) {
+        assetPath = assetPath.substring(7);
+      }
+      // Ensure proper path formatting
+      assetPath = assetPath.replace(/\\/g, '/');
+      // Remove leading slash to avoid double slashes in URL construction
+      assetPath = assetPath.replace(/^\//, '');
+      // Construct proper URL by joining base pathname with asset path
+      const basePath = base.pathname.replace(/\/$/, ''); // Remove trailing slash
+      const abs = `${base.origin}${basePath}/${assetPath}`;
+      return abs;
+    }
 
     // Derive asset path under assets/images
     let assetPath = trimmed;
@@ -123,9 +150,27 @@ async function postToDev(filePath) {
     );
     const tags = sanitized.slice(0, 4);
 
+    // Process Mermaid diagrams and convert to images
+    console.log('🔄 Processing Mermaid diagrams...');
+    const mermaidOutputDir = path.join('public', 'assets', 'images', 'mermaid');
+    const { content: processedContent, images: mermaidImages } = await processMermaidDiagrams(
+      content,
+      publicBaseUrl,
+      mermaidOutputDir
+    );
+
+    if (mermaidImages.length > 0) {
+      console.log(`✅ Successfully converted ${mermaidImages.length} Mermaid diagram(s) to images`);
+      mermaidImages.forEach(img => {
+        console.log(`   📊 ${img.filename} -> ${img.url}`);
+      });
+    } else {
+      console.log('ℹ️  No Mermaid diagrams found in content');
+    }
+
     // Absolutize image URLs for dev.to rendering
     const firstImageRef = { url: null };
-    const bodyMarkdown = absolutizeImagesInMarkdown(content, publicBaseUrl, firstImageRef);
+    const bodyMarkdown = absolutizeImagesInMarkdown(processedContent, publicBaseUrl, firstImageRef);
 
     // canonical_url to original blog post
     const slug = slugifyTitle(frontmatter.title || path.basename(filePath, path.extname(filePath)));
