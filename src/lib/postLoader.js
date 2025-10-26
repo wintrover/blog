@@ -1,4 +1,5 @@
 import { parseMarkdown } from './markdown.js'
+import categoryConfig from './categories.json'
 
 function parseFrontMatter(content) {
   const frontMatterRegex = /^---\s*\n([\s\S]*?)\n---\s*\n([\s\S]*)$/;
@@ -61,31 +62,53 @@ function slugifyTitle(title) {
     .trim();
 }
 
+// 폴더 구조로부터 카테고리 결정
+function determineCategoryFromPath(path) {
+  const pathParts = path.split('/');
+  const folderName = pathParts[pathParts.length - 2]; // 부모 폴더 이름
+
+  const folderMapping = {
+    'project': 'Project',
+    'company': 'Company Work',
+    'tutorial': 'Tutorial',
+    'general': 'General'
+  };
+
+  return folderMapping[folderName] || categoryConfig.defaultCategory;
+}
+
 // 모든 포스트를 동적으로 로드하는 함수
 export async function loadAllPosts() {
   try {
-    // Vite의 import.meta.glob을 사용하여 모든 .md 파일을 동적으로 로드
-    const modules = import.meta.glob('../posts/*.md', { eager: true, query: '?raw', import: 'default' });
+    // Vite의 import.meta.glob을 사용하여 모든 .md 파일을 동적으로 로드 (서브폴더 포함)
+    const modules = import.meta.glob('../posts/**/*.md', { eager: true, query: '?raw', import: 'default' });
     
     const posts = [];
     
     for (const path in modules) {
       const content = modules[path];
       const fileName = path.split('/').pop().replace('.md', '');
-      
+
       // parseFrontMatter로 front matter와 content 분리
       const { data, content: markdownContent } = parseFrontMatter(content);
-      
+
+      // 카테고리 결정 로직
+      let category = data.category;
+      if (categoryConfig.autoAssignByFolder && !category) {
+        category = determineCategoryFromPath(path);
+      }
+
       // front matter가 없는 경우 기본값 설정
       const post = {
         fileName: fileName,
         slug: slugifyTitle(data.title || fileName),
         title: data.title || fileName,
         date: data.date || new Date().toISOString().split('T')[0],
-        category: data.category || 'general',
+        category: category || categoryConfig.defaultCategory,
         tags: data.tags || [],
         excerpt: data.excerpt || '',
         content: markdownContent,
+        folder: path.split('/')[path.split('/').length - 2], // 포함된 폴더 정보
         ...data // 다른 front matter 데이터 추가
       };
       
@@ -103,8 +126,8 @@ export async function loadAllPosts() {
 // 특정 slug로 포스트를 로드하는 함수
 export async function loadPostBySlug(slug) {
   try {
-    // Vite의 import.meta.glob을 사용하여 모든 .md 파일을 동적으로 로드
-    const modules = import.meta.glob('../posts/*.md', { eager: true, query: '?raw', import: 'default' });
+    // Vite의 import.meta.glob을 사용하여 모든 .md 파일을 동적으로 로드 (서브폴더 포함)
+    const modules = import.meta.glob('../posts/**/*.md', { eager: true, query: '?raw', import: 'default' });
     
     // 모든 파일을 순회하며 slug가 일치하는 포스트를 찾음
     let targetContent = null;
