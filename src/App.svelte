@@ -156,8 +156,8 @@
 </script>
 
 <div id="app-container" class:sidebar-collapsed={sidebarCollapsed}>
-  <!-- 토글 버튼을 사이드바 외부로 이동 -->
-  <button class="sidebar-toggle" on:click={toggleSidebar} class:sidebar-shifted={!sidebarCollapsed}>
+  <!-- 토글 버튼을 항상 왼쪽 위에 고정 -->
+  <button class="sidebar-toggle" on:click={toggleSidebar}>
     ☰
   </button>
 
@@ -268,7 +268,7 @@
     text-align: center;
   }
 
-  /* 토글 버튼 스타일 - App.svelte로 이동 */
+  /* 토글 버튼 스타일 - 항상 왼쪽 위에 고정 */
   .sidebar-toggle {
     position: fixed;
     top: 15px;
@@ -282,16 +282,11 @@
     font-size: 16px;
     cursor: pointer;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-    transition: all 0.3s ease; /* 부드러운 전환 */
+    transition: background-color 0.2s;
   }
 
   .sidebar-toggle:hover {
     background: #0256cc;
-  }
-
-  /* 사이드바가 열려있을 때 버튼 위치 조정 */
-  .sidebar-toggle.sidebar-shifted {
-    left: 255px; /* 사이드바 너비(240px) + 여백(15px) */
   }
 
   /* 반응형 디자인 */
@@ -301,10 +296,6 @@
       left: 10px;
       padding: 6px 8px;
       font-size: 14px;
-    }
-
-    .sidebar-toggle.sidebar-shifted {
-      left: 10px; /* 모바일에서는 항상 왼쪽에 고정 */
     }
   }
 
