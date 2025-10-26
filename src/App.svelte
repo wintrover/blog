@@ -136,13 +136,21 @@
     if (mainContentElement) resizeObserver.observe(mainContentElement)
     
     window.addEventListener('resize', handleResize)
-    
+
+    // 토글 이벤트 리스너
+    const handleToggleSidebar = () => {
+      toggleSidebar()
+    }
+
+    document.addEventListener('toggle-sidebar', handleToggleSidebar)
+
     return () => {
         if (checkTimeout) {
           clearTimeout(checkTimeout)
         }
         resizeObserver.disconnect()
         window.removeEventListener('resize', handleResize)
+        document.removeEventListener('toggle-sidebar', handleToggleSidebar)
       }
   })
 </script>
@@ -152,12 +160,7 @@
     <Sidebar />
   </aside>
   
-  {#if sidebarCollapsed}
-    <button id="sidebar-toggle" on:click={toggleSidebar}>
-      ☰
-    </button>
-  {/if}
-  
+    
   <main id="main-content" bind:this={mainContentElement}>
     <div id="content" bind:this={contentElement}>
       {#await $posts}
@@ -206,26 +209,7 @@
     transform: translateX(-100%);
   }
   
-  #sidebar-toggle {
-    position: fixed;
-    top: 20px;
-    left: 20px;
-    z-index: 1001;
-    background: #0366d6;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    padding: 10px 12px;
-    font-size: 16px;
-    cursor: pointer;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-    transition: background-color 0.2s;
-  }
-  
-  #sidebar-toggle:hover {
-    background: #0256cc;
-  }
-  
+    
   #main-content {
     flex: 1;
     margin-left: 240px;
@@ -251,13 +235,6 @@
   @media (max-width: 480px) {
     #content {
       margin: 20px 15px;
-    }
-    
-    #sidebar-toggle {
-      top: 15px;
-      left: 15px;
-      padding: 8px 10px;
-      font-size: 14px;
     }
   }
   

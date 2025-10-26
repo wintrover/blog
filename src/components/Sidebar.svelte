@@ -52,9 +52,20 @@
     selectedCategory.set('all')
     push('/')
   }
+
+  function toggleSidebar() {
+    // 부모 컴포넌트(App.svelte)의 toggleSidebar 함수 호출
+    const event = new CustomEvent('toggle-sidebar', { bubbles: true })
+    document.dispatchEvent(event)
+  }
 </script>
 
 <div class="sidebar-header">
+  <!-- 토글 버튼 -->
+  <button class="sidebar-toggle" on:click={toggleSidebar}>
+    ☰
+  </button>
+
   <div class="profile-section">
     <a href={siteConfig.baseUrl + '/'} class="avatar-link" on:click={goHome}>
       <img src={siteConfig.avatar} alt={siteConfig.name} class="avatar" />
@@ -94,10 +105,12 @@
     padding: 30px 20px;
     border-bottom: 1px solid #e1e4e8;
     background: white;
+    position: relative;
   }
   
   .profile-section {
     text-align: center;
+    margin-left: 40px; /* 토글 버튼 공간 확보 */
   }
   
   .avatar-link {
@@ -225,5 +238,53 @@
     font-size: 14px;
     line-height: 1.5;
     margin: 0;
+  }
+
+  /* 토글 버튼 스타일 */
+  .sidebar-toggle {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    z-index: 1001;
+    background: #0366d6;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 10px;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    transition: background-color 0.2s;
+  }
+
+  .sidebar-toggle:hover {
+    background: #0256cc;
+  }
+
+  /* 반응형 디자인 */
+  @media (max-width: 768px) {
+    .sidebar-toggle {
+      top: 10px;
+      left: 10px;
+      padding: 6px 8px;
+      font-size: 14px;
+    }
+
+    .profile-section {
+      margin-left: 35px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .sidebar-toggle {
+      top: 8px;
+      left: 8px;
+      padding: 5px 7px;
+      font-size: 12px;
+    }
+
+    .profile-section {
+      margin-left: 30px;
+    }
   }
 </style>
