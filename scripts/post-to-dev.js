@@ -42,6 +42,18 @@ export function absolutizeSrc(src, publicBaseUrl) {
   try {
     if (typeof src !== 'string' || !src) return src;
     const trimmed = src.trim().replace(/^['"]|['"]$/g, '');
+
+    // Check for UCloud temporary URLs and return them as-is for now
+    // These need manual handling as they're temporary and signed
+    if (trimmed.includes('ufileos.com') ||
+        trimmed.includes('UCloudPublicKey') ||
+        trimmed.includes('signature=') ||
+        trimmed.includes('Expires=')) {
+      console.warn(`⚠️ UCloud temporary URL detected: ${trimmed.substring(0, 100)}...`);
+      console.warn('   This URL may not render on Dev.to. Consider downloading and hosting the image publicly.');
+      return trimmed;
+    }
+
     if (/^(https?:)?\/\//i.test(trimmed) || trimmed.startsWith('data:')) return trimmed;
 
     const baseUrl = normalizePublicBaseUrl(publicBaseUrl);
@@ -100,24 +112,44 @@ export function absolutizeSrc(src, publicBaseUrl) {
   }
 }
 
-export function absolutizeImagesInMarkdown(markdown, publicBaseUrl, firstImageRef) {
+export async function absolutizeImagesInMarkdown(markdown, publicBaseUrl, firstImageRef) {
   if (typeof markdown !== 'string') return markdown;
   let out = markdown;
 
   // HTML <img ...> tags
-  out = out.replace(/<img\s+([^>]*?)src=["']([^"']+)["']([^>]*)>/gi, (m, pre, src, post) => {
-    const abs = absolutizeSrc(src, publicBaseUrl);
+  out = out.replace(/<img\s+([^>]*?)src=["']([^"']+)["']([^>]*)>/gi, async (m, pre, src, post) => {
+    let abs = src;
+    if (isUCloudUrl(src)) {
+      console.log(`🔄 Processing UCloud image: ${src.substring(0, 80)}...`);
+      abs = await downloadAndHostUCloudImage(src, publicBaseUrl);
+      console.log(`✅ Converted to: ${abs}`);
+    } else {
+      abs = absolutizeSrc(src, publicBaseUrl);
+    }
     if (!firstImageRef.url) firstImageRef.url = abs;
     return `<img ${pre}src="${abs}"${post}>`;
   });
 
   // Markdown images ![alt](url "title")
-  out = out.replace(/!\[([^\]]*)\]\((\s*<?([^)\s]+)>?)([^)]*)\)/g, (m, alt, urlPart, urlOnly, rest) => {
-    const abs = absolutizeSrc(urlOnly, publicBaseUrl);
+  const markdownImageRegex = /!\[([^\]]*)\]\((\s*<?([^)\s]+)>?)([^)]*)\)/g;
+  const matches = [...markdown.matchAll(markdownImageRegex)];
+
+  for (const match of matches) {
+    const [fullMatch, alt, urlPart, urlOnly, rest] = match;
+    let abs = urlOnly;
+
+    if (isUCloudUrl(urlOnly)) {
+      console.log(`🔄 Processing UCloud image: ${urlOnly.substring(0, 80)}...`);
+      abs = await downloadAndHostUCloudImage(urlOnly, publicBaseUrl);
+      console.log(`✅ Converted to: ${abs}`);
+    } else {
+      abs = absolutizeSrc(urlOnly, publicBaseUrl);
+    }
+
     if (!firstImageRef.url) firstImageRef.url = abs;
     const restOut = rest || '';
-    return `![${alt}](${abs}${restOut})`;
-  });
+    out = out.replace(fullMatch, `![${alt}](${abs}${restOut})`);
+  }
 
   return out;
 }
@@ -174,7 +206,7 @@ async function postToDev(filePath) {
 
     // Absolutize image URLs for dev.to rendering
     const firstImageRef = { url: null };
-    const bodyMarkdown = absolutizeImagesInMarkdown(processedContent, publicBaseUrl, firstImageRef);
+    const bodyMarkdown = await absolutizeImagesInMarkdown(processedContent, publicBaseUrl, firstImageRef);
 
     // canonical_url to original blog post
     const slug = slugifyTitle(frontmatter.title || path.basename(filePath, path.extname(filePath)));
@@ -212,6 +244,79 @@ async function postToDev(filePath) {
     console.error('An error occurred:', error);
     process.exit(1);
   }
+}
+
+// Utility function to download and host UCloud images
+async function downloadAndHostUCloudImage(ucloudUrl, publicBaseUrl) {
+  try {
+    const crypto = await import('crypto');
+
+    // Extract filename from URL or generate one
+    const urlHash = crypto.createHash('md5').update(ucloudUrl).digest('hex');
+    const filename = `ucloud-${urlHash}.png`;
+    const outputPath = path.join('public', 'assets', 'images', 'ucloud', filename);
+
+    // Ensure directory exists
+    await fs.mkdir(path.dirname(outputPath), { recursive: true });
+
+    // Download image
+    const response = await fetch(ucloudUrl);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch image: ${response.status}`);
+    }
+
+    const buffer = await response.arrayBuffer();
+    await fs.writeFile(outputPath, Buffer.from(buffer));
+
+    // Return GitHub raw URL instead of GitHub Pages URL
+    // Get git remote URL to determine the correct raw URL format
+    const gitRemote = await getGitHubRepoInfo();
+    if (gitRemote) {
+      const { owner, repo } = gitRemote;
+      // Use GitHub's raw content URL
+      const normalizedPath = `public/assets/images/ucloud/${filename}`.replace(/\\/g, '/');
+      return `https://raw.githubusercontent.com/${owner}/${repo}/refs/heads/main/${normalizedPath}`;
+    }
+
+    // Fallback to GitHub Pages URL if git info not available
+    const baseUrl = normalizePublicBaseUrl(publicBaseUrl);
+    return `${baseUrl}/assets/images/ucloud/${filename}`;
+  } catch (error) {
+    console.error('Failed to process UCloud image:', error.message);
+    return ucloudUrl; // Fallback to original URL
+  }
+}
+
+// Get GitHub repository info from git remote
+async function getGitHubRepoInfo() {
+  try {
+    const { exec } = await import('child_process');
+    const util = await import('util');
+    const execAsync = util.promisify(exec);
+
+    // Get remote URL
+    const { stdout: remoteUrl } = await execAsync('git remote get-url origin');
+
+    // Parse GitHub URL
+    const match = remoteUrl.match(/github\.com[/:]([^/]+)\/([^/.]+)(\.git)?/i);
+    if (match) {
+      return {
+        owner: match[1],
+        repo: match[2]
+      };
+    }
+    return null;
+  } catch (error) {
+    return null;
+  }
+}
+
+// Function to check if a URL is a UCloud temporary URL
+function isUCloudUrl(url) {
+  return url.includes('ufileos.com') ||
+         url.includes('UCloudPublicKey') ||
+         url.includes('signature=') ||
+         url.includes('Expires=');
 }
 
 // CLI 실행 가드: 직접 실행일 때만 동작

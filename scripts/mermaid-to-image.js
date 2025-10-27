@@ -3,6 +3,53 @@ import path from 'path';
 import fs from 'fs/promises';
 import crypto from 'crypto';
 
+// Get GitHub raw URL for a file
+async function getGitHubRawUrl(outputDir, filename) {
+  try {
+    const { exec } = await import('child_process');
+    const util = await import('util');
+    const execAsync = util.promisify(exec);
+
+    // Get remote URL
+    const { stdout: remoteUrl } = await execAsync('git remote get-url origin');
+
+    // Parse GitHub URL
+    const match = remoteUrl.match(/github\.com[/:]([^/]+)\/([^/.]+)(\.git)?/i);
+    if (match) {
+      const owner = match[1];
+      const repo = match[2];
+
+      // Normalize outputDir to remove 'public/' prefix if present
+      let normalizedDir = outputDir;
+      if (normalizedDir.startsWith('public/')) {
+        normalizedDir = normalizedDir.substring(7);
+      }
+
+      // Use GitHub's raw content URL
+      // Ensure path uses forward slashes
+      const normalizedPath = `${normalizedDir}/${filename}`.replace(/\\/g, '/');
+      return `https://raw.githubusercontent.com/${owner}/${repo}/refs/heads/main/${normalizedPath}`;
+    }
+
+    // Fallback to GitHub Pages URL if git info not available
+    const publicBaseUrl = 'https://wintrover.github.io/blog';
+    let urlPath = outputDir;
+    if (urlPath.startsWith('public/')) {
+      urlPath = urlPath.substring(7);
+    }
+    return `${publicBaseUrl}/${urlPath}/${filename}`;
+  } catch (error) {
+    console.error('Failed to get GitHub repo info:', error.message);
+    // Fallback
+    const publicBaseUrl = 'https://wintrover.github.io/blog';
+    let urlPath = outputDir;
+    if (urlPath.startsWith('public/')) {
+      urlPath = urlPath.substring(7);
+    }
+    return `${publicBaseUrl}/${urlPath}/${filename}`;
+  }
+}
+
 /**
  * Convert Mermaid diagram to PNG image using Puppeteer
  * @param {string} mermaidCode - The Mermaid diagram code
@@ -162,27 +209,9 @@ export async function processMermaidDiagrams(markdown, publicBaseUrl, outputDir 
       // Generate unique filename
       const filename = `mermaid-${crypto.randomBytes(8).toString('hex')}.png`;
       const imagePath = path.join(outputDir, filename);
-      // Remove 'public' prefix and any leading './' from outputDir for URL generation
-      let urlPath = outputDir;
-      if (urlPath.startsWith('./public/')) {
-        urlPath = urlPath.substring(8); // Remove './public/'
-      } else if (urlPath.startsWith('public/')) {
-        urlPath = urlPath.substring(7); // Remove 'public/'
-      } else if (urlPath.startsWith('./')) {
-        urlPath = urlPath.substring(2); // Remove './'
-      }
-      const baseUrl = publicBaseUrl.replace(/\/$/, '');
-      // Ensure proper URL encoding for paths
-      urlPath = urlPath.replace(/\\/g, '/'); // Replace backslashes with forward slashes
-      // Remove any duplicate 'public/' from the path
-      if (urlPath.startsWith('public/')) {
-        urlPath = urlPath.substring(7);
-      }
-      // Remove 'blog/' prefix if it's already in the baseUrl to avoid duplication
-      if (urlPath.startsWith('blog/')) {
-        urlPath = urlPath.substring(5);
-      }
-      const imageUrl = `${baseUrl}/${urlPath.replace(/^\//, '')}/${filename}`;
+
+      // Get GitHub raw URL
+      const imageUrl = await getGitHubRawUrl(outputDir, filename);
 
       // Convert Mermaid to image
       await convertMermaidToImage(block.code, imagePath);
