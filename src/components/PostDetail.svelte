@@ -4,6 +4,7 @@
   import { loadPostBySlug } from "../lib/postLoader.js";
   import { push } from 'svelte-spa-router';
   import mermaid from 'mermaid';
+  import Comments from './Comments.svelte';
 
   export let params = {};
   let post = null;
@@ -181,6 +182,9 @@
     <footer class="post-footer">
       <button class="back-link" on:click={goBack}>← Back to Blog</button>
     </footer>
+
+    <!-- Comments section -->
+    <Comments />
   </article>
 {:else}
   <div class="post-not-found">
