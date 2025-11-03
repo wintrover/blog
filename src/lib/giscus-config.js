@@ -1,8 +1,5 @@
 // Giscus configuration
 export const giscusConfig = {
-  // These values should be replaced with your actual Giscus configuration
-  // Get them from: https://giscus.app
-
   // Repository where discussions will be created
   repo: import.meta.env.VITE_GISCUS_REPO || 'wintrover/blog',
 
@@ -13,7 +10,7 @@ export const giscusConfig = {
   category: import.meta.env.VITE_GISCUS_CATEGORY || 'General',
 
   // Category ID (found in Giscus settings)
-  categoryId: import.meta.env.VITE_GISCUS_CATEGORY_ID || 'DIC_kwDOKkT5Gs4CY4vM',
+  categoryId: import.meta.env.VITE_GISCUS_CATEGORY_ID || 'DIC_kwDOPBuacs4Cwqu_',
 
   // How discussions are mapped to pages
   // Options: pathname, url, title, og:title, specific

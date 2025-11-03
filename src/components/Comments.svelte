@@ -3,9 +3,9 @@
   import { giscusConfig } from '../lib/giscus-config.js';
 
   // Use configuration or allow override via props
+  // Use configuration or allow override via props
   export let repo = giscusConfig.repo;
-  // Temporarily hardcode the correct repo ID
-  export let repoId = 'R_kgDOGOEESY'; // giscusConfig.repoId;
+  export let repoId = giscusConfig.repoId;
   export let category = giscusConfig.category;
   export let categoryId = giscusConfig.categoryId;
   // Use specific term mapping for better reliability
@@ -45,6 +45,8 @@
     console.log('Strict mode:', strict);
     console.log('Theme:', theme);
     console.log('Lang:', lang);
+    console.log('Current URL:', window.location.href);
+    console.log('Origin:', window.location.origin);
 
     // Check if all required values are present
     if (!repo || !repoId || !categoryId) {
@@ -73,17 +75,41 @@
 
     // Test the API call directly
     try {
-      const response = await fetch(apiUrl.toString());
+      const response = await fetch(apiUrl.toString(), {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+        }
+      });
+      const headers = {};
+response.headers.forEach((value, key) => {
+  headers[key] = value;
+});
+console.log('📥 API Response Headers:', JSON.stringify(headers, null, 2));
       console.log('📥 API Response Status:', response.status);
-      const data = await response.json();
-      console.log('📦 API Response Data:', data);
+      console.log('📥 API Response Status Text:', response.statusText);
+
+      const responseText = await response.text();
+      console.log('📦 API Response Raw:', responseText);
+
+      let data;
+      try {
+        data = JSON.parse(responseText);
+        console.log('📦 API Response Parsed:', data);
+      } catch (e) {
+        console.error('Failed to parse JSON response:', e);
+      }
 
       if (response.status === 404) {
         console.warn('⚠️ Discussion not found - this is normal for new posts');
         console.info('💡 A new discussion will be created when the first comment is posted');
+      } else if (response.status >= 400) {
+        console.error('❌ API Error:', response.status, response.statusText);
+        console.error('Response body:', responseText);
       }
     } catch (error) {
       console.error('❌ API call failed:', error);
+      console.error('Network error or CORS issue');
     }
 
     console.groupEnd();
