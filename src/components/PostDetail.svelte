@@ -184,7 +184,7 @@
     </footer>
 
     <!-- Comments section -->
-    <Comments />
+    <Comments term="comments-{params.slug}" />
   </article>
 {:else}
   <div class="post-not-found">

@@ -7,7 +7,7 @@ export const giscusConfig = {
   repo: import.meta.env.VITE_GISCUS_REPO || 'wintrover/blog',
 
   // Repository ID (found in Giscus settings)
-  repoId: import.meta.env.VITE_GISCUS_REPO_ID || 'R_kgDOKkT5Gg',
+  repoId: import.meta.env.VITE_GISCUS_REPO_ID || 'R_kgDOGOEESY',
 
   // Discussion category
   category: import.meta.env.VITE_GISCUS_CATEGORY || 'General',
@@ -17,10 +17,10 @@ export const giscusConfig = {
 
   // How discussions are mapped to pages
   // Options: pathname, url, title, og:title, specific
-  mapping: 'pathname',
+  mapping: 'title',
 
   // Strict matching
-  strict: '0',
+  strict: '1',
 
   // Enable reactions (👍, ❤️, etc.)
   reactionsEnabled: '1',
