@@ -1,0 +1,91 @@
+name: Debug GitHub Actions Permissions
+
+on:
+  workflow_dispatch:
+    inputs:
+      test_type:
+        description: 'Type of permission test'
+        required: true
+        default: 'basic'
+        type: choice
+        options:
+        - basic
+        - gh-pages-push
+        - pages-deploy
+
+jobs:
+  debug-permissions:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+
+    steps:
+      - name: Show GitHub context
+        run: |
+          echo "GitHub Repository: ${{ github.repository }}"
+          echo "GitHub Ref: ${{ github.ref }}"
+          echo "GitHub SHA: ${{ github.sha }}"
+          echo "GitHub Actor: ${{ github.actor }}"
+          echo "GitHub Token Available: ${{ secrets.GITHUB_TOKEN != '' }}"
+          echo "PAT Available: ${{ secrets.PAT != '' }}"
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Test basic git operations
+        if: github.event.inputs.test_type == 'basic' || github.event.inputs.test_type == 'gh-pages-push'
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          echo "Git user configured successfully"
+
+          # Test if we can read from the repository
+          git log --oneline -n 1
+          echo "Git read test successful"
+
+      - name: Test gh-pages branch operations
+        if: github.event.inputs.test_type == 'gh-pages-push'
+        run: |
+          # Check if gh-pages branch exists
+          if git ls-remote --heads origin gh-pages | grep -q "gh-pages"; then
+            echo "gh-pages branch exists"
+            git checkout origin/gh-pages -b gh-pages-test
+          else
+            echo "gh-pages branch does not exist, creating it"
+            git checkout --orphan gh-pages-test
+            git rm -rf . || true
+            echo "# Test Pages" > index.html
+            git add index.html
+            git commit -m "Initial test commit"
+          fi
+
+      - name: Test push to gh-pages with GITHUB_TOKEN
+        if: github.event.inputs.test_type == 'gh-pages-push'
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+          if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+            echo "Testing push with GITHUB_TOKEN..."
+            git push origin gh-pages-test:gh-pages -f || {
+              echo "Push with GITHUB_TOKEN failed"
+              exit 1
+            }
+            echo "Push with GITHUB_TOKEN successful"
+          else
+            echo "Not on main branch, skipping push test"
+          fi
+
+      - name: Test GitHub Pages configuration
+        if: github.event.inputs.test_type == 'pages-deploy'
+        uses: actions/configure-pages@v4
+
+      - name: Check Pages environment
+        if: github.event.inputs.test_type == 'pages-deploy'
+        run: |
+          echo "Checking Pages environment configuration..."
+          echo "Pages URL will be: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"
