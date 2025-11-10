@@ -84,53 +84,11 @@
     apiUrl.searchParams.append('strict', strict);
     apiUrl.searchParams.append('first', '15');
 
-    console.log('📡 Giscus API URL:', apiUrl.toString());
-    console.log('📡 All search parameters:');
-    apiUrl.searchParams.forEach((value, key) => {
-      console.log(`  ${key}: ${value}`);
-    });
+    // API URL and parameters logged for debugging purposes
+    // console.log('📡 Giscus API URL:', apiUrl.toString());
 
-  // Test the API call directly
-    try {
-      const response = await fetch(apiUrl.toString(), {
-        method: 'GET',
-        headers: {
-          'Accept': 'application/json',
-        }
-      });
-      const headers = {};
-response.headers.forEach((value, key) => {
-  headers[key] = value;
-});
-console.log('📥 API Response Headers:', JSON.stringify(headers, null, 2));
-      console.log('📥 API Response Status:', response.status);
-      console.log('📥 API Response Status Text:', response.statusText);
-
-      const responseText = await response.text();
-      console.log('📦 API Response Raw:', responseText);
-
-      let data;
-      try {
-        data = JSON.parse(responseText);
-        console.log('📦 API Response Parsed:', data);
-      } catch (e) {
-        console.error('Failed to parse JSON response:', e);
-      }
-
-      if (response.status === 404) {
-        console.warn('⚠️ Discussion not found - this is normal for new posts');
-        console.info('💡 A new discussion will be created when the first comment is posted');
-      } else if (response.status >= 400) {
-        console.error('❌ API Error:', response.status, response.statusText);
-        console.error('Response body:', responseText);
-      }
-    } catch (error) {
-      console.error('❌ API call failed:', error);
-      console.error('Network error or CORS issue');
-    }
-
-    // Note: GitHub GraphQL testing removed as it's not necessary for Giscus functionality
-    // and was causing authentication errors in the console
+  // Note: Direct API testing removed to prevent CORS errors
+    // Giscus handles API calls internally through its script
 
     console.groupEnd();
 
