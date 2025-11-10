@@ -1,0 +1,11 @@
+flowchart LR
+    A[Camera Feed] --> B{Document<br/>Detection}
+    B -->|ID Card Found| C{Quality<br/>Check}
+    C -->|Score > 80%| D[Auto Capture]
+    C -->|Poor Quality| E[User Guidance]
+    D --> F[OCR Processing]
+    F --> G[Field Extraction]
+
+    style A fill:#e3f2fd
+    style D fill:#c8e6c9
+    style G fill:#fff3e0

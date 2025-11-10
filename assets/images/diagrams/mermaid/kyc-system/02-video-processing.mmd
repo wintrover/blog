@@ -1,0 +1,9 @@
+graph TD
+    A[30-sec Video<br/>900 Frames] --> B[Uniform Sampling]
+    B --> C[12 Key Frames<br/>Evenly Distributed]
+    C --> D[Quality Assessment<br/>Min 80% Score]
+    D --> E[Final Similarity<br/>Average of Best Frames]
+
+    style A fill:#ffcdd2
+    style C fill:#fff9c4
+    style E fill:#c8e6c9

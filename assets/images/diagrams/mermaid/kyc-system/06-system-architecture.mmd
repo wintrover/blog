@@ -1,0 +1,43 @@
+graph TB
+    subgraph "Frontend Layer"
+        A[React Web Frontend<br/>Real-time UI/UX]
+    end
+
+    subgraph "Backend Layer"
+        B[FastAPI Backend<br/>RESTful APIs]
+        C[WebSocket Server<br/>Real-time Communication]
+    end
+
+    subgraph "Processing Layer"
+        D[Celery Workers<br/>Async Task Processing]
+        E[Face Recognition Service<br/>Dual Engine System]
+    end
+
+    subgraph "Computer Vision Engines"
+        F[InsightFace Engine<br/>Primary: 99.8% Accuracy]
+        G[OpenCV Engine<br/>Backup: 97.2% Accuracy]
+        H[PaddleOCR Engine<br/>Document Recognition]
+    end
+
+    subgraph "Data Layer"
+        I[MariaDB<br/>Primary Database]
+        J[Redis<br/>Cache & Message Broker]
+    end
+
+    A <--> C
+    A --> B
+    B --> D
+    D --> E
+    E --> F
+    E --> G
+    E --> H
+    D --> I
+    D --> J
+    C --> J
+
+    style A fill:#e1f5fe
+    style B fill:#f3e5f5
+    style D fill:#fff3e0
+    style F fill:#e8f5e8
+    style I fill:#fce4ec
+    style J fill:#f1f8e9
