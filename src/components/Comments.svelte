@@ -20,9 +20,17 @@
 
   let giscusLoaded = false;
   let container;
+  let monitoringTimeouts = [];
 
   onMount(() => {
     loadGiscus();
+
+    // Cleanup function for component unmount
+    return () => {
+      // Clear all pending timeouts to prevent errors after unmount
+      monitoringTimeouts.forEach(timeoutId => clearTimeout(timeoutId));
+      monitoringTimeouts = [];
+    };
   });
 
   async function loadGiscus() {
@@ -114,6 +122,14 @@
 
       // Monitor for iframe creation (minimal logging)
       const monitorIframe = () => {
+        // Defensive checks to prevent null reference errors
+        if (!container || !container.isConnected) {
+          if (import.meta.env.DEV) {
+            console.warn('⚠️ Container not available for iframe monitoring');
+          }
+          return false;
+        }
+
         const iframe = container.querySelector('iframe');
         if (iframe) {
           if (import.meta.env.DEV) {
@@ -139,64 +155,57 @@
         }
       };
 
-      // Try multiple times with increasing delays
-      setTimeout(monitorIframe, 2000);
-      setTimeout(monitorIframe, 5000);
-      setTimeout(monitorIframe, 10000);
+      // Try multiple times with increasing delays, tracking timeouts for cleanup
+      const timeout1 = setTimeout(monitorIframe, 2000);
+      const timeout2 = setTimeout(monitorIframe, 5000);
+      const timeout3 = setTimeout(monitorIframe, 10000);
+
+      monitoringTimeouts.push(timeout1, timeout2, timeout3);
     }
   }
 
   // Function to update theme (optional)
   export function updateTheme(newTheme) {
     theme = newTheme;
-    const iframe = container?.querySelector('iframe');
-    if (iframe) {
-      iframe.contentWindow.postMessage({
-        giscus: {
-          setConfig: {
-            theme: newTheme
+
+    // Defensive checks before accessing iframe
+    if (!container || !container.isConnected) {
+      if (import.meta.env.DEV) {
+        console.warn('⚠️ Container not available for theme update');
+      }
+      return;
+    }
+
+    const iframe = container.querySelector('iframe');
+    if (iframe && iframe.contentWindow) {
+      try {
+        iframe.contentWindow.postMessage({
+          giscus: {
+            setConfig: {
+              theme: newTheme
+            }
           }
+        }, 'https://giscus.app');
+
+        if (import.meta.env.DEV) {
+          console.log('🎨 Theme updated to:', newTheme);
         }
-      }, 'https://giscus.app');
+      } catch (error) {
+        console.error('❌ Failed to update theme:', error);
+      }
+    } else if (import.meta.env.DEV) {
+      console.warn('⚠️ Giscus iframe not available for theme update');
     }
   }
 </script>
 
-<div class="comments-container">
-  <div class="comments-header">
-    <h3>댓글</h3>
-    <p class="comments-info">
-      GitHub 계정으로 댓글을 남길 수 있습니다.
-    </p>
-  </div>
-  <div bind:this={container} class="giscus-wrapper"></div>
-</div>
+<div bind:this={container} class="giscus-wrapper"></div>
 
 <style>
-  .comments-container {
+  .giscus-wrapper {
     margin-top: 60px;
     padding-top: 40px;
     border-top: 1px solid #e1e4e8;
-  }
-
-  .comments-header {
-    margin-bottom: 30px;
-  }
-
-  .comments-header h3 {
-    font-size: 24px;
-    font-weight: 600;
-    color: #24292e;
-    margin: 0 0 8px 0;
-  }
-
-  .comments-info {
-    font-size: 14px;
-    color: #586069;
-    margin: 0;
-  }
-
-  .giscus-wrapper {
     min-height: 200px;
   }
 
@@ -209,15 +218,7 @@
 
   /* Dark theme support */
   @media (prefers-color-scheme: dark) {
-    .comments-header h3 {
-      color: #f0f6fc;
-    }
-
-    .comments-info {
-      color: #8b949e;
-    }
-
-    .comments-container {
+    .giscus-wrapper {
       border-top-color: #30363d;
     }
   }
