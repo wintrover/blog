@@ -28,38 +28,17 @@
   async function loadGiscus() {
     if (giscusLoaded) return;
 
-    console.group('🔍 Giscus Debug Information');
-    console.log('Raw env vars:');
-    console.log('  VITE_GISCUS_REPO:', import.meta.env.VITE_GISCUS_REPO);
-    console.log('  VITE_GISCUS_REPO_ID:', import.meta.env.VITE_GISCUS_REPO_ID);
-    console.log('  VITE_GISCUS_CATEGORY:', import.meta.env.VITE_GISCUS_CATEGORY);
-    console.log('  VITE_GISCUS_CATEGORY_ID:', import.meta.env.VITE_GISCUS_CATEGORY_ID);
-    console.log('');
-    console.log('Actual values:');
-    console.log('Repository:', repo);
-    console.log('Repository ID:', repoId);
-    console.log('Category:', category);
-    console.log('Category ID:', categoryId);
-    console.log('Mapping:', mapping);
-    console.log('Term:', term);
-    console.log('Strict mode:', strict);
-    console.log('Theme:', theme);
-    console.log('Lang:', lang);
-    console.log('Current URL:', window.location.href);
-    console.log('Origin:', window.location.origin);
-    console.log('Pathname:', window.location.pathname);
-    console.log('Document title:', document.title);
-    console.log('Meta tags:');
-
-    // Check for Open Graph tags
-    const ogTitle = document.querySelector('meta[property="og:title"]');
-    const ogUrl = document.querySelector('meta[property="og:url"]');
-    console.log('  og:title:', ogTitle?.content);
-    console.log('  og:url:', ogUrl?.content);
-
-    // Check for canonical URL
-    const canonical = document.querySelector('link[rel="canonical"]');
-    console.log('  canonical:', canonical?.href);
+    // Only debug in development
+    if (import.meta.env.DEV) {
+      console.group('🔍 Giscus Debug Information');
+      console.log('Repository:', repo);
+      console.log('Repository ID:', repoId);
+      console.log('Category:', category);
+      console.log('Category ID:', categoryId);
+      console.log('Mapping:', mapping);
+      console.log('Term:', term);
+      console.log('Debug mode enabled');
+    }
 
     // Check if all required values are present
     if (!repo || !repoId || !categoryId) {
@@ -67,11 +46,15 @@
       console.error('Repo:', repo);
       console.error('Repo ID:', repoId);
       console.error('Category ID:', categoryId);
-      console.groupEnd();
+      if (import.meta.env.DEV) {
+        console.groupEnd();
+      }
       return;
     }
 
-    console.log('✅ All required configuration values present');
+    if (import.meta.env.DEV) {
+      console.log('✅ All required configuration values present');
+    }
 
     // Build the URL that Giscus will call
     const apiUrl = new URL('https://giscus.app/api/discussions');

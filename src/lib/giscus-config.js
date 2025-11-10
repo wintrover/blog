@@ -1,4 +1,6 @@
 // Giscus configuration
+const isDev = import.meta.env.DEV;
+
 export const giscusConfig = {
   // Repository where discussions will be created
   repo: import.meta.env.VITE_GISCUS_REPO || 'wintrover/blog',
@@ -33,5 +35,8 @@ export const giscusConfig = {
   theme: 'preferred_color_scheme',
 
   // Language
-  lang: 'en'
+  lang: 'en',
+
+  // Development-only debugging
+  debug: isDev
 };
