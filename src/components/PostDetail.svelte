@@ -5,6 +5,8 @@
   import { push } from 'svelte-spa-router';
   import mermaid from 'mermaid';
   import Comments from './Comments.svelte';
+  // Browser detection
+  const browser = typeof window !== 'undefined';
 
   export let params = {};
   let post = null;
@@ -16,15 +18,29 @@
       try {
         // 포스트 데이터 로드
         const postData = await loadPostBySlug(params.slug);
-        
+
         if (!postData) {
           throw new Error('포스트를 찾을 수 없습니다.');
         }
-        
+
         post = postData;
         markdownContent = postData;
         loading = false;
-        
+
+        // Update page title and meta tags
+        if (browser && post) {
+          document.title = `${post.title} - wintrover`;
+
+          // Update or create meta tags
+          updateMetaTag('og:title', post.title);
+          updateMetaTag('og:url', window.location.href);
+          updateMetaTag('og:description', post.excerpt || post.title);
+          updateMetaTag('description', post.excerpt || post.title);
+
+          // Update canonical URL
+          updateLinkTag('canonical', window.location.href);
+        }
+
         // 버튼 이벤트 리스너 추가
         setTimeout(() => {
           setupCodeBlockButtons();
@@ -34,6 +50,31 @@
         loading = false;
       }
     }
+  }
+
+  function updateMetaTag(property, content) {
+    let meta = document.querySelector(`meta[property="${property}"]`) ||
+               document.querySelector(`meta[name="${property}"]`);
+
+    if (!meta) {
+      meta = document.createElement('meta');
+      meta.setAttribute(property.includes('og:') ? 'property' : 'name', property);
+      document.head.appendChild(meta);
+    }
+
+    meta.setAttribute('content', content);
+  }
+
+  function updateLinkTag(rel, href) {
+    let link = document.querySelector(`link[rel="${rel}"]`);
+
+    if (!link) {
+      link = document.createElement('link');
+      link.setAttribute('rel', rel);
+      document.head.appendChild(link);
+    }
+
+    link.setAttribute('href', href);
   }
 
   onMount(() => {
@@ -184,7 +225,7 @@
     </footer>
 
     <!-- Comments section -->
-    <Comments term="comments-{params.slug}" />
+    <Comments mapping="specific" term={params.slug} />
   </article>
 {:else}
   <div class="post-not-found">

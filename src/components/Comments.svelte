@@ -8,9 +8,9 @@
   export let repoId = giscusConfig.repoId;
   export let category = giscusConfig.category;
   export let categoryId = giscusConfig.categoryId;
-  // Use specific term mapping for better reliability
-  export let mapping = 'specific';
-  export let term = 'blog-comments'; // Will be updated with slug
+  // Allow override of mapping via props
+  export let mapping = giscusConfig.mapping;
+  export let term = ''; // Used when mapping is 'specific'
   export let strict = giscusConfig.strict;
   export let reactionsEnabled = giscusConfig.reactionsEnabled;
   export let emitMetadata = giscusConfig.emitMetadata;
@@ -47,6 +47,19 @@
     console.log('Lang:', lang);
     console.log('Current URL:', window.location.href);
     console.log('Origin:', window.location.origin);
+    console.log('Pathname:', window.location.pathname);
+    console.log('Document title:', document.title);
+    console.log('Meta tags:');
+
+    // Check for Open Graph tags
+    const ogTitle = document.querySelector('meta[property="og:title"]');
+    const ogUrl = document.querySelector('meta[property="og:url"]');
+    console.log('  og:title:', ogTitle?.content);
+    console.log('  og:url:', ogUrl?.content);
+
+    // Check for canonical URL
+    const canonical = document.querySelector('link[rel="canonical"]');
+    console.log('  canonical:', canonical?.href);
 
     // Check if all required values are present
     if (!repo || !repoId || !categoryId) {
@@ -72,8 +85,12 @@
     apiUrl.searchParams.append('first', '15');
 
     console.log('📡 Giscus API URL:', apiUrl.toString());
+    console.log('📡 All search parameters:');
+    apiUrl.searchParams.forEach((value, key) => {
+      console.log(`  ${key}: ${value}`);
+    });
 
-    // Test the API call directly
+  // Test the API call directly
     try {
       const response = await fetch(apiUrl.toString(), {
         method: 'GET',
@@ -112,6 +129,65 @@ console.log('📥 API Response Headers:', JSON.stringify(headers, null, 2));
       console.error('Network error or CORS issue');
     }
 
+    // Note: GitHub GraphQL testing removed as it's not necessary for Giscus functionality
+    // and was causing authentication errors in the console
+
+    console.groupEnd();
+
+    // Monitor network requests for debugging
+    console.group('🌐 Network Request Monitoring');
+    const originalFetch = window.fetch;
+    const originalXHROpen = XMLHttpRequest.prototype.open;
+    const originalXHRSend = XMLHttpRequest.prototype.send;
+
+    // Monitor fetch requests
+    window.fetch = function(...args) {
+      const [url, options] = args;
+      if (url.includes('giscus.app') || url.includes('github.com')) {
+        console.log('📡 Fetch request:', url, options);
+        return originalFetch.apply(this, args)
+          .then(response => {
+            console.log('📥 Fetch response:', response.status, response.statusText);
+            return response.clone().text().then(text => {
+              try {
+                const json = JSON.parse(text);
+                console.log('📦 Fetch response body:', json);
+              } catch {
+                console.log('📦 Fetch response body (raw):', text.substring(0, 500));
+              }
+              return response;
+            });
+          })
+          .catch(error => {
+            console.error('❌ Fetch error:', error);
+            throw error;
+          });
+      }
+      return originalFetch.apply(this, args);
+    };
+
+    // Monitor XMLHttpRequest
+    XMLHttpRequest.prototype.open = function(method, url, ...args) {
+      if (url.includes('giscus.app') || url.includes('github.com')) {
+        console.log('📡 XHR request:', method, url);
+        this._giscusDebug = true;
+      }
+      return originalXHROpen.apply(this, [method, url, ...args]);
+    };
+
+    XMLHttpRequest.prototype.send = function(...args) {
+      if (this._giscusDebug) {
+        this.addEventListener('load', () => {
+          console.log('📥 XHR response:', this.status, this.statusText);
+          console.log('📦 XHR response body:', this.responseText?.substring(0, 500));
+        });
+        this.addEventListener('error', (e) => {
+          console.error('❌ XHR error:', e);
+        });
+      }
+      return originalXHRSend.apply(this, args);
+    };
+
     console.groupEnd();
 
     const script = document.createElement('script');
@@ -147,21 +223,63 @@ console.log('📥 API Response Headers:', JSON.stringify(headers, null, 2));
       container.appendChild(script);
       giscusLoaded = true;
 
-      // Monitor for iframe creation
-      setTimeout(() => {
+      // Monitor for iframe creation with enhanced debugging
+      const monitorIframe = () => {
         const iframe = container.querySelector('iframe');
         if (iframe) {
           console.log('🖼️ Giscus iframe created');
+          console.log('📄 Iframe src:', iframe.src);
+          console.log('📄 Iframe dataset:', iframe.dataset);
+
+          // Log all data attributes
+          console.group('🔍 Iframe Data Attributes');
+          Object.keys(iframe.dataset).forEach(key => {
+            console.log(`  data-${key}: ${iframe.dataset[key]}`);
+          });
+          console.groupEnd();
+
           iframe.addEventListener('load', () => {
             console.log('✅ Giscus iframe loaded');
+            console.log('📄 Iframe src after load:', iframe.src);
+
+            // Try to access iframe content for debugging
+            try {
+              console.log('📄 Iframe contentWindow exists:', !!iframe.contentWindow);
+              if (iframe.contentDocument) {
+                console.log('📄 Iframe title:', iframe.contentDocument.title);
+              }
+            } catch (e) {
+              console.warn('⚠️ Cannot access iframe content (CORS):', e.message);
+            }
           });
+
           iframe.addEventListener('error', (e) => {
             console.error('❌ Giscus iframe error:', e);
           });
+
+          // Monitor messages from iframe
+          const messageListener = (event) => {
+            if (event.origin === 'https://giscus.app') {
+              console.log('📨 Message from Giscus iframe:', event.data);
+            }
+          };
+          window.addEventListener('message', messageListener);
+
+          // Store listener for cleanup
+          iframe._messageListener = messageListener;
+
+          return true;
         } else {
           console.warn('⚠️ Giscus iframe not found after 2 seconds');
+          console.log('🔍 Container content:', container.innerHTML);
+          return false;
         }
-      }, 2000);
+      };
+
+      // Try multiple times with increasing delays
+      setTimeout(monitorIframe, 2000);
+      setTimeout(monitorIframe, 5000);
+      setTimeout(monitorIframe, 10000);
     }
   }
 

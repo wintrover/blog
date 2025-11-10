@@ -4,20 +4,20 @@ export const giscusConfig = {
   repo: import.meta.env.VITE_GISCUS_REPO || 'wintrover/blog',
 
   // Repository ID (found in Giscus settings)
-  repoId: import.meta.env.VITE_GISCUS_REPO_ID || 'R_kgDOGOEESY',
+  repoId: import.meta.env.VITE_GISCUS_REPO_ID || 'R_kgDOQOClcw',
 
   // Discussion category
   category: import.meta.env.VITE_GISCUS_CATEGORY || 'General',
 
   // Category ID (found in Giscus settings)
-  categoryId: import.meta.env.VITE_GISCUS_CATEGORY_ID || 'DIC_kwDOPBuacs4Cwqu_',
+  categoryId: import.meta.env.VITE_GISCUS_CATEGORY_ID || 'DIC_kwDOQOClc84CxX8B',
 
   // How discussions are mapped to pages
   // Options: pathname, url, title, og:title, specific
-  mapping: 'title',
+  mapping: 'pathname',
 
-  // Strict matching
-  strict: '1',
+  // Strict matching - set to '0' for more flexible matching
+  strict: '0',
 
   // Enable reactions (👍, ❤️, etc.)
   reactionsEnabled: '1',
@@ -33,5 +33,5 @@ export const giscusConfig = {
   theme: 'preferred_color_scheme',
 
   // Language
-  lang: 'ko'
+  lang: 'en'
 };
