@@ -22,7 +22,7 @@ export const giscusConfig = {
   strict: '0',
 
   // Enable reactions (👍, ❤️, etc.)
-  reactionsEnabled: '1',
+  reactionsEnabled: '0',
 
   // Emit metadata
   emitMetadata: '0',
