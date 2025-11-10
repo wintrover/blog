@@ -6,8 +6,19 @@ export default defineConfig({
   base: '/blog/',
   build: {
     outDir: 'dist',
-    copyPublicDir: true
+    copyPublicDir: true,
+    rollupOptions: {
+      output: {
+        manualChunks: undefined
+      }
+    }
   },
   assetsInclude: ['**/*.md'],
-  publicDir: 'public'
+  publicDir: 'public',
+  server: {
+    historyApiFallback: true
+  },
+  preview: {
+    historyApiFallback: true
+  }
 })
