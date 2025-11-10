@@ -1,0 +1,16 @@
+sequenceDiagram
+    participant U as User
+    participant F as Frontend
+    participant A as API
+    participant Q as Redis Queue
+    participant W as Celery Worker
+    participant D as Database
+
+    U->>F: Upload Video
+    F->>A: Submit Request
+    A->>Q: Add to Queue
+    A->>U: "Processing..."
+    Q->>W: Process Task
+    W->>D: Store Results
+    W->>U: WebSocket Update
+    U->>U: See Progress
