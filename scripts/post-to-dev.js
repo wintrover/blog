@@ -15,12 +15,16 @@ function normalizePublicBaseUrl(url) {
     if (!u.pathname.endsWith('/blog')) {
       // /blog로 끝나지 않으면 추가
       if (u.pathname === '/') {
-        u.pathname = '/blog';
+        u.pathname = '/blog/';
       } else if (!u.pathname.includes('/blog')) {
-        u.pathname = u.pathname + '/blog';
+        u.pathname = (u.pathname.replace(/\/$/, '')) + '/blog/';
       } else {
         // 이미 /blog가 있는 경로는 그대로 유지
       }
+    }
+    // 최종적으로 디렉터리 경로로 인식되도록 반드시 슬래시 유지
+    if (!u.pathname.endsWith('/')) {
+      u.pathname = u.pathname + '/';
     }
     return u.toString();
   } catch {

@@ -6,7 +6,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "build:github": "vite build --base=/blog/ && cp 404.html dist/",
+    "build:github": "vite build --base=/blog/",
     "preview:github": "vite preview --base=/blog/",
     "deploy:github": "npm run build:github && node deploy-github.js",
     "test": "node tests/run-tests.js",
