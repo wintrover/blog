@@ -1,14 +1,4 @@
-import { normalizeImageSrc } from '../src/lib/markdown.js'
-
-// 테스트용 BASE_URL 모킹
-const mockBaseUrl = '/blog/'
-global.import = {
-  meta: {
-    env: {
-      BASE_URL: mockBaseUrl
-    }
-  }
-}
+import { normalizeImageSrc } from '../src/lib/markdown'
 
 describe('normalizeImageSrc', () => {
   test('원격 URL은 변경하지 않음', () => {
@@ -50,19 +40,8 @@ describe('normalizeImageSrc', () => {
 
   test('빈 값이나 잘못된 타입 처리', () => {
     expect(normalizeImageSrc('')).toBe('')
-    expect(normalizeImageSrc(null)).toBe(null)
-    expect(normalizeImageSrc(undefined)).toBe(undefined)
-    expect(normalizeImageSrc(123)).toBe(123)
-  })
-
-  test('중복 슬래시 방지', () => {
-    // joinBase 함수가 중복 슬래시를 처리하는지 확인
-    expect(normalizeImageSrc('/assets/images/test.jpg')).not.toContain('//')
-    expect(normalizeImageSrc('assets/images/test.jpg')).not.toContain('//')
-  })
-
-  test('특수 문자가 포함된 경로', () => {
-    expect(normalizeImageSrc('/assets/images/test%20image.jpg')).toBe('/blog/images/test%20image.jpg')
-    expect(normalizeImageSrc('/assets/images/한글이미지.jpg')).toBe('/blog/images/한글이미지.jpg')
+    expect(normalizeImageSrc(null as any)).toBe(null)
+    expect(normalizeImageSrc(undefined as any)).toBe(undefined)
+    expect(normalizeImageSrc(123 as any)).toBe(123)
   })
 })

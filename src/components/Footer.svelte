@@ -1,5 +1,5 @@
-<script>
-  import { siteConfig } from '../lib/config.js'
+<script lang="ts">
+  import { siteConfig } from '../lib/config'
 </script>
 
 <footer class="wrapper-footer">

@@ -1,7 +1,7 @@
-<script>
+<script lang="ts">
   import { onMount, afterUpdate } from "svelte";
-  import { formatDate, slugify } from "../lib/utils.js";
-  import { loadPostBySlug } from "../lib/postLoader.js";
+  import { formatDate, slugify } from "../lib/utils";
+  import { loadPostBySlug } from "../lib/postLoader";
   import { push } from 'svelte-spa-router';
   import mermaid from 'mermaid';
   import Comments from './Comments.svelte';

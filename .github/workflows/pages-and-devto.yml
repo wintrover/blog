@@ -49,7 +49,7 @@ jobs:
       - name: Generate Mermaid images
         env:
           BLOG_PUBLIC_BASE_URL: https://wintrover.github.io/blog
-        run: node scripts/generate-images-ci.js
+        run: npx tsx scripts/generate-images-ci.ts
       - name: Build for Pages
         run: npm run build:github
       - name: Upload Pages Artifact
@@ -99,10 +99,10 @@ jobs:
             LATEST=$(find src/posts -type f -name '*.md' | sort -r | head -n 1)
             if [ -z "$LATEST" ]; then echo "No posts found"; exit 0; fi
             echo "No posts changed; publishing latest: $LATEST"
-            node scripts/post-to-dev.js "$LATEST"
+            npx tsx scripts/post-to-dev.ts "$LATEST"
             exit 0
           fi
           for f in $CHANGED; do
             echo "Publishing $f"
-            node scripts/post-to-dev.js "$f"
+            npx tsx scripts/post-to-dev.ts "$f"
           done

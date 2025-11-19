@@ -1,9 +1,9 @@
-<script>
-  import { formatDate, truncateText, slugify } from '../lib/utils.js'
-  import { siteConfig } from '../lib/config.js'
+<script lang="ts">
+  import { formatDate, truncateText, slugify } from '../lib/utils'
+  import { siteConfig } from '../lib/config'
   import { push } from 'svelte-spa-router'
-  import { selectedCategory } from '../stores/category.js'
-  import { loadAllPosts } from '../lib/postLoader.js'
+  import { selectedCategory } from '../stores/category'
+  import { loadAllPosts } from '../lib/postLoader'
   import { onMount } from 'svelte'
   
   export let params = {}

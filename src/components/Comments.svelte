@@ -1,6 +1,6 @@
-<script>
+<script lang="ts">
   import { onMount } from 'svelte';
-  import { giscusConfig } from '../lib/giscus-config.js';
+  import { giscusConfig } from '../lib/giscus-config';
 
   // Use configuration or allow override via props
   // Use configuration or allow override via props

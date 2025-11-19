@@ -1,8 +1,8 @@
-<script>
-  import { selectedCategory } from '../stores/category.js'
-  import { posts } from '../stores/posts.js'
-  import { slugify } from '../lib/utils.js'
-  import { siteConfig } from '../lib/config.js'
+<script lang="ts">
+  import { selectedCategory } from '../stores/category'
+  import { posts } from '../stores/posts'
+  import { slugify } from '../lib/utils'
+  import { siteConfig } from '../lib/config'
   import { push } from 'svelte-spa-router'
   
   let categories = []

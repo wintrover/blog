@@ -1,4 +1,4 @@
-export function formatDate(dateString) {
+export function formatDate(dateString: string) {
   const date = new Date(dateString)
   return date.toLocaleDateString('ko-KR', {
     year: 'numeric',
@@ -7,12 +7,12 @@ export function formatDate(dateString) {
   })
 }
 
-export function truncateText(text, wordLimit = 30) {
+export function truncateText(text: string, wordLimit = 30) {
   const words = text.replace(/<[^>]*>/g, '').split(/\s+/)
   if (words.length <= wordLimit) return text
   return words.slice(0, wordLimit).join(' ') + '...'
 }
 
-export function slugify(text) {
+export function slugify(text: string) {
   return text.toLowerCase().replace(/\s+/g, '-')
 }

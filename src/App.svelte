@@ -1,9 +1,9 @@
-<script>
+<script lang="ts">
   import Sidebar from './components/Sidebar.svelte'
   import BlogList from './components/BlogList.svelte'
   import PostDetail from './components/PostDetail.svelte'
   import Footer from './components/Footer.svelte'
-  import { posts } from './stores/posts.js'
+  import { posts } from './stores/posts'
   import { onMount } from 'svelte'
   import Router from 'svelte-spa-router'
   

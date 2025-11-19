@@ -1,18 +1,12 @@
 import { strict as assert } from 'node:assert'
-import fs from 'node:fs'
-import path from 'node:path'
-import url from 'node:url'
 
-// markdown.js의 parseMarkdown을 직접 import
-import { parseMarkdown } from '../src/lib/markdown.js'
+import { parseMarkdown } from '../src/lib/markdown'
+import { runDevtoAbsolutizeTests } from './devto-absolutize.test'
 
-// dev.to absolutize 테스트 포함
-import { runDevtoAbsolutizeTests } from '../tests/devto-absolutize.test.js'
-
-function extractImgSrcs(html) {
-  const out = []
+function extractImgSrcs(html: string) {
+  const out: string[] = []
   const re = /<img\s+[^>]*src=["']([^"']+)["'][^>]*>/g
-  let m
+  let m: RegExpExecArray | null
   while ((m = re.exec(html))) out.push(m[1])
   return out
 }
@@ -25,7 +19,6 @@ async function testImageNormalization() {
     { md: '![a](/blog/assets/images/09/wandb-lfw-insightface-arcface.svg)', expect: '/blog/images/09-wandb-lfw-insightface-arcface.svg' },
     { md: '<img src="/assets/images/09/wandb-lfw-insightface-arcface.svg" alt="a" />', expect: '/blog/images/09-wandb-lfw-insightface-arcface.svg' }
   ]
-
   for (const c of cases) {
     const { html } = parseMarkdown(c.md)
     const srcs = extractImgSrcs(html)
@@ -36,7 +29,6 @@ async function testImageNormalization() {
 
 (async () => {
   try {
-    if (typeof parseMarkdown !== 'function') throw new Error('parseMarkdown not imported')
     await testImageNormalization()
     await runDevtoAbsolutizeTests()
     console.log('OK: image path normalization tests passed')

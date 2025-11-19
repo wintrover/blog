@@ -1,13 +1,13 @@
 import fs from 'fs/promises'
 import path from 'path'
 import matter from 'gray-matter'
-import { processMermaidDiagrams } from './mermaid-to-image.js'
+import { processMermaidDiagrams } from './mermaid-to-image'
 
 const baseUrl = process.env.BLOG_PUBLIC_BASE_URL || 'https://wintrover.github.io/blog'
 const postsRoot = 'src/posts'
 
-async function listMarkdownFiles(dir) {
-  const out = []
+async function listMarkdownFiles(dir: string) {
+  const out: string[] = []
   const entries = await fs.readdir(dir, { withFileTypes: true })
   for (const e of entries) {
     const p = path.join(dir, e.name)
@@ -21,7 +21,7 @@ async function listMarkdownFiles(dir) {
   return out
 }
 
-function deriveFilenameBase(filePath, frontmatter) {
+function deriveFilenameBase(filePath: string, frontmatter: any) {
   const base = path.basename(filePath, path.extname(filePath))
   const m = base.match(/^(\d{4}-\d{2}-\d{2})(?:-(\d+))?$/)
   const datePart = (m && m[1]) || String(frontmatter?.date || '')
@@ -36,7 +36,7 @@ async function run() {
     const raw = await fs.readFile(f, 'utf-8')
     const { data, content } = matter(raw)
     const filenameBase = deriveFilenameBase(f, data)
-    await processMermaidDiagrams(content, baseUrl, 'public/images', filenameBase)
+    await processMermaidDiagrams(content, baseUrl as string, 'public/images', filenameBase)
   }
   console.log('OK: mermaid images generated')
 }
