@@ -5,11 +5,12 @@
   import { push } from 'svelte-spa-router';
   import mermaid from 'mermaid';
   import Comments from './Comments.svelte';
+  import type { Post } from '../lib/types';
   // Browser detection
   const browser = typeof window !== 'undefined';
 
   export let params = {};
-  let post = null;
+  let post: Post | null = null;
   let markdownContent = null;
   let loading = true;
 
