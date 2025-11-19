@@ -22,30 +22,30 @@ describe('normalizeImageSrc', () => {
   })
 
   test('절대 경로에 BASE_URL 접두', () => {
-    expect(normalizeImageSrc('/assets/images/test.jpg')).toBe('/blog/assets/images/test.jpg')
+    expect(normalizeImageSrc('/assets/images/test.jpg')).toBe('/blog/images/test.jpg')
     expect(normalizeImageSrc('/images/test.png')).toBe('/blog/images/test.png')
     expect(normalizeImageSrc('/favicon.ico')).toBe('/blog/favicon.ico')
   })
 
   test('상대 경로에 BASE_URL 접두', () => {
-    expect(normalizeImageSrc('assets/images/test.jpg')).toBe('/blog/assets/images/test.jpg')
+    expect(normalizeImageSrc('assets/images/test.jpg')).toBe('/blog/images/test.jpg')
     expect(normalizeImageSrc('images/test.png')).toBe('/blog/images/test.png')
     expect(normalizeImageSrc('test.jpg')).toBe('/blog/test.jpg')
   })
 
   test('이전 하드코딩된 /blog/ 경로 처리', () => {
-    expect(normalizeImageSrc('/blog/assets/images/test.jpg')).toBe('/blog/assets/images/test.jpg')
+    expect(normalizeImageSrc('/blog/assets/images/test.jpg')).toBe('/blog/images/test.jpg')
     expect(normalizeImageSrc('/blog/images/test.png')).toBe('/blog/images/test.png')
   })
 
   test('이미 BASE_URL로 시작하는 경로는 그대로 유지', () => {
-    expect(normalizeImageSrc('/blog/assets/images/test.jpg')).toBe('/blog/assets/images/test.jpg')
+    expect(normalizeImageSrc('/blog/images/test.jpg')).toBe('/blog/images/test.jpg')
   })
 
   test('상대 경로 내 assets 포함 처리', () => {
-    expect(normalizeImageSrc('../assets/images/test.jpg')).toBe('/blog/assets/images/test.jpg')
-    expect(normalizeImageSrc('./assets/images/test.jpg')).toBe('/blog/assets/images/test.jpg')
-    expect(normalizeImageSrc('../../assets/images/test.jpg')).toBe('/blog/assets/images/test.jpg')
+    expect(normalizeImageSrc('../assets/images/test.jpg')).toBe('/blog/images/test.jpg')
+    expect(normalizeImageSrc('./assets/images/test.jpg')).toBe('/blog/images/test.jpg')
+    expect(normalizeImageSrc('../../assets/images/test.jpg')).toBe('/blog/images/test.jpg')
   })
 
   test('빈 값이나 잘못된 타입 처리', () => {
@@ -62,7 +62,7 @@ describe('normalizeImageSrc', () => {
   })
 
   test('특수 문자가 포함된 경로', () => {
-    expect(normalizeImageSrc('/assets/images/test%20image.jpg')).toBe('/blog/assets/images/test%20image.jpg')
-    expect(normalizeImageSrc('/assets/images/한글이미지.jpg')).toBe('/blog/assets/images/한글이미지.jpg')
+    expect(normalizeImageSrc('/assets/images/test%20image.jpg')).toBe('/blog/images/test%20image.jpg')
+    expect(normalizeImageSrc('/assets/images/한글이미지.jpg')).toBe('/blog/images/한글이미지.jpg')
   })
 })

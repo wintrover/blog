@@ -1,7 +1,7 @@
 export const siteConfig = {
   name: 'wintrover',
   description: 'Fullstack AI Application Architect',
-  avatar: '/blog/assets/images/common/profile.png',
+  avatar: '/blog/images/profile.png',
   baseUrl: '/blog',
   
   social: {

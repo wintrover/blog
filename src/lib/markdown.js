@@ -32,25 +32,52 @@ export function normalizeImageSrc(src) {
 
   // 2) 이전 하드코딩 '/blog/'를 현재 BASE로 동기화
   if (src.startsWith('/blog/')) {
-    return joinBase(src.slice('/blog/'.length))
+    const rest = src.slice('/blog/'.length)
+    // handle legacy assets/images -> images flat
+    if (rest.startsWith('assets/images/')) {
+      const flattened = flattenLegacyAssetsPath(rest)
+      return joinBase(flattened)
+    }
+    return joinBase(rest)
   }
 
   // 3) 이미 BASE로 시작하면 그대로
   if (src.startsWith(BASE)) return src
 
-  // 4) 절대 경로 (/assets/, /images/ 등) -> BASE 접두
-  if (src.startsWith('/')) {
-    return joinBase(src.slice(1)) // 앞의 '/' 제거 후 BASE 접두
+  // 4) 절대 경로 중 /assets/images/* 는 images 평면으로 변환
+  if (src.startsWith('/assets/images/')) {
+    const flattened = flattenLegacyAssetsPath(src.slice(1))
+    return joinBase(flattened)
+  }
+  // 5) 절대 경로 /images/* -> BASE 접두
+  if (src.startsWith('/images/')) {
+    return joinBase(src.slice(1))
   }
 
-  // 5) 상대 경로 내 assets 포함 (../assets, ./assets 등)
-  const assetsIdx = src.indexOf('/assets/')
-  if (assetsIdx !== -1) {
-    return joinBase(src.slice(assetsIdx + 1)) // '/' 제거 후 BASE 접두
+  // 6) 상대 경로 내 assets 포함 (../assets, ./assets 등)
+  const mRelAssetsImages = src.match(/(^|\/?)(?:\.\.\/|\.\/)?assets\/images\/(.+)$/)
+  if (mRelAssetsImages) {
+    const flattened = flattenLegacyAssetsPath(`assets/images/${mRelAssetsImages[2]}`)
+    return joinBase(flattened)
   }
 
-  // 6) 기타 상대경로 (예: assets/... 또는 images/...) -> BASE 접두
+  // 7) 기타 상대경로 (예: images/...) -> BASE 접두
   return joinBase(src)
+}
+
+function flattenLegacyAssetsPath(p) {
+  // input like 'assets/images/<dir>/<filename>' or 'assets/images/<filename>'
+  const rest = p.replace(/^assets\/images\//, '')
+  const parts = rest.split('/')
+  if (parts.length >= 2) {
+    const first = parts[0]
+    const filename = parts.slice(1).join('/')
+    if (/^\d{2}$/.test(first)) {
+      return `images/${first}-${filename}`
+    }
+    return `images/${filename}`
+  }
+  return `images/${rest}`
 }
 
 // 마크다운 파일 로드 및 파싱

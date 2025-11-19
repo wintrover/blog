@@ -10,25 +10,16 @@ async function getGitHubRawUrl(outputDir, filename) {
     const util = await import('util');
     const execAsync = util.promisify(exec);
 
-    // Get remote URL
-    const { stdout: remoteUrl } = await execAsync('git remote get-url origin');
-
-    // Parse GitHub URL
-    const match = remoteUrl.match(/github\.com[/:]([^/]+)\/([^/.]+)(\.git)?/i);
-    if (match) {
-      const owner = match[1];
-      const repo = match[2];
-
-      // Normalize outputDir to remove 'public/' prefix if present
-      let normalizedDir = outputDir;
-      if (normalizedDir.startsWith('public/')) {
-        normalizedDir = normalizedDir.substring(7);
+    const mode = String(process.env.BLOG_IMAGE_ABS_MODE || '').toLowerCase();
+    if (mode === 'raw') {
+      const { stdout: remoteUrl } = await execAsync('git remote get-url origin');
+      const match = remoteUrl.match(/github\.com[/:]([^/]+)\/([^/.]+)(\.git)?/i);
+      if (match) {
+        const owner = match[1];
+        const repo = match[2];
+        const rawPath = `${outputDir}/${filename}`.replace(/\\/g, '/');
+        return `https://raw.githubusercontent.com/${owner}/${repo}/refs/heads/main/${rawPath}`;
       }
-
-      // Use GitHub's raw content URL
-      // Ensure path uses forward slashes
-      const normalizedPath = `${normalizedDir}/${filename}`.replace(/\\/g, '/');
-      return `https://raw.githubusercontent.com/${owner}/${repo}/refs/heads/main/${normalizedPath}`;
     }
 
     // Fallback to GitHub Pages URL if git info not available
@@ -188,7 +179,7 @@ export function extractMermaidBlocks(markdown) {
  * @param {string} outputDir - Directory to save generated images
  * @returns {Promise<{content: string, images: Array}>} - Processed content and image paths
  */
-export async function processMermaidDiagrams(markdown, publicBaseUrl, outputDir = 'assets/images/mermaid') {
+export async function processMermaidDiagrams(markdown, publicBaseUrl, outputDir = 'public/images', filenameBase = 'diagram') {
   const mermaidBlocks = extractMermaidBlocks(markdown);
 
   if (mermaidBlocks.length === 0) {
@@ -201,13 +192,12 @@ export async function processMermaidDiagrams(markdown, publicBaseUrl, outputDir 
   let processedContent = markdown;
   const images = [];
 
-  // Process blocks in reverse order to avoid index shifting
   for (let i = mermaidBlocks.length - 1; i >= 0; i--) {
     const block = mermaidBlocks[i];
 
     try {
-      // Generate unique filename
-      const filename = `mermaid-${crypto.randomBytes(8).toString('hex')}.png`;
+      const idx = (mermaidBlocks.length - i);
+      const filename = `${filenameBase}-${idx}.png`;
       const imagePath = path.join(outputDir, filename);
 
       // Get GitHub raw URL

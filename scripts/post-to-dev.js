@@ -64,8 +64,8 @@ export function absolutizeSrc(src, publicBaseUrl) {
     const base = new URL(baseUrl);
     const underBlog = base.pathname.replace(/\/+$/, '').endsWith('/blog');
 
-    // Special handling for Mermaid images - ensure they're accessible from GitHub Pages
-    if (trimmed.includes('assets/images/mermaid')) {
+    // Fast-path for already-flat images path
+    if (/^(?:public\/)?images\//.test(trimmed) || /^(?:\/)(?:public\/)?images\//.test(trimmed) || /^blog\/images\//.test(trimmed) || /^\/blog\/images\//.test(trimmed)) {
       // Remove 'public/' prefix if present
       let assetPath = trimmed;
       if (assetPath.startsWith('public/')) {
@@ -98,6 +98,27 @@ export function absolutizeSrc(src, publicBaseUrl) {
       assetPath = mImages[1];
     } else {
       assetPath = trimmed.replace(/^\.{1,2}\//, '').replace(/^blog\//i, '');
+    }
+
+    // Flatten legacy assets/images to images flat folder
+    if (/^assets\/images\//i.test(assetPath)) {
+      const rest = assetPath.replace(/^assets\/images\//i, '');
+      const parts = rest.split('/');
+      if (parts.length >= 2 && /^\d{2}$/.test(parts[0])) {
+        assetPath = `images/${parts[0]}-${parts.slice(1).join('/')}`;
+      } else {
+        assetPath = `images/${parts.slice(1).join('/') || parts[0]}`;
+      }
+    }
+
+    const useRaw = String(process.env.BLOG_IMAGE_ABS_MODE || '').toLowerCase() === 'raw';
+    const ghRepo = process.env.GITHUB_REPOSITORY; // owner/repo in GitHub Actions
+    if (useRaw && ghRepo) {
+      let repoPath = assetPath.replace(/^\/+/, '');
+      if (!repoPath.startsWith('public/')) {
+        repoPath = `public/${repoPath}`;
+      }
+      return `https://raw.githubusercontent.com/${ghRepo}/refs/heads/main/${repoPath}`;
     }
 
     let p;
@@ -190,13 +211,18 @@ async function postToDev(filePath) {
     );
     const tags = sanitized.slice(0, 4);
 
-    // Process Mermaid diagrams and convert to images
     console.log('🔄 Processing Mermaid diagrams...');
-    const mermaidOutputDir = path.join('public', 'assets', 'images', 'mermaid');
+    const mermaidOutputDir = path.join('public', 'images');
+    const baseName = path.basename(filePath, path.extname(filePath));
+    const m = baseName.match(/^(\d{4}-\d{2}-\d{2})(?:-(\d+))?/);
+    const datePart = (m && m[1]) || (frontmatter.date || '').toString();
+    const numPart = (m && m[2]) || '0';
+    const filenameBase = `${datePart}-${numPart}`;
     const { content: processedContent, images: mermaidImages } = await processMermaidDiagrams(
       content,
       publicBaseUrl,
-      mermaidOutputDir
+      mermaidOutputDir,
+      filenameBase
     );
 
     if (mermaidImages.length > 0) {
@@ -258,7 +284,7 @@ async function downloadAndHostUCloudImage(ucloudUrl, publicBaseUrl) {
     // Extract filename from URL or generate one
     const urlHash = crypto.createHash('md5').update(ucloudUrl).digest('hex');
     const filename = `ucloud-${urlHash}.png`;
-    const outputPath = path.join('public', 'assets', 'images', 'ucloud', filename);
+    const outputPath = path.join('public', 'images', filename);
 
     // Ensure directory exists
     await fs.mkdir(path.dirname(outputPath), { recursive: true });
@@ -278,13 +304,13 @@ async function downloadAndHostUCloudImage(ucloudUrl, publicBaseUrl) {
     if (gitRemote) {
       const { owner, repo } = gitRemote;
       // Use GitHub's raw content URL
-      const normalizedPath = `public/assets/images/ucloud/${filename}`.replace(/\\/g, '/');
+      const normalizedPath = `public/images/${filename}`.replace(/\\/g, '/');
       return `https://raw.githubusercontent.com/${owner}/${repo}/refs/heads/main/${normalizedPath}`;
     }
 
     // Fallback to GitHub Pages URL if git info not available
     const baseUrl = normalizePublicBaseUrl(publicBaseUrl);
-    return `${baseUrl}/assets/images/ucloud/${filename}`;
+    return `${baseUrl}/images/${filename}`;
   } catch (error) {
     console.error('Failed to process UCloud image:', error.message);
     return ucloudUrl; // Fallback to original URL

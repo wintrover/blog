@@ -7,11 +7,11 @@ export async function runDevtoAbsolutizeTests() {
     const base = 'https://wintrover.github.io/blog' // no trailing slash
     assert.equal(
       absolutizeSrc('/assets/images/a.png', base),
-      'https://wintrover.github.io/blog/assets/images/a.png'
+      'https://wintrover.github.io/blog/images/a.png'
     )
     assert.equal(
       absolutizeSrc('assets/images/a.png', base),
-      'https://wintrover.github.io/blog/assets/images/a.png'
+      'https://wintrover.github.io/blog/images/a.png'
     )
   }
 
@@ -20,11 +20,11 @@ export async function runDevtoAbsolutizeTests() {
     const base = 'https://wintrover.github.io/blog/'
     assert.equal(
       absolutizeSrc('/assets/images/a.png', base),
-      'https://wintrover.github.io/blog/assets/images/a.png'
+      'https://wintrover.github.io/blog/images/a.png'
     )
     assert.equal(
       absolutizeSrc('assets/images/a.png', base),
-      'https://wintrover.github.io/blog/assets/images/a.png'
+      'https://wintrover.github.io/blog/images/a.png'
     )
   }
 
@@ -33,7 +33,7 @@ export async function runDevtoAbsolutizeTests() {
     const base = 'https://wintrover.github.io/blog'
     assert.equal(
       absolutizeSrc('/blog/assets/images/a.png', base),
-      'https://wintrover.github.io/blog/assets/images/a.png'
+      'https://wintrover.github.io/blog/images/a.png'
     )
   }
 

@@ -19,11 +19,11 @@ function extractImgSrcs(html) {
 
 async function testImageNormalization() {
   const cases = [
-    { md: '![a](../assets/images/09/wandb-lfw-insightface-arcface.svg)', expect: '/blog/assets/images/09/wandb-lfw-insightface-arcface.svg' },
-    { md: '![a](/assets/images/09/wandb-lfw-insightface-arcface.svg)', expect: '/blog/assets/images/09/wandb-lfw-insightface-arcface.svg' },
-    { md: '![a](assets/images/09/wandb-lfw-insightface-arcface.svg)', expect: '/blog/assets/images/09/wandb-lfw-insightface-arcface.svg' },
-    { md: '![a](/blog/assets/images/09/wandb-lfw-insightface-arcface.svg)', expect: '/blog/assets/images/09/wandb-lfw-insightface-arcface.svg' },
-    { md: '<img src="/assets/images/09/wandb-lfw-insightface-arcface.svg" alt="a" />', expect: '/blog/assets/images/09/wandb-lfw-insightface-arcface.svg' }
+    { md: '![a](../assets/images/09/wandb-lfw-insightface-arcface.svg)', expect: '/blog/images/09-wandb-lfw-insightface-arcface.svg' },
+    { md: '![a](/assets/images/09/wandb-lfw-insightface-arcface.svg)', expect: '/blog/images/09-wandb-lfw-insightface-arcface.svg' },
+    { md: '![a](assets/images/09/wandb-lfw-insightface-arcface.svg)', expect: '/blog/images/09-wandb-lfw-insightface-arcface.svg' },
+    { md: '![a](/blog/assets/images/09/wandb-lfw-insightface-arcface.svg)', expect: '/blog/images/09-wandb-lfw-insightface-arcface.svg' },
+    { md: '<img src="/assets/images/09/wandb-lfw-insightface-arcface.svg" alt="a" />', expect: '/blog/images/09-wandb-lfw-insightface-arcface.svg' }
   ]
 
   for (const c of cases) {
