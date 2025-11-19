@@ -24,7 +24,7 @@ async function getGitHubRawUrl(outputDir, filename) {
 
     // Fallback to GitHub Pages URL if git info not available
     const publicBaseUrl = 'https://wintrover.github.io/blog';
-    let urlPath = outputDir;
+    let urlPath = outputDir.replace(/\\/g, '/');
     if (urlPath.startsWith('public/')) {
       urlPath = urlPath.substring(7);
     }
@@ -33,7 +33,7 @@ async function getGitHubRawUrl(outputDir, filename) {
     console.error('Failed to get GitHub repo info:', error.message);
     // Fallback
     const publicBaseUrl = 'https://wintrover.github.io/blog';
-    let urlPath = outputDir;
+    let urlPath = outputDir.replace(/\\/g, '/');
     if (urlPath.startsWith('public/')) {
       urlPath = urlPath.substring(7);
     }

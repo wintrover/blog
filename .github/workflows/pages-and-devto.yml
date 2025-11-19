@@ -95,7 +95,13 @@ jobs:
           TO="${{ github.sha }}"
           if [ -z "$FROM" ]; then FROM="$(git rev-parse HEAD~1)"; fi
           CHANGED=$(git diff --name-only "$FROM" "$TO" | grep -E '^src/posts/.+\.md$' || true)
-          if [ -z "$CHANGED" ]; then echo "No posts changed"; exit 0; fi
+          if [ -z "$CHANGED" ]; then
+            LATEST=$(find src/posts -type f -name '*.md' | sort -r | head -n 1)
+            if [ -z "$LATEST" ]; then echo "No posts found"; exit 0; fi
+            echo "No posts changed; publishing latest: $LATEST"
+            node scripts/post-to-dev.js "$LATEST"
+            exit 0
+          fi
           for f in $CHANGED; do
             echo "Publishing $f"
             node scripts/post-to-dev.js "$f"

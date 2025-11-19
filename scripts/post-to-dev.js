@@ -244,8 +244,14 @@ async function postToDev(filePath) {
     const slug = slugifyTitle(frontmatter.title || path.basename(filePath, path.extname(filePath)));
     const canonicalUrl = frontmatter.canonical_url || `${publicBaseUrl}#/post/${slug}`;
 
+    // dev.to title length limit: 128 chars for full_post
+    const clampTitle = (t) => {
+      if (!t) return ''
+      return t.length <= 128 ? t : (t.slice(0, 125) + '...')
+    }
+
     const article = {
-      title: frontmatter.title,
+      title: clampTitle(frontmatter.title),
       published: false,
       body_markdown: bodyMarkdown,
       tags,
