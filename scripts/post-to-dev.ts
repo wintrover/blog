@@ -184,11 +184,53 @@ async function postToDev(filePath: string) {
       canonical_url: canonicalUrl,
       cover_image: (frontmatter as any).cover_image || firstImageRef.url || undefined,
     }
-    const response = await fetch('https://dev.to/api/articles', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/vnd.forem.api-v1+json', 'api-key': devtoApiKey!, }, body: JSON.stringify({ article }) })
+
+    // Check if article exists
+    console.log(`🔍 Checking if article "${article.title}" already exists...`)
+    const checkResponse = await fetch('https://dev.to/api/articles/me/all?per_page=1000', {
+      headers: { 'api-key': devtoApiKey! }
+    })
+    
+    let existingId = null
+    if (checkResponse.ok) {
+      const articles = await checkResponse.json() as any[]
+      const found = articles.find(a => a.title === article.title)
+      if (found) {
+        existingId = found.id
+        console.log(`✅ Found existing article ID: ${existingId}`)
+      }
+    }
+
+    let response
+    if (existingId) {
+      console.log(`🔄 Updating existing article ${existingId}...`)
+      response = await fetch(`https://dev.to/api/articles/${existingId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/vnd.forem.api-v1+json',
+          'api-key': devtoApiKey!,
+        },
+        body: JSON.stringify({ article })
+      })
+    } else {
+      console.log('✨ Creating new draft...')
+      response = await fetch('https://dev.to/api/articles', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/vnd.forem.api-v1+json',
+          'api-key': devtoApiKey!,
+        },
+        body: JSON.stringify({ article })
+      })
+    }
+
     if (response.ok) {
       const result = await response.json() as any
-      console.log(`Successfully created draft: ${result.url}`)
+      console.log(`Successfully ${existingId ? 'updated' : 'created'} draft: ${result.url}`)
     } else {
+
       const error = await response.json() as any
       console.error('Failed to create draft:', error)
       process.exit(1)
