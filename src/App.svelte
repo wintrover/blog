@@ -270,41 +270,41 @@
 
   /* 토글 버튼 스타일 - 항상 왼쪽 위에 고정 */
   .sidebar-toggle {
-    position: fixed;
-    top: 15px;
-    left: 15px;
-    z-index: 1002; /* 사이드바보다 높은 z-index */
-    background: #0366d6;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    padding: 8px 10px;
-    font-size: 16px;
-    cursor: pointer;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-    transition: background-color 0.2s;
-  }
+          position: fixed;
+          top: 15px;
+          left: 15px;
+          z-index: 1002; /* 사이드바보다 높은 z-index */
+          background: #0366d6;
+          color: white;
+          border: none;
+          border-radius: 4px;
+          padding: 8px;
+          font-size: 16px;
+          cursor: pointer;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+          transition: background-color 0.2s;
+        }
 
   .sidebar-toggle:hover {
     background: #0256cc;
   }
 
   /* 반응형 디자인 */
-  @media (max-width: 768px) {
-    .sidebar-toggle {
-      top: 10px;
-      left: 10px;
-      padding: 6px 8px;
-      font-size: 14px;
-    }
-  }
+        @media (max-width: 768px) {
+          .sidebar-toggle {
+            top: 10px;
+            left: 10px;
+            padding: 6px;
+            font-size: 14px;
+          }
+        }
 
-  @media (max-width: 480px) {
-    .sidebar-toggle {
-      top: 8px;
-      left: 8px;
-      padding: 5px 7px;
-      font-size: 12px;
-    }
-  }
+        @media (max-width: 480px) {
+          .sidebar-toggle {
+            top: 8px;
+            left: 8px;
+            padding: 5px;
+            font-size: 12px;
+          }
+        }
 </style>
