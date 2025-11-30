@@ -5,13 +5,12 @@
   import { selectedCategory } from '../stores/category'
   import { loadAllPosts } from '../lib/postLoader'
   import { onMount } from 'svelte'
-  import type { Post } from '../lib/types'
   
   export let params = {}
-  let posts: Post[] = []
-  let filteredPosts: Post[] = []
+  let posts = []
+  let filteredPosts = []
   
-  function selectPost(post: Post) {
+  function selectPost(post) {
     push(`/post/${post.slug}`)
   }
   

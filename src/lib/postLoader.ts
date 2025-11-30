@@ -1,6 +1,5 @@
 import { parseMarkdown } from './markdown'
 import categoryConfig from './categories.json'
-import { Post } from './types'
 
 function parseFrontMatter(content: string) {
   const frontMatterRegex = /^---\s*\n([\s\S]*?)\n---\s*\n([\s\S]*)$/
@@ -62,7 +61,7 @@ function determineCategoryFromPath(path: string) {
 export async function loadAllPosts() {
   try {
     const modules = import.meta.glob('../posts/**/*.md', { eager: true, query: '?raw', import: 'default' }) as Record<string, string>
-    const posts: Post[] = []
+    const posts: any[] = []
     for (const path in modules) {
       const content = modules[path]
       const fileName = path.split('/').pop()!.replace('.md', '')
@@ -71,7 +70,7 @@ export async function loadAllPosts() {
       if ((categoryConfig as any).autoAssignByFolder && !category) {
         category = determineCategoryFromPath(path)
       }
-      const post: Post = {
+      const post = {
         fileName,
         slug: slugifyTitle((data as any).title || fileName),
         title: (data as any).title || fileName,
@@ -85,14 +84,14 @@ export async function loadAllPosts() {
       }
       posts.push(post)
     }
-    return posts.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    return posts.sort((a, b) => new Date(b.date as any).getTime() - new Date(a.date as any).getTime())
   } catch (error) {
     console.error('포스트 로딩 중 오류 발생:', error)
     return []
   }
 }
 
-export async function loadPostBySlug(slug: string): Promise<Post | null> {
+export async function loadPostBySlug(slug: string) {
   try {
     const modules = import.meta.glob('../posts/**/*.md', { eager: true, query: '?raw', import: 'default' }) as Record<string, string>
     let targetContent: string | null = null
@@ -118,15 +117,15 @@ export async function loadPostBySlug(slug: string): Promise<Post | null> {
     return {
       fileName: targetFileName!,
       slug,
-      title: data.title || targetFileName!,
-      date: data.date || new Date().toISOString().split('T')[0],
-      category: data.category || 'general',
-      tags: data.tags || [],
-      excerpt: data.excerpt || data.description || '',
+      title: (data as any).title || targetFileName!,
+      date: (data as any).date || new Date().toISOString().split('T')[0],
+      category: (data as any).category || 'general',
+      tags: (data as any).tags || [],
+      excerpt: (data as any).excerpt || (data as any).description || '',
       content: markdownContent,
       html: htmlContent,
       ...data
-    } as Post
+    }
   } catch (error) {
     console.error(`포스트 로딩 중 오류 발생 (${slug}):`, error)
     return null
