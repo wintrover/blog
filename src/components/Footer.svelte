@@ -1,5 +1,7 @@
 <script lang="ts">
+import { siteConfig } from "../lib/config";
 
+void siteConfig;
 </script>
 
 <footer class="wrapper-footer">

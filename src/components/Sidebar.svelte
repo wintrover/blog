@@ -1,9 +1,14 @@
 <script lang="ts">
 import { push } from "svelte-spa-router";
+import { siteConfig } from "../lib/config";
 import { slugify } from "../lib/utils";
 import { selectedCategory } from "../stores/category";
+import { posts } from "../stores/posts";
 
-let _categories = [];
+let categories = [];
+
+void siteConfig;
+void posts;
 
 $: {
 	const categoryCount = {};
@@ -23,7 +28,7 @@ $: {
 		}
 	});
 
-	_categories = [
+	categories = [
 		{ name: "All Posts", slug: "all", count: $posts.length },
 		...Object.entries(categoryCount).map(([name, count]) => ({
 			name,
@@ -34,7 +39,7 @@ $: {
 	];
 }
 
-function _selectCategory(categorySlug, categoryName) {
+function selectCategory(categorySlug, categoryName) {
 	// slug 대신 실제 카테고리 이름을 저장
 	if (categorySlug === "all") {
 		selectedCategory.set("all");
@@ -45,11 +50,15 @@ function _selectCategory(categorySlug, categoryName) {
 	}
 }
 
-function _goHome(event) {
+function goHome(event) {
 	event.preventDefault();
 	selectedCategory.set("all");
 	push("/");
 }
+
+void categories;
+void selectCategory;
+void goHome;
 </script>
 
 <div class="sidebar-header">

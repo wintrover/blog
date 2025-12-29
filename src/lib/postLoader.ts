@@ -65,35 +65,49 @@ export async function loadAllPosts() {
 			query: "?raw",
 			import: "default",
 		}) as Record<string, string>;
+
+		const postPaths = Object.keys(modules);
+
 		const posts: any[] = [];
 		for (const path in modules) {
-			const content = modules[path];
-			const fileName = path.split("/").pop()?.replace(".md", "");
-			const { data, content: markdownContent } = parseFrontMatter(content);
-			let category = (data as any).category;
-			if ((categoryConfig as any).autoAssignByFolder && !category) {
-				category = determineCategoryFromPath(path);
+			try {
+				const content = modules[path];
+				const fileName = path.split("/").pop()?.replace(".md", "");
+				const { data, content: markdownContent } = parseFrontMatter(content);
+				let category = (data as any).category;
+				if ((categoryConfig as any).autoAssignByFolder && !category) {
+					category = determineCategoryFromPath(path);
+				}
+				const post = {
+					fileName,
+					slug: slugifyTitle((data as any).title || fileName),
+					title: (data as any).title || fileName,
+					date: (data as any).date || new Date().toISOString().split("T")[0],
+					category: category || (categoryConfig as any).defaultCategory,
+					tags: (data as any).tags || [],
+					excerpt: (data as any).excerpt || (data as any).description || "",
+					content: markdownContent,
+					folder: path.split("/")[path.split("/").length - 2],
+					...data,
+				};
+				posts.push(post);
+			} catch (postError) {
+				console.error(`[postLoader] Error parsing post at ${path}:`, postError);
 			}
-			const post = {
-				fileName,
-				slug: slugifyTitle((data as any).title || fileName),
-				title: (data as any).title || fileName,
-				date: (data as any).date || new Date().toISOString().split("T")[0],
-				category: category || (categoryConfig as any).defaultCategory,
-				tags: (data as any).tags || [],
-				excerpt: (data as any).excerpt || (data as any).description || "",
-				content: markdownContent,
-				folder: path.split("/")[path.split("/").length - 2],
-				...data,
-			};
-			posts.push(post);
 		}
+
 		return posts.sort(
 			(a, b) =>
 				new Date(b.date as any).getTime() - new Date(a.date as any).getTime(),
 		);
 	} catch (error) {
-		console.error("포스트 로딩 중 오류 발생:", error);
+		console.error("[postLoader] Critical error loading posts:", error);
+		if (error instanceof Error) {
+			console.error("[postLoader] Error details:", {
+				message: error.message,
+				stack: error.stack,
+			});
+		}
 		return [];
 	}
 }
@@ -105,30 +119,34 @@ export async function loadPostBySlug(slug: string) {
 			query: "?raw",
 			import: "default",
 		}) as Record<string, string>;
+
 		let targetContent: string | null = null;
-		let _targetData: any = null;
 		let targetFileName: string | null = null;
+
 		for (const path in modules) {
 			const content = modules[path];
-			const fileName = path.split("/").pop()?.replace(".md", "") ?? null;
+			const fileName = path.split("/").pop()?.replace(".md", "") ?? "unknown";
 			const { data } = parseFrontMatter(content);
-			const postSlug = slugifyTitle((data as any).title || fileName || "");
+			const postSlug = slugifyTitle((data as any).title || fileName);
 			if (postSlug === slug) {
 				targetContent = content;
-				_targetData = data;
 				targetFileName = fileName;
 				break;
 			}
 		}
-		if (!targetContent) {
+
+		if (!targetContent || !targetFileName) {
+			console.warn(`[postLoader] Post not found for slug: ${slug}`);
 			return null;
 		}
+
 		const { data, content: markdownContent } = parseFrontMatter(targetContent);
 		const { html: htmlContent } = parseMarkdown(markdownContent);
+
 		return {
-			fileName: targetFileName!,
+			fileName: targetFileName,
 			slug,
-			title: (data as any).title || targetFileName!,
+			title: (data as any).title || targetFileName,
 			date: (data as any).date || new Date().toISOString().split("T")[0],
 			category: (data as any).category || "general",
 			tags: (data as any).tags || [],
@@ -138,7 +156,13 @@ export async function loadPostBySlug(slug: string) {
 			...data,
 		};
 	} catch (error) {
-		console.error(`포스트 로딩 중 오류 발생 (${slug}):`, error);
+		console.error(`[postLoader] Error loading post by slug (${slug}):`, error);
+		if (error instanceof Error) {
+			console.error("[postLoader] Error details:", {
+				message: error.message,
+				stack: error.stack,
+			});
+		}
 		return null;
 	}
 }

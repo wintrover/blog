@@ -2,14 +2,14 @@
 import { onMount } from "svelte";
 import { push } from "svelte-spa-router";
 import { loadAllPosts } from "../lib/postLoader";
-import { slugify } from "../lib/utils";
+import { formatDate, slugify } from "../lib/utils";
 import { selectedCategory } from "../stores/category";
 
 export const params = {};
 let posts = [];
-let _filteredPosts = [];
+let filteredPosts = [];
 
-function _selectPost(post) {
+function selectPost(post) {
 	push(`/post/${post.slug}`);
 }
 
@@ -20,7 +20,7 @@ async function loadPosts() {
 
 		// URL 파라미터에 따라 필터링
 		if (params.category) {
-			_filteredPosts = posts.filter(
+			filteredPosts = posts.filter(
 				(post) => slugify(post.category) === params.category,
 			);
 			selectedCategory.set(
@@ -28,12 +28,12 @@ async function loadPosts() {
 					"all",
 			);
 		} else {
-			_filteredPosts = posts;
+			filteredPosts = posts;
 			selectedCategory.set("all");
 		}
 	} catch (error) {
 		console.error("포스트 로딩 중 오류 발생:", error);
-		_filteredPosts = [];
+		filteredPosts = [];
 	}
 }
 
@@ -44,6 +44,9 @@ onMount(() => {
 $: if (params) {
 	loadPosts();
 }
+
+void filteredPosts;
+void selectPost;
 </script>
 
 <div class="blog-page">

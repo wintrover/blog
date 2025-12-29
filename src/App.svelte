@@ -1,7 +1,16 @@
 <script lang="ts">
 import { onMount } from "svelte";
+import Router from "svelte-spa-router";
 import BlogList from "./components/BlogList.svelte";
+import Footer from "./components/Footer.svelte";
 import PostDetail from "./components/PostDetail.svelte";
+import Sidebar from "./components/Sidebar.svelte";
+import { posts } from "./stores/posts";
+
+void Router;
+void Footer;
+void Sidebar;
+void posts;
 
 let sidebarCollapsed = false;
 let sidebarElement;
@@ -12,11 +21,13 @@ let _manualToggleTimeout;
 let resizeTimeout; // 리사이즈 디바운스용
 
 // 라우트 정의
-const _routes = {
+const routes = {
 	"/": BlogList,
 	"/category/:category": BlogList,
 	"/post/:slug": PostDetail,
 };
+
+void routes;
 
 // 사이드바 상태 변화 감지
 $: {
