@@ -9,7 +9,7 @@
   <script type="module">
     // GitHub Pages SPA redirect fix
     // This script redirects 404s back to the SPA with the original path
-    (function() {
+    (() => {
       var path = window.location.pathname;
       var search = window.location.search;
       var hash = window.location.hash;
@@ -17,7 +17,7 @@
       // If we're not at the root and not already at the SPA
       if (path !== '/' && path !== '/blog/' && path !== '/blog') {
         // Redirect to the root with the original path as hash
-        window.location.replace('/blog/#' + path + search + hash);
+        window.location.replace(`/blog/#${path}${search}${hash}`);
       }
     })();
   </script>

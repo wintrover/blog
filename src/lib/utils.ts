@@ -1,18 +1,18 @@
 export function formatDate(dateString: string) {
-  const date = new Date(dateString)
-  return date.toLocaleDateString('ko-KR', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit'
-  })
+	const date = new Date(dateString);
+	return date.toLocaleDateString("ko-KR", {
+		year: "numeric",
+		month: "2-digit",
+		day: "2-digit",
+	});
 }
 
 export function truncateText(text: string, wordLimit = 30) {
-  const words = text.replace(/<[^>]*>/g, '').split(/\s+/)
-  if (words.length <= wordLimit) return text
-  return words.slice(0, wordLimit).join(' ') + '...'
+	const words = text.replace(/<[^>]*>/g, "").split(/\s+/);
+	if (words.length <= wordLimit) return text;
+	return `${words.slice(0, wordLimit).join(" ")}...`;
 }
 
 export function slugify(text: string) {
-  return text.toLowerCase().replace(/\s+/g, '-')
+	return text.toLowerCase().replace(/\s+/g, "-");
 }

@@ -22,10 +22,10 @@
       <polygon points="0 0, 10 3.5, 0 7" fill="#388e3c" />
     </marker>
   </defs>
-  
+
   <!-- Title -->
   <text x="500" y="30" class="text title" style="font-size: 18px;">기술 스택 진화 과정</text>
-  
+
   <!-- Phase 1: 초기 시도 -->
   <g>
     <text x="150" y="70" class="text title">Phase 1: 초기 시도</text>
@@ -36,7 +36,7 @@
     <text x="250" y="115" class="text">문제</text>
     <line x1="150" y1="100" x2="200" y2="100" class="problem-arrow" />
   </g>
-  
+
   <!-- Phase 2: 방향 전환 -->
   <g>
     <text x="150" y="170" class="text title">Phase 2: 방향 전환</text>
@@ -46,7 +46,7 @@
     <text x="250" y="205" class="text">MediaPipe</text>
     <line x1="150" y1="200" x2="200" y2="200" class="success-arrow" />
   </g>
-  
+
   <!-- Phase 3: 알고리즘 문제 -->
   <g>
     <text x="500" y="70" class="text title">Phase 3: 알고리즘 개선</text>
@@ -60,7 +60,7 @@
     <line x1="520" y1="100" x2="570" y2="100" class="problem-arrow" />
     <line x1="620" y1="120" x2="460" y2="140" class="success-arrow" />
   </g>
-  
+
   <!-- Phase 4: 최종 안정화 -->
   <g>
     <text x="800" y="70" class="text title">Phase 4: 시스템 안정화</text>
@@ -72,12 +72,12 @@
     <text x="800" y="175" class="text">직접 구현</text>
     <line x1="800" y1="120" x2="800" y2="140" class="success-arrow" />
   </g>
-  
+
   <!-- 최종 기술 스택 -->
   <g>
     <rect x="200" y="300" width="600" height="200" class="box" style="fill: #f0f8ff; stroke: #1976d2; stroke-width: 3;" />
     <text x="500" y="330" class="text title" style="font-size: 16px;">최종 기술 스택</text>
-    
+
     <!-- Frontend -->
     <text x="300" y="360" class="text title">Frontend</text>
     <rect x="220" y="370" width="80" height="30" class="box improved" />
@@ -88,7 +88,7 @@
     <text x="260" y="430" class="text">Vanilla JS</text>
     <rect x="320" y="410" width="80" height="30" class="box improved" />
     <text x="360" y="430" class="text">WebRTC</text>
-    
+
     <!-- Backend -->
     <text x="600" y="360" class="text title">Backend</text>
     <rect x="520" y="370" width="80" height="30" class="box improved" />
@@ -99,12 +99,12 @@
     <text x="560" y="430" class="text">MariaDB</text>
     <rect x="620" y="410" width="80" height="30" class="box improved" />
     <text x="660" y="430" class="text">Multer</text>
-    
+
     <!-- 성과 -->
     <text x="500" y="470" class="text title">주요 성과</text>
     <text x="500" y="490" class="text">✅ 로딩 속도 대폭 개선 | ✅ 시스템 안정성 향상 | ✅ 메모리 사용량 최적화</text>
   </g>
-  
+
   <!-- 연결선들 -->
   <line x1="300" y1="100" x2="400" y2="100" class="arrow" />
   <line x1="670" y1="100" x2="750" y2="100" class="arrow" />

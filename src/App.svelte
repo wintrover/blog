@@ -1,158 +1,152 @@
 <script lang="ts">
-  import Sidebar from './components/Sidebar.svelte'
-  import BlogList from './components/BlogList.svelte'
-  import PostDetail from './components/PostDetail.svelte'
-  import Footer from './components/Footer.svelte'
-  import { posts } from './stores/posts'
-  import { onMount } from 'svelte'
-  import Router from 'svelte-spa-router'
-  
-  let sidebarCollapsed = false
-  let sidebarElement
-  let mainContentElement
-  let contentElement
-  let manualToggle = false // 수동 토글 상태
-  let manualToggleTimeout
-  let resizeTimeout // 리사이즈 디바운스용
+import { onMount } from "svelte";
+import BlogList from "./components/BlogList.svelte";
+import PostDetail from "./components/PostDetail.svelte";
 
-  // 라우트 정의
-  const routes = {
-    '/': BlogList,
-    '/category/:category': BlogList,
-    '/post/:slug': PostDetail
-  }
+let sidebarCollapsed = false;
+let sidebarElement;
+let mainContentElement;
+let contentElement;
+let manualToggle = false; // 수동 토글 상태
+let _manualToggleTimeout;
+let resizeTimeout; // 리사이즈 디바운스용
 
-  // 사이드바 상태 변화 감지
-  $: {
-    if (typeof document !== 'undefined') {
-      if (sidebarCollapsed) {
-        document.body.classList.add('sidebar-collapsed')
-      } else {
-        document.body.classList.remove('sidebar-collapsed')
-      }
-    }
-  }
-  
+// 라우트 정의
+const _routes = {
+	"/": BlogList,
+	"/category/:category": BlogList,
+	"/post/:slug": PostDetail,
+};
 
+// 사이드바 상태 변화 감지
+$: {
+	if (typeof document !== "undefined") {
+		if (sidebarCollapsed) {
+			document.body.classList.add("sidebar-collapsed");
+		} else {
+			document.body.classList.remove("sidebar-collapsed");
+		}
+	}
+}
 
-  let checkTimeout = null
+let checkTimeout = null;
 
-  function checkSidebarCollision() {
-    if (!sidebarElement || !mainContentElement) {
-      return
-    }
+function checkSidebarCollision() {
+	if (!sidebarElement || !mainContentElement) {
+		return;
+	}
 
-    // manualToggle 상태일 때는 자동 충돌 감지 비활성화
-    if (manualToggle) {
-      return
-    }
+	// manualToggle 상태일 때는 자동 충돌 감지 비활성화
+	if (manualToggle) {
+		return;
+	}
 
-    // 디바운스: 이전 타이머 취소하고 새로 설정
-    clearTimeout(resizeTimeout)
-    resizeTimeout = setTimeout(() => {
-      // 요소가 null이면 리턴
-      if (!sidebarElement || !contentElement) {
-        return
-      }
-      
-      // 요소가 아직 렌더링되지 않았다면 사이드바를 표시
-      const sidebarRect = sidebarElement.getBoundingClientRect()
-      const contentRect = contentElement.getBoundingClientRect()
-      
-      if (sidebarRect.width === 0 || contentRect.width === 0) {
-        if (sidebarCollapsed) {
-          sidebarCollapsed = false
-        }
-        return
-      }
+	// 디바운스: 이전 타이머 취소하고 새로 설정
+	clearTimeout(resizeTimeout);
+	resizeTimeout = setTimeout(() => {
+		// 요소가 null이면 리턴
+		if (!sidebarElement || !contentElement) {
+			return;
+		}
 
-      // 화면이 너무 작으면 자동으로 접기
-      if (window.innerWidth < 768) {
-        if (!sidebarCollapsed) {
-          sidebarCollapsed = true
-        }
-        return
-      }
-      
-      // 화면이 충분히 크고 사이드바가 접혀있으면 펼치기
-      if (window.innerWidth >= 1200 && sidebarCollapsed) {
-        if (contentRect.left > 120) {
-          sidebarCollapsed = false
-        }
-        return
-      }
+		// 요소가 아직 렌더링되지 않았다면 사이드바를 표시
+		const sidebarRect = sidebarElement.getBoundingClientRect();
+		const contentRect = contentElement.getBoundingClientRect();
 
-      // 사이드바와 콘텐츠가 겹치는지 확인 (사이드바 오른쪽 끝이 콘텐츠 왼쪽 시작점을 넘어가면 겹침)
-      const isOverlapping = sidebarRect.right >= contentRect.left
+		if (sidebarRect.width === 0 || contentRect.width === 0) {
+			if (sidebarCollapsed) {
+				sidebarCollapsed = false;
+			}
+			return;
+		}
 
-      // 무한 루프 방지: 현재 상태와 다를 때만 변경
-      // 겹치면서 현재 펼쳐져 있으면 접기
-      if (isOverlapping && !sidebarCollapsed) {
-        sidebarCollapsed = true
-      }
-      // 콘텐츠의 왼쪽 x좌표가 120보다 크고 현재 접혀져 있으면 펼치기
-      else if (contentRect.left > 120 && sidebarCollapsed) {
-        sidebarCollapsed = false
-      }
-    }, 5) // 5ms 디바운스
-  }
+		// 화면이 너무 작으면 자동으로 접기
+		if (window.innerWidth < 768) {
+			if (!sidebarCollapsed) {
+				sidebarCollapsed = true;
+			}
+			return;
+		}
 
-  function debouncedCheckSidebarCollision() {
-    if (checkTimeout) {
-      clearTimeout(checkTimeout)
-    }
-    checkTimeout = setTimeout(checkSidebarCollision, 10)
-  }
+		// 화면이 충분히 크고 사이드바가 접혀있으면 펼치기
+		if (window.innerWidth >= 1200 && sidebarCollapsed) {
+			if (contentRect.left > 120) {
+				sidebarCollapsed = false;
+			}
+			return;
+		}
 
-  function handleResize() {
-    // 리사이즈 시 수동 토글 상태 리셋
-    manualToggle = false
-    checkSidebarCollision()
-  }
+		// 사이드바와 콘텐츠가 겹치는지 확인 (사이드바 오른쪽 끝이 콘텐츠 왼쪽 시작점을 넘어가면 겹침)
+		const isOverlapping = sidebarRect.right >= contentRect.left;
 
-  function toggleSidebar() {
-    manualToggle = true
-    sidebarCollapsed = !sidebarCollapsed
-  }
+		// 무한 루프 방지: 현재 상태와 다를 때만 변경
+		// 겹치면서 현재 펼쳐져 있으면 접기
+		if (isOverlapping && !sidebarCollapsed) {
+			sidebarCollapsed = true;
+		}
+		// 콘텐츠의 왼쪽 x좌표가 120보다 크고 현재 접혀져 있으면 펼치기
+		else if (contentRect.left > 120 && sidebarCollapsed) {
+			sidebarCollapsed = false;
+		}
+	}, 5); // 5ms 디바운스
+}
 
-  onMount(() => {
-    // 초기 체크를 여러 번 시도 (배포 환경에서 DOM 로딩 지연 대응)
-    const checkWithRetry = () => {
-      checkSidebarCollision()
-      // 요소가 아직 준비되지 않았으면 다시 시도
-      if (!sidebarElement || !mainContentElement) {
-        setTimeout(checkWithRetry, 200)
-      }
-    }
-    
-    setTimeout(checkWithRetry, 100)
-    
-    // ResizeObserver로 요소 크기 변화 감지
-    const resizeObserver = new ResizeObserver(() => {
-      debouncedCheckSidebarCollision()
-    })
-    
-    if (sidebarElement) resizeObserver.observe(sidebarElement)
-    if (mainContentElement) resizeObserver.observe(mainContentElement)
-    
-    window.addEventListener('resize', handleResize)
+function debouncedCheckSidebarCollision() {
+	if (checkTimeout) {
+		clearTimeout(checkTimeout);
+	}
+	checkTimeout = setTimeout(checkSidebarCollision, 10);
+}
 
-    // 토글 이벤트 리스너
-    const handleToggleSidebar = () => {
-      toggleSidebar()
-    }
+function handleResize() {
+	// 리사이즈 시 수동 토글 상태 리셋
+	manualToggle = false;
+	checkSidebarCollision();
+}
 
-    document.addEventListener('toggle-sidebar', handleToggleSidebar)
+function toggleSidebar() {
+	manualToggle = true;
+	sidebarCollapsed = !sidebarCollapsed;
+}
 
-    return () => {
-        if (checkTimeout) {
-          clearTimeout(checkTimeout)
-        }
-        resizeObserver.disconnect()
-        window.removeEventListener('resize', handleResize)
-        document.removeEventListener('toggle-sidebar', handleToggleSidebar)
-      }
-  })
+onMount(() => {
+	// 초기 체크를 여러 번 시도 (배포 환경에서 DOM 로딩 지연 대응)
+	const checkWithRetry = () => {
+		checkSidebarCollision();
+		// 요소가 아직 준비되지 않았으면 다시 시도
+		if (!sidebarElement || !mainContentElement) {
+			setTimeout(checkWithRetry, 200);
+		}
+	};
+
+	setTimeout(checkWithRetry, 100);
+
+	// ResizeObserver로 요소 크기 변화 감지
+	const resizeObserver = new ResizeObserver(() => {
+		debouncedCheckSidebarCollision();
+	});
+
+	if (sidebarElement) resizeObserver.observe(sidebarElement);
+	if (mainContentElement) resizeObserver.observe(mainContentElement);
+
+	window.addEventListener("resize", handleResize);
+
+	// 토글 이벤트 리스너
+	const handleToggleSidebar = () => {
+		toggleSidebar();
+	};
+
+	document.addEventListener("toggle-sidebar", handleToggleSidebar);
+
+	return () => {
+		if (checkTimeout) {
+			clearTimeout(checkTimeout);
+		}
+		resizeObserver.disconnect();
+		window.removeEventListener("resize", handleResize);
+		document.removeEventListener("toggle-sidebar", handleToggleSidebar);
+	};
+});
 </script>
 
 <div id="app-container" class:sidebar-collapsed={sidebarCollapsed}>
@@ -164,8 +158,8 @@
   <aside id="sidebar" class:collapsed={sidebarCollapsed} bind:this={sidebarElement}>
     <Sidebar />
   </aside>
-  
-    
+
+
   <main id="main-content" bind:this={mainContentElement}>
     <div id="content" bind:this={contentElement}>
       {#await $posts}
@@ -190,7 +184,7 @@
     background-color: #fff;
     color: #333;
   }
-  
+
   #app-container {
     display: flex;
     min-height: 100vh;
@@ -209,12 +203,12 @@
     transition: transform 0.01s ease;
     z-index: 1000;
   }
-  
+
   #sidebar.collapsed {
     transform: translateX(-100%);
   }
-  
-    
+
+
   #main-content {
     flex: 1;
     margin-left: 240px;
@@ -223,26 +217,26 @@
     min-height: 100vh;
     transition: margin-left 0.01s ease;
   }
-  
 
-  
+
+
   #content {
     flex: 1;
     max-width: 800px;
     margin: 40px auto;
     width: 100%;
   }
-  
+
   .sidebar-collapsed #main-content {
     margin-left: 0;
   }
-  
+
   @media (max-width: 480px) {
     #content {
       margin: 20px 15px;
     }
   }
-  
+
   /* Mermaid 다이어그램 스타일 */
   :global(.mermaid-diagram) {
     text-align: center;
@@ -252,12 +246,12 @@
     border-radius: 8px;
     border: 1px solid #e1e4e8;
   }
-  
+
   :global(.mermaid-diagram svg) {
     max-width: 100%;
     height: auto;
   }
-  
+
   :global(.mermaid-error) {
     color: #d73a49;
     background: #ffeef0;

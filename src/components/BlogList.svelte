@@ -1,45 +1,49 @@
 <script lang="ts">
-  import { formatDate, truncateText, slugify } from '../lib/utils'
-  import { siteConfig } from '../lib/config'
-  import { push } from 'svelte-spa-router'
-  import { selectedCategory } from '../stores/category'
-  import { loadAllPosts } from '../lib/postLoader'
-  import { onMount } from 'svelte'
-  
-  export let params = {}
-  let posts = []
-  let filteredPosts = []
-  
-  function selectPost(post) {
-    push(`/post/${post.slug}`)
-  }
-  
-  async function loadPosts() {
-    try {
-      // 모든 포스트를 동적으로 로드
-      posts = await loadAllPosts()
-      
-      // URL 파라미터에 따라 필터링
-      if (params.category) {
-        filteredPosts = posts.filter(post => slugify(post.category) === params.category)
-        selectedCategory.set(posts.find(p => slugify(p.category) === params.category)?.category || 'all')
-      } else {
-        filteredPosts = posts
-        selectedCategory.set('all')
-      }
-    } catch (error) {
-      console.error('포스트 로딩 중 오류 발생:', error)
-      filteredPosts = []
-    }
-  }
-  
-  onMount(() => {
-    loadPosts()
-  })
-  
-  $: if (params) {
-    loadPosts()
-  }
+import { onMount } from "svelte";
+import { push } from "svelte-spa-router";
+import { loadAllPosts } from "../lib/postLoader";
+import { slugify } from "../lib/utils";
+import { selectedCategory } from "../stores/category";
+
+export const params = {};
+let posts = [];
+let _filteredPosts = [];
+
+function _selectPost(post) {
+	push(`/post/${post.slug}`);
+}
+
+async function loadPosts() {
+	try {
+		// 모든 포스트를 동적으로 로드
+		posts = await loadAllPosts();
+
+		// URL 파라미터에 따라 필터링
+		if (params.category) {
+			_filteredPosts = posts.filter(
+				(post) => slugify(post.category) === params.category,
+			);
+			selectedCategory.set(
+				posts.find((p) => slugify(p.category) === params.category)?.category ||
+					"all",
+			);
+		} else {
+			_filteredPosts = posts;
+			selectedCategory.set("all");
+		}
+	} catch (error) {
+		console.error("포스트 로딩 중 오류 발생:", error);
+		_filteredPosts = [];
+	}
+}
+
+onMount(() => {
+	loadPosts();
+});
+
+$: if (params) {
+	loadPosts();
+}
 </script>
 
 <div class="blog-page">
@@ -79,33 +83,33 @@
   .blog-page {
     min-height: 400px;
   }
-  
+
   .posts {
     display: flex;
     flex-direction: column;
     gap: 40px;
   }
-  
+
   .post {
     border-bottom: 1px solid #eee;
   }
-  
+
   .post:last-child {
     border-bottom: none;
   }
-  
+
   .post-meta {
     display: flex;
     align-items: center;
     gap: 10px;
     margin-bottom: 10px;
   }
-  
+
   .date {
     color: #666;
     font-size: 14px;
   }
-  
+
   .category-badge {
     background: #0366d6;
     color: white;
@@ -114,21 +118,21 @@
     font-size: 12px;
     font-weight: 500;
   }
-  
+
   .category-badge.project {
     background: #28a745;
   }
-  
+
   .category-badge.company-work {
     background: #6f42c1;
   }
-  
+
   .post h1 {
     margin: 0 0 15px 0;
     font-size: 24px;
     line-height: 1.3;
   }
-  
+
   .post-link {
     background: none;
     border: none;
@@ -141,28 +145,28 @@
     transition: color 0.2s;
     width: 100%;
   }
-  
+
   .post-link:hover {
     color: #0366d6;
   }
-  
+
   .post-excerpt {
     color: #666;
     line-height: 1.6;
     font-size: 16px;
   }
-  
+
   .no-posts {
     text-align: center;
     padding: 60px 20px;
     color: #666;
   }
-  
+
   @media (max-width: 640px) {
     .post h1 {
       font-size: 20px;
     }
-    
+
     .post-excerpt {
       font-size: 14px;
     }

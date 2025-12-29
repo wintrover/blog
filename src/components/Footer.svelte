@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { siteConfig } from '../lib/config'
+
 </script>
 
 <footer class="wrapper-footer">
@@ -10,26 +10,26 @@
           <svg class="svg-icon"><use href="#icon-email"></use></svg>
         </a>
       {/if}
-      
+
       {#if siteConfig.social.github}
         <a href="https://github.com/{siteConfig.social.github}" title="GitHub">
           <svg class="svg-icon"><use href="#icon-github"></use></svg>
         </a>
       {/if}
-      
+
       {#if siteConfig.social.instagram}
         <a href="https://instagram.com/{siteConfig.social.instagram}" title="Instagram">
           <svg class="svg-icon"><use href="#icon-instagram"></use></svg>
         </a>
       {/if}
-      
+
       {#if siteConfig.social.linkedin}
         <a href="https://linkedin.com/in/{siteConfig.social.linkedin}" title="LinkedIn">
           <svg class="svg-icon"><use href="#icon-linkedin"></use></svg>
         </a>
       {/if}
     </div>
-    
+
 
   </div>
 </footer>
@@ -57,32 +57,32 @@
     border-top: 1px solid #ddd;
     background-color: #f8f9fa;
   }
-  
+
   .container {
     margin: 30px 0;
     text-align: center;
   }
-  
+
   .footer-links {
     display: flex;
     justify-content: center;
     gap: 20px;
   }
-  
+
   .footer-links a {
     color: #666;
     transition: color 0.2s;
   }
-  
+
   .footer-links a:hover {
     color: #0366d6;
   }
-  
+
   .svg-icon {
     width: 24px;
     height: 24px;
     fill: currentColor;
   }
-  
+
 
 </style>

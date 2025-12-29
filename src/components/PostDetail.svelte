@@ -1,189 +1,191 @@
 <script lang="ts">
-  import { onMount, afterUpdate } from "svelte";
-  import { formatDate, slugify } from "../lib/utils";
-  import { loadPostBySlug } from "../lib/postLoader";
-  import { push } from 'svelte-spa-router';
-  import mermaid from 'mermaid';
-  import Comments from './Comments.svelte';
-  // Browser detection
-  const browser = typeof window !== 'undefined';
+import mermaid from "mermaid";
+import { afterUpdate, onMount } from "svelte";
+import { push } from "svelte-spa-router";
+import { loadPostBySlug } from "../lib/postLoader";
 
-  export let params = {};
-  let post = null;
-  let markdownContent = null;
-  let loading = true;
+// Browser detection
+const browser = typeof window !== "undefined";
 
-  async function loadPostData() {
-    if (params.slug) {
-      try {
-        // 포스트 데이터 로드
-        const postData = await loadPostBySlug(params.slug);
+export const params = {};
+let post = null;
+let markdownContent = null;
+let loading = true;
 
-        if (!postData) {
-          throw new Error('포스트를 찾을 수 없습니다.');
-        }
+async function loadPostData() {
+	if (params.slug) {
+		try {
+			// 포스트 데이터 로드
+			const postData = await loadPostBySlug(params.slug);
 
-        post = postData;
-        markdownContent = postData;
-        loading = false;
+			if (!postData) {
+				throw new Error("포스트를 찾을 수 없습니다.");
+			}
 
-        // Update page title and meta tags
-        if (browser && post) {
-          document.title = `${post.title} - wintrover`;
+			post = postData;
+			markdownContent = postData;
+			loading = false;
 
-          // Update or create meta tags
-          updateMetaTag('og:title', post.title);
-          updateMetaTag('og:url', window.location.href);
-          updateMetaTag('og:description', post.excerpt || post.title);
-          updateMetaTag('description', post.excerpt || post.title);
+			// Update page title and meta tags
+			if (browser && post) {
+				document.title = `${post.title} - wintrover`;
 
-          // Update canonical URL
-          updateLinkTag('canonical', window.location.href);
-        }
+				// Update or create meta tags
+				updateMetaTag("og:title", post.title);
+				updateMetaTag("og:url", window.location.href);
+				updateMetaTag("og:description", post.excerpt || post.title);
+				updateMetaTag("description", post.excerpt || post.title);
 
-        // 버튼 이벤트 리스너 추가
-        setTimeout(() => {
-          setupCodeBlockButtons();
-        }, 500);
-      } catch (error) {
-        console.error('포스트 로딩 실패:', error);
-        loading = false;
-      }
-    }
-  }
+				// Update canonical URL
+				updateLinkTag("canonical", window.location.href);
+			}
 
-  function updateMetaTag(property, content) {
-    let meta = document.querySelector(`meta[property="${property}"]`) ||
-               document.querySelector(`meta[name="${property}"]`);
+			// 버튼 이벤트 리스너 추가
+			setTimeout(() => {
+				setupCodeBlockButtons();
+			}, 500);
+		} catch (error) {
+			console.error("포스트 로딩 실패:", error);
+			loading = false;
+		}
+	}
+}
 
-    if (!meta) {
-      meta = document.createElement('meta');
-      meta.setAttribute(property.includes('og:') ? 'property' : 'name', property);
-      document.head.appendChild(meta);
-    }
+function updateMetaTag(property, content) {
+	let meta =
+		document.querySelector(`meta[property="${property}"]`) ||
+		document.querySelector(`meta[name="${property}"]`);
 
-    meta.setAttribute('content', content);
-  }
+	if (!meta) {
+		meta = document.createElement("meta");
+		meta.setAttribute(property.includes("og:") ? "property" : "name", property);
+		document.head.appendChild(meta);
+	}
 
-  function updateLinkTag(rel, href) {
-    let link = document.querySelector(`link[rel="${rel}"]`);
+	meta.setAttribute("content", content);
+}
 
-    if (!link) {
-      link = document.createElement('link');
-      link.setAttribute('rel', rel);
-      document.head.appendChild(link);
-    }
+function updateLinkTag(rel, href) {
+	let link = document.querySelector(`link[rel="${rel}"]`);
 
-    link.setAttribute('href', href);
-  }
+	if (!link) {
+		link = document.createElement("link");
+		link.setAttribute("rel", rel);
+		document.head.appendChild(link);
+	}
 
-  onMount(() => {
-    loadPostData();
-  });
-  
-  $: if (params.slug) {
-    loadPostData();
-  }
+	link.setAttribute("href", href);
+}
 
-  afterUpdate(() => {
-    if (!loading && markdownContent) {
-      setTimeout(async () => {
-        setupCodeBlockButtons();
-        await setupMermaidDiagrams();
-      }, 100);
-    }
-  });
+onMount(() => {
+	loadPostData();
+});
 
-  function showCopyToast(codeBlock) {
-    // 기존 토스트 제거
-    const existingToast = codeBlock.querySelector('.copy-toast');
-    if (existingToast) {
-      existingToast.remove();
-    }
+$: if (params.slug) {
+	loadPostData();
+}
 
-    // 새 토스트 생성
-    const toast = document.createElement('div');
-    toast.className = 'copy-toast';
-    toast.textContent = 'code has been copied';
+afterUpdate(() => {
+	if (!loading && markdownContent) {
+		setTimeout(async () => {
+			setupCodeBlockButtons();
+			await setupMermaidDiagrams();
+		}, 100);
+	}
+});
 
+function showCopyToast(codeBlock) {
+	// 기존 토스트 제거
+	const existingToast = codeBlock.querySelector(".copy-toast");
+	if (existingToast) {
+		existingToast.remove();
+	}
 
-    
-    // 코드 블록에 토스트 추가
-    codeBlock.appendChild(toast);
-    
-    // 애니메이션을 위한 지연
-    setTimeout(() => {
-      toast.classList.add('show');
-    }, 10);
-    
-    // 3초 후 제거
-    setTimeout(() => {
-      toast.classList.remove('show');
-      setTimeout(() => {
-        if (toast.parentNode) {
-          toast.remove();
-        }
-      }, 300);
-    }, 3000);
-  }
+	// 새 토스트 생성
+	const toast = document.createElement("div");
+	toast.className = "copy-toast";
+	toast.textContent = "code has been copied";
 
-  function setupCodeBlockButtons() {
-    const codeBlocks = document.querySelectorAll('.markdown-content pre');
-    
-    codeBlocks.forEach((pre) => {
-      const themeToggle = pre.querySelector('.devsite-icon-theme-toggle');
-      const copyButton = pre.querySelector('.devsite-icon-copy');
-      
-      if (themeToggle && !themeToggle.hasAttribute('data-listener-added')) {
-        themeToggle.setAttribute('data-listener-added', 'true');
-        themeToggle.addEventListener('click', (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          pre.classList.toggle('dark-theme');
-          themeToggle.classList.toggle('light-mode');
-        });
-      }
-      
-      if (copyButton) {
-        copyButton.addEventListener('click', () => {
-          const code = pre.querySelector('code');
-          if (code) {
-            const text = code.textContent || code.innerText;
-            navigator.clipboard.writeText(text).then(() => {
-              showCopyToast(pre);
-            }).catch(err => {
-              console.error('복사 실패:', err);
-            });
-          }
-        });
-      }
-    });
-  }
+	// 코드 블록에 토스트 추가
+	codeBlock.appendChild(toast);
 
-  async function setupMermaidDiagrams() {
-    const mermaidElements = document.querySelectorAll('.mermaid-diagram');
-    
-    for (const element of mermaidElements) {
-      if (element.hasAttribute('data-rendered')) continue;
-      
-      const code = decodeURIComponent(element.getAttribute('data-mermaid-code'));
-      const id = element.id;
-      
-      try {
-        const { svg } = await mermaid.render(id + '-svg', code);
-        element.innerHTML = svg;
-        element.setAttribute('data-rendered', 'true');
-      } catch (error) {
-        console.error('Mermaid rendering error:', error);
-        element.innerHTML = '<div class="mermaid-error">Mermaid diagram rendering failed</div>';
-        element.setAttribute('data-rendered', 'true');
-      }
-    }
-  }
+	// 애니메이션을 위한 지연
+	setTimeout(() => {
+		toast.classList.add("show");
+	}, 10);
 
-  function goBack() {
-    push('/');
-  }
+	// 3초 후 제거
+	setTimeout(() => {
+		toast.classList.remove("show");
+		setTimeout(() => {
+			if (toast.parentNode) {
+				toast.remove();
+			}
+		}, 300);
+	}, 3000);
+}
+
+function setupCodeBlockButtons() {
+	const codeBlocks = document.querySelectorAll(".markdown-content pre");
+
+	codeBlocks.forEach((pre) => {
+		const themeToggle = pre.querySelector(".devsite-icon-theme-toggle");
+		const copyButton = pre.querySelector(".devsite-icon-copy");
+
+		if (themeToggle && !themeToggle.hasAttribute("data-listener-added")) {
+			themeToggle.setAttribute("data-listener-added", "true");
+			themeToggle.addEventListener("click", (e) => {
+				e.preventDefault();
+				e.stopPropagation();
+				pre.classList.toggle("dark-theme");
+				themeToggle.classList.toggle("light-mode");
+			});
+		}
+
+		if (copyButton) {
+			copyButton.addEventListener("click", () => {
+				const code = pre.querySelector("code");
+				if (code) {
+					const text = code.textContent || code.innerText;
+					navigator.clipboard
+						.writeText(text)
+						.then(() => {
+							showCopyToast(pre);
+						})
+						.catch((err) => {
+							console.error("복사 실패:", err);
+						});
+				}
+			});
+		}
+	});
+}
+
+async function setupMermaidDiagrams() {
+	const mermaidElements = document.querySelectorAll(".mermaid-diagram");
+
+	for (const element of mermaidElements) {
+		if (element.hasAttribute("data-rendered")) continue;
+
+		const code = decodeURIComponent(element.getAttribute("data-mermaid-code"));
+		const id = element.id;
+
+		try {
+			const { svg } = await mermaid.render(`${id}-svg`, code);
+			element.innerHTML = svg;
+			element.setAttribute("data-rendered", "true");
+		} catch (error) {
+			console.error("Mermaid rendering error:", error);
+			element.innerHTML =
+				'<div class="mermaid-error">Mermaid diagram rendering failed</div>';
+			element.setAttribute("data-rendered", "true");
+		}
+	}
+}
+
+function _goBack() {
+	push("/");
+}
 </script>
 
 {#if post}
