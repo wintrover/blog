@@ -145,13 +145,16 @@ async function loadGiscus() {
 				});
 
 				iframe.addEventListener("error", (e) => {
-					console.error("❌ Giscus iframe error:", e);
+					console.error("❌ [Comments] Giscus iframe 에러 발생:", {
+						message: e instanceof Error ? e.message : "Iframe error event",
+						event: e,
+					});
 				});
 
 				return true;
 			} else {
 				if (import.meta.env.DEV) {
-					console.warn("⚠️ Giscus iframe not found");
+					console.warn("⚠️ [Comments] Giscus iframe을 찾을 수 없음");
 				}
 				return false;
 			}
@@ -173,7 +176,9 @@ export function updateTheme(newTheme) {
 	// Defensive checks before accessing iframe
 	if (!container || !container.isConnected) {
 		if (import.meta.env.DEV) {
-			console.warn("⚠️ Container not available for theme update");
+			console.warn(
+				"⚠️ [Comments] 테마 업데이트를 위한 컨테이너가 준비되지 않음",
+			);
 		}
 		return;
 	}
@@ -193,13 +198,20 @@ export function updateTheme(newTheme) {
 			);
 
 			if (import.meta.env.DEV) {
-				console.log("🎨 Theme updated to:", newTheme);
+				console.log("🎨 [Comments] 테마 업데이트 성공:", newTheme);
 			}
 		} catch (error) {
-			console.error("❌ Failed to update theme:", error);
+			console.error("❌ [Comments] 테마 업데이트 중 에러 발생:", {
+				newTheme,
+				message: error instanceof Error ? error.message : String(error),
+				stack: error instanceof Error ? error.stack : "Stack trace unavailable",
+				error,
+			});
 		}
 	} else if (import.meta.env.DEV) {
-		console.warn("⚠️ Giscus iframe not available for theme update");
+		console.warn(
+			"⚠️ [Comments] 테마 업데이트를 위한 Giscus iframe이 준비되지 않음",
+		);
 	}
 }
 </script>

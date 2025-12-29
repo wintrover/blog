@@ -76,12 +76,18 @@ export async function loadPost(slug: string) {
 	try {
 		const response = await fetch(filePath);
 		if (!response.ok) {
-			throw new Error(`Failed to load ${filePath}`);
+			throw new Error(`HTTP error! status: ${response.status} for ${filePath}`);
 		}
 		const content = await response.text();
 		return parseMarkdown(content);
 	} catch (error) {
-		console.error("Error loading post:", error);
+		console.error("❌ [markdown] 포스트 로딩 중 에러 발생:", {
+			slug,
+			filePath,
+			message: error instanceof Error ? error.message : String(error),
+			stack: error instanceof Error ? error.stack : "Stack trace unavailable",
+			error,
+		});
 		return null;
 	}
 }
@@ -90,32 +96,55 @@ export function parseMarkdown(content: string) {
 	const frontMatterRegex = /^---\s*\n([\s\S]*?)\n---\s*\n([\s\S]*)$/;
 	const match = content.match(frontMatterRegex);
 	if (!match) {
-		const htmlRaw = marked.parse(content, { async: false }) as string;
-		return {
-			frontMatter: {},
-			html: htmlRaw.replace(
-				/<img\s+[^>]*src=["']([^"']+)["'][^>]*>/g,
-				(m: string, src: string) => {
-					const fixed = normalizeImageSrc(src);
-					return m.replace(src, fixed);
+		try {
+			const htmlRaw = marked.parse(content, { async: false }) as string;
+			return {
+				frontMatter: {},
+				html: htmlRaw.replace(
+					/<img\s+[^>]*src=["']([^"']+)["'][^>]*>/g,
+					(m: string, src: string) => {
+						const fixed = normalizeImageSrc(src);
+						return m.replace(src, fixed);
+					},
+				),
+			};
+		} catch (error) {
+			console.error(
+				"❌ [markdown] 마크다운 파싱 중 에러 발생 (No FrontMatter):",
+				{
+					message: error instanceof Error ? error.message : String(error),
+					stack:
+						error instanceof Error ? error.stack : "Stack trace unavailable",
+					error,
 				},
-			),
-		};
+			);
+			return { frontMatter: {}, html: `<p>Error parsing markdown content</p>` };
+		}
 	}
 	const [, frontMatterStr, markdownContent] = match;
-	const frontMatter = parseFrontMatter(frontMatterStr);
-	const htmlRaw = marked.parse(markdownContent, { async: false }) as string;
-	const html = htmlRaw.replace(
-		/<img\s+[^>]*src=["']([^"']+)["'][^>]*>/g,
-		(m: string, src: string) => {
-			const fixed = normalizeImageSrc(src);
-			return m.replace(src, fixed);
-		},
-	);
-	return {
-		frontMatter,
-		html,
-	};
+	try {
+		const frontMatter = parseFrontMatter(frontMatterStr);
+		const htmlRaw = marked.parse(markdownContent, { async: false }) as string;
+		const html = htmlRaw.replace(
+			/<img\s+[^>]*src=["']([^"']+)["'][^>]*>/g,
+			(m: string, src: string) => {
+				const fixed = normalizeImageSrc(src);
+				return m.replace(src, fixed);
+			},
+		);
+		return {
+			frontMatter,
+			html,
+		};
+	} catch (error) {
+		console.error("❌ [markdown] 마크다운 파싱 중 에러 발생:", {
+			frontMatterStr,
+			message: error instanceof Error ? error.message : String(error),
+			stack: error instanceof Error ? error.stack : "Stack trace unavailable",
+			error,
+		});
+		return { frontMatter: {}, html: `<p>Error parsing markdown content</p>` };
+	}
 }
 
 function parseFrontMatter(str: string) {
@@ -152,7 +181,11 @@ if (typeof window !== "undefined") {
 			securityLevel: "loose",
 		});
 	} catch (e) {
-		console.error("Mermaid init error:", e);
+		console.error("❌ [markdown] Mermaid 초기화 중 에러 발생:", {
+			message: e instanceof Error ? e.message : String(e),
+			stack: e instanceof Error ? e.stack : "Stack trace unavailable",
+			error: e,
+		});
 	}
 }
 

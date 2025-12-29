@@ -66,8 +66,6 @@ export async function loadAllPosts() {
 			import: "default",
 		}) as Record<string, string>;
 
-		const postPaths = Object.keys(modules);
-
 		const posts: any[] = [];
 		for (const path in modules) {
 			try {
@@ -92,7 +90,15 @@ export async function loadAllPosts() {
 				};
 				posts.push(post);
 			} catch (postError) {
-				console.error(`[postLoader] Error parsing post at ${path}:`, postError);
+				console.error(`❌ [postLoader] 포스트 파싱 중 에러 발생 (${path}):`, {
+					message:
+						postError instanceof Error ? postError.message : String(postError),
+					stack:
+						postError instanceof Error
+							? postError.stack
+							: "Stack trace unavailable",
+					error: postError,
+				});
 			}
 		}
 
@@ -101,13 +107,11 @@ export async function loadAllPosts() {
 				new Date(b.date as any).getTime() - new Date(a.date as any).getTime(),
 		);
 	} catch (error) {
-		console.error("[postLoader] Critical error loading posts:", error);
-		if (error instanceof Error) {
-			console.error("[postLoader] Error details:", {
-				message: error.message,
-				stack: error.stack,
-			});
-		}
+		console.error("❌ [postLoader] 포스트 로딩 중 치명적 에러 발생:", {
+			message: error instanceof Error ? error.message : String(error),
+			stack: error instanceof Error ? error.stack : "Stack trace unavailable",
+			error,
+		});
 		return [];
 	}
 }
@@ -136,7 +140,9 @@ export async function loadPostBySlug(slug: string) {
 		}
 
 		if (!targetContent || !targetFileName) {
-			console.warn(`[postLoader] Post not found for slug: ${slug}`);
+			console.warn(
+				`⚠️ [postLoader] 해당 슬러그에 대한 포스트를 찾을 수 없음: ${slug}`,
+			);
 			return null;
 		}
 
@@ -156,13 +162,14 @@ export async function loadPostBySlug(slug: string) {
 			...data,
 		};
 	} catch (error) {
-		console.error(`[postLoader] Error loading post by slug (${slug}):`, error);
-		if (error instanceof Error) {
-			console.error("[postLoader] Error details:", {
-				message: error.message,
-				stack: error.stack,
-			});
-		}
+		console.error(
+			`❌ [postLoader] 슬러그(${slug})로 포스트 로딩 중 에러 발생:`,
+			{
+				message: error instanceof Error ? error.message : String(error),
+				stack: error instanceof Error ? error.stack : "Stack trace unavailable",
+				error,
+			},
+		);
 		return null;
 	}
 }

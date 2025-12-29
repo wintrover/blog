@@ -3,6 +3,8 @@ import mermaid from "mermaid";
 import { afterUpdate, onMount } from "svelte";
 import { push } from "svelte-spa-router";
 import { loadPostBySlug } from "../lib/postLoader";
+import { formatDate, slugify } from "../lib/utils";
+import Comments from "./Comments.svelte";
 
 // Browser detection
 const browser = typeof window !== "undefined";
@@ -45,7 +47,12 @@ async function loadPostData() {
 				setupCodeBlockButtons();
 			}, 500);
 		} catch (error) {
-			console.error("포스트 로딩 실패:", error);
+			console.error("❌ [PostDetail] 포스트 데이터 로딩 중 에러 발생:", {
+				slug: params.slug,
+				message: error instanceof Error ? error.message : String(error),
+				stack: error instanceof Error ? error.stack : "Stack trace unavailable",
+				error,
+			});
 			loading = false;
 		}
 	}
@@ -153,7 +160,12 @@ function setupCodeBlockButtons() {
 							showCopyToast(pre);
 						})
 						.catch((err) => {
-							console.error("복사 실패:", err);
+							console.error("❌ [PostDetail] 클립보드 복사 실패:", {
+								message: err instanceof Error ? err.message : String(err),
+								stack:
+									err instanceof Error ? err.stack : "Stack trace unavailable",
+								error: err,
+							});
 						});
 				}
 			});
@@ -175,7 +187,13 @@ async function setupMermaidDiagrams() {
 			element.innerHTML = svg;
 			element.setAttribute("data-rendered", "true");
 		} catch (error) {
-			console.error("Mermaid rendering error:", error);
+			console.error("❌ [PostDetail] Mermaid 렌더링 중 에러 발생:", {
+				elementId: id,
+				mermaidCode: code,
+				message: error instanceof Error ? error.message : String(error),
+				stack: error instanceof Error ? error.stack : "Stack trace unavailable",
+				error,
+			});
 			element.innerHTML =
 				'<div class="mermaid-error">Mermaid diagram rendering failed</div>';
 			element.setAttribute("data-rendered", "true");
@@ -183,9 +201,14 @@ async function setupMermaidDiagrams() {
 	}
 }
 
-function _goBack() {
+function goBack() {
 	push("/");
 }
+
+void formatDate;
+void slugify;
+void Comments;
+void goBack;
 </script>
 
 {#if post}
