@@ -28,7 +28,9 @@ onMount(() => {
 	// Cleanup function for component unmount
 	return () => {
 		// Clear all pending timeouts to prevent errors after unmount
-		monitoringTimeouts.forEach((timeoutId) => clearTimeout(timeoutId));
+		monitoringTimeouts.forEach((timeoutId) => {
+			clearTimeout(timeoutId);
+		});
 		monitoringTimeouts = [];
 	};
 });
