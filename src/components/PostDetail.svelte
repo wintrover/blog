@@ -111,14 +111,8 @@ onMount(() => {
 	}
 });
 
-$: {
-	if (params) {
-		console.log("🔍 [PostDetail] params 변경 감지:", {
-			params,
-			slug: params?.slug,
-			url: browser ? window.location.href : "SSR",
-		});
-	}
+$: if (params) {
+	// params 변경 감지 (디버깅용 로그 삭제됨)
 }
 
 $: if (params?.slug) {

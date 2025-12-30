@@ -38,32 +38,17 @@ onMount(() => {
 async function loadGiscus() {
 	if (giscusLoaded) return;
 
-	// Only debug in development
-	if (import.meta.env.DEV) {
-		console.group("🔍 Giscus Debug Information");
-		console.log("Repository:", repo);
-		console.log("Repository ID:", repoId);
-		console.log("Category:", category);
-		console.log("Category ID:", categoryId);
-		console.log("Mapping:", mapping);
-		console.log("Term:", term);
-		console.log("Debug mode enabled");
-	}
-
 	// Check if all required values are present
 	if (!repo || !repoId || !categoryId) {
-		console.error("❌ Missing required Giscus configuration:");
-		console.error("Repo:", repo);
-		console.error("Repo ID:", repoId);
-		console.error("Category ID:", categoryId);
-		if (import.meta.env.DEV) {
-			console.groupEnd();
-		}
+		console.error("❌ Missing required Giscus configuration:", {
+			repo,
+			repoId,
+			category,
+			categoryId,
+			mapping,
+			term,
+		});
 		return;
-	}
-
-	if (import.meta.env.DEV) {
-		console.log("✅ All required configuration values present");
 	}
 
 	// Build the URL that Giscus will call
@@ -76,16 +61,6 @@ async function loadGiscus() {
 	apiUrl.searchParams.append("number", "0");
 	apiUrl.searchParams.append("strict", strict);
 	apiUrl.searchParams.append("first", "15");
-
-	// API URL and parameters logged for debugging purposes
-	// console.log('📡 Giscus API URL:', apiUrl.toString());
-
-	// Note: Direct API testing removed to prevent CORS errors
-	// Giscus handles API calls internally through its script
-
-	if (import.meta.env.DEV) {
-		console.groupEnd();
-	}
 
 	const script = document.createElement("script");
 	script.src = "https://giscus.app/client.js";
@@ -108,13 +83,16 @@ async function loadGiscus() {
 
 	// Add event listeners
 	script.addEventListener("load", () => {
-		if (import.meta.env.DEV) {
-			console.log("✅ Giscus script loaded successfully");
-		}
+		// script 로드 완료 (로그 삭제됨)
 	});
 
 	script.addEventListener("error", (e) => {
-		console.error("❌ Giscus script failed to load:", e);
+		console.error("❌ Giscus script failed to load:", {
+			error: e,
+			repo,
+			repoId,
+			categoryId,
+		});
 	});
 
 	if (container) {
@@ -122,40 +100,30 @@ async function loadGiscus() {
 		container.appendChild(script);
 		giscusLoaded = true;
 
-		// Monitor for iframe creation (minimal logging)
+		// Monitor for iframe creation
 		const monitorIframe = () => {
 			// Defensive checks to prevent null reference errors
 			if (!container || !container.isConnected) {
-				if (import.meta.env.DEV) {
-					console.warn("⚠️ Container not available for iframe monitoring");
-				}
 				return false;
 			}
 
 			const iframe = container.querySelector("iframe");
 			if (iframe) {
-				if (import.meta.env.DEV) {
-					console.log("🖼️ Giscus iframe created");
-				}
-
 				iframe.addEventListener("load", () => {
-					if (import.meta.env.DEV) {
-						console.log("✅ Giscus iframe loaded");
-					}
+					// iframe 로드 완료 (로그 삭제됨)
 				});
 
 				iframe.addEventListener("error", (e) => {
 					console.error("❌ [Comments] Giscus iframe 에러 발생:", {
 						message: e instanceof Error ? e.message : "Iframe error event",
 						event: e,
+						config: { repo, repoId, categoryId },
 					});
 				});
 
 				return true;
 			} else {
-				if (import.meta.env.DEV) {
-					console.warn("⚠️ [Comments] Giscus iframe을 찾을 수 없음");
-				}
+				// iframe을 찾을 수 없음 (로그 삭제됨)
 				return false;
 			}
 		};
@@ -175,11 +143,6 @@ export function updateTheme(newTheme) {
 
 	// Defensive checks before accessing iframe
 	if (!container || !container.isConnected) {
-		if (import.meta.env.DEV) {
-			console.warn(
-				"⚠️ [Comments] 테마 업데이트를 위한 컨테이너가 준비되지 않음",
-			);
-		}
 		return;
 	}
 
@@ -196,10 +159,6 @@ export function updateTheme(newTheme) {
 				},
 				"https://giscus.app",
 			);
-
-			if (import.meta.env.DEV) {
-				console.log("🎨 [Comments] 테마 업데이트 성공:", newTheme);
-			}
 		} catch (error) {
 			console.error("❌ [Comments] 테마 업데이트 중 에러 발생:", {
 				newTheme,
@@ -208,10 +167,6 @@ export function updateTheme(newTheme) {
 				error,
 			});
 		}
-	} else if (import.meta.env.DEV) {
-		console.warn(
-			"⚠️ [Comments] 테마 업데이트를 위한 Giscus iframe이 준비되지 않음",
-		);
 	}
 }
 </script>
