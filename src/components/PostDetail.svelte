@@ -9,52 +9,62 @@ import Comments from "./Comments.svelte";
 // Browser detection
 const browser = typeof window !== "undefined";
 
-export const params = {};
+export const params = { slug: "" };
 let post = null;
 let markdownContent = null;
 let loading = true;
 
 async function loadPostData() {
-	if (params.slug) {
-		try {
-			// 포스트 데이터 로드
-			const postData = await loadPostBySlug(params.slug);
+	if (!params?.slug) {
+		console.error("❌ [PostDetail] params.slug가 없습니다. params 상태:", {
+			params,
+			type: typeof params,
+			isNull: params === null,
+			isUndefined: params === undefined,
+			keys: params ? Object.keys(params) : [],
+		});
+		loading = false;
+		return;
+	}
 
-			if (!postData) {
-				throw new Error("포스트를 찾을 수 없습니다.");
-			}
+	try {
+		// 포스트 데이터 로드
+		const postData = await loadPostBySlug(params.slug);
 
-			post = postData;
-			markdownContent = postData;
-			loading = false;
-
-			// Update page title and meta tags
-			if (browser && post) {
-				document.title = `${post.title} - wintrover`;
-
-				// Update or create meta tags
-				updateMetaTag("og:title", post.title);
-				updateMetaTag("og:url", window.location.href);
-				updateMetaTag("og:description", post.excerpt || post.title);
-				updateMetaTag("description", post.excerpt || post.title);
-
-				// Update canonical URL
-				updateLinkTag("canonical", window.location.href);
-			}
-
-			// 버튼 이벤트 리스너 추가
-			setTimeout(() => {
-				setupCodeBlockButtons();
-			}, 500);
-		} catch (error) {
-			console.error("❌ [PostDetail] 포스트 데이터 로딩 중 에러 발생:", {
-				slug: params.slug,
-				message: error instanceof Error ? error.message : String(error),
-				stack: error instanceof Error ? error.stack : "Stack trace unavailable",
-				error,
-			});
-			loading = false;
+		if (!postData) {
+			throw new Error(`포스트를 찾을 수 없습니다. (slug: ${params.slug})`);
 		}
+
+		post = postData;
+		markdownContent = postData;
+		loading = false;
+
+		// Update page title and meta tags
+		if (browser && post) {
+			document.title = `${post.title} - wintrover`;
+
+			// Update or create meta tags
+			updateMetaTag("og:title", post.title);
+			updateMetaTag("og:url", window.location.href);
+			updateMetaTag("og:description", post.excerpt || post.title);
+			updateMetaTag("description", post.excerpt || post.title);
+
+			// Update canonical URL
+			updateLinkTag("canonical", window.location.href);
+		}
+
+		// 버튼 이벤트 리스너 추가
+		setTimeout(() => {
+			setupCodeBlockButtons();
+		}, 500);
+	} catch (error) {
+		console.error("❌ [PostDetail] 포스트 데이터 로딩 중 에러 발생:", {
+			slug: params?.slug,
+			message: error instanceof Error ? error.message : String(error),
+			stack: error instanceof Error ? error.stack : "Stack trace unavailable",
+			error,
+		});
+		loading = false;
 	}
 }
 
@@ -88,7 +98,7 @@ onMount(() => {
 	loadPostData();
 });
 
-$: if (params.slug) {
+$: if (params?.slug) {
 	loadPostData();
 }
 
