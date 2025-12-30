@@ -9,7 +9,6 @@ import Comments from "./Comments.svelte";
 // Browser detection
 const browser = typeof window !== "undefined";
 
-// biome-ignore lint/style/useConst: Svelte prop must be let
 export let params: { slug?: string } = {};
 let post = null;
 let markdownContent = null;
