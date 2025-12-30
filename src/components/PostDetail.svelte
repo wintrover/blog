@@ -273,23 +273,32 @@ void goBack;
       {:else}
         <div class="content-error">
           <p><strong>Failed to load post content.</strong></p>
-          <p>The markdown file for this post could not be loaded.</p>
+          <p>The post might not exist or there was an error loading it.</p>
         </div>
       {/if}
     </div>
 
     <footer class="post-footer">
-      <button class="back-link" on:click={goBack}>← Back to Blog</button>
-    </footer>
+      <button class="back-button" on:click={goBack}>
+        ← Back to List
+      </button>
 
-    <!-- Comments section -->
-    <Comments mapping="specific" term={params.slug} />
+      <div class="comments-section">
+        <Comments slug={params.slug} title={post.title} />
+      </div>
+    </footer>
   </article>
+{:else if !loading}
+  <div class="error-container">
+    <h2>Post not found</h2>
+    <p>The post you're looking for doesn't exist or has been moved.</p>
+    <button class="back-button" on:click={goBack}>
+      Go back to home
+    </button>
+  </div>
 {:else}
-  <div class="post-not-found">
-    <h1>Post Not Found</h1>
-    <p>The post you're looking for doesn't exist.</p>
-    <button class="back-link" on:click={goBack}>← Back to Blog</button>
+  <div class="loading-container">
+    <p>Loading post...</p>
   </div>
 {/if}
 
@@ -297,34 +306,29 @@ void goBack;
   .post-detail {
     max-width: 800px;
     margin: 0 auto;
-    margin-top: 20px;
-    margin-bottom: 20px;
+    padding: 20px;
   }
 
   .post-header {
     margin-bottom: 40px;
-    padding-bottom: 20px;
     border-bottom: 1px solid #eee;
+    padding-bottom: 20px;
   }
 
   .post-meta {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 15px;
     margin-bottom: 15px;
-  }
-
-  .date {
-    color: #666;
     font-size: 14px;
+    color: #666;
   }
 
   .category-badge {
     background: #0366d6;
     color: white;
-    padding: 4px 12px;
-    border-radius: 16px;
-    font-size: 12px;
+    padding: 2px 10px;
+    border-radius: 12px;
     font-weight: 500;
   }
 
@@ -337,8 +341,8 @@ void goBack;
   }
 
   .post-title {
-    margin: 0 0 20px 0;
-    font-size: 32px;
+    font-size: 36px;
+    margin: 0 0 15px 0;
     line-height: 1.2;
     color: #24292e;
   }
@@ -350,289 +354,177 @@ void goBack;
   }
 
   .tag {
-    background: #f1f8ff;
+    font-size: 13px;
     color: #0366d6;
-    padding: 4px 8px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: 500;
+    background: #f1f8ff;
+    padding: 2px 8px;
+    border-radius: 4px;
   }
 
   .post-content {
-    margin-bottom: 40px;
     line-height: 1.6;
+    font-size: 17px;
+    color: #24292e;
   }
 
-  .loading {
+  .loading, .content-error {
     text-align: center;
     padding: 40px;
     color: #666;
   }
 
-  .content-error {
-    background: #fff5f5;
-    border: 1px solid #fed7d7;
-    border-radius: 8px;
-    color: #c53030;
-  }
-
-  .markdown-content {
-    font-size: 16px;
-    line-height: 1.7;
-  }
-
-  .markdown-content :global(h1),
-  .markdown-content :global(h2),
-  .markdown-content :global(h3) {
-    margin: 30px 0 15px 0;
-    color: #24292e;
-  }
-
-  .markdown-content :global(h2) {
-    font-size: 24px;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 8px;
-  }
-
-  .markdown-content :global(h3) {
-    font-size: 20px;
-  }
-
-  .markdown-content :global(p) {
-    margin: 0 0 16px 0;
-  }
-
-  .markdown-content :global(img) {
-    width: 100%;
-    height: auto;
-  }
-
-  .markdown-content :global(ul),
-  .markdown-content :global(ol) {
-    margin: 0 0 16px 0;
-    padding-left: 30px;
-  }
-
-  .markdown-content :global(li) {
-    margin-bottom: 8px;
-  }
-
-  .markdown-content :global(code) {
-    background: #f1f3f4;
-    color: #37474f;
-    padding: 2px 4px;
-    border-radius: 4px;
-    font-size: 14px;
-    font-family: 'Roboto Mono', 'Courier New', monospace;
-  }
-
-  /* Google Developer 사이트 CSS 변수 정의 */
-  .markdown-content {
-    --devsite-code-buttons-container-right: 40px;
-    --devsite-code-margin: 16px -40px;
-    --devsite-code-padding-block: 24px;
-    --devsite-code-padding-inline: 40px;
-    --devsite-code-border: 0;
-    --devsite-code-border-radius: 0;
-    --devsite-code-button-size: 32px;
-    --devsite-code-buttons-toggle-dark-display: inline-block;
-    --devsite-code-buttons-toggle-light-display: none;
-    --devsite-code-comments-color: #b80672;
-    --devsite-code-keywords-color: #1967d2;
-    --devsite-code-numbers-color: #c5221f;
-    --devsite-code-strings-color: #188038;
-    --devsite-code-types-color: #9334e6;
-    --devsite-code-background: #f1f3f4;
-    --devsite-code-color: #37474f;
-    --devsite-var-color: #d01884;
-    --devsite-primary-font-family: 'Google Sans', 'Noto Sans', 'Noto Sans JP', 'Noto Sans KR', 'Noto Naskh Arabic', 'Noto Sans Thai', 'Noto Sans Hebrew', 'Noto Sans Bengali', sans-serif;
-    --devsite-headline-font-family: 'Google Sans', 'Noto Sans', 'Noto Sans JP', 'Noto Sans KR', 'Noto Naskh Arabic', 'Noto Sans Thai', 'Noto Sans Hebrew', 'Noto Sans Bengali', sans-serif;
-  }
-
-  .markdown-content :global(pre) {
-    border: var(--devsite-code-border, 0);
-    border-radius: var(--devsite-code-border-radius, 0);
-    clear: both;
-    direction: ltr !important;
-    display: block;
-    margin: 16px 0;
-    min-height: var(--devsite-code-button-size);
-    overflow: hidden;
-    position: relative;
-    background: var(--devsite-code-background);
-    color: var(--devsite-code-color);
-    padding: var(--devsite-code-padding-block) var(--devsite-code-padding-inline);
-    font-family: 'Roboto Mono', 'Courier New', monospace;
-    font-size: 14px;
-    line-height: 1.5;
-    overflow-x: auto;
-    box-sizing: inherit;
-    white-space: pre-wrap;
-    word-wrap: break-word;
-    word-break: break-all;
-  }
-
-  .markdown-content :global(.devsite-code-buttons-container) {
-    position: absolute;
-    right: 10px;
-    top: 10px;
-    z-index: 1;
-    margin: 0;
-    padding: 0;
-    box-sizing: inherit;
-    display: flex;
-    gap: 4px;
-  }
-
-  .markdown-content :global(.devsite-code-buttons-container button) {
-    background: none;
-    border: none;
-    padding: 8px;
-    cursor: pointer;
-    border-radius: 4px;
-    color: #5f6368;
-    font-size: 18px;
-    line-height: 1;
-    transition: background-color 0.2s, color 0.2s;
-    margin: 0;
-    box-sizing: inherit;
-  }
-
-  .markdown-content :global(.devsite-code-buttons-container button:hover) {
-    background-color: rgba(95, 99, 104, 0.1);
-    color: #202124;
-  }
-
-  .markdown-content :global(.devsite-icon-theme-toggle)::before {
-    content: '\e3a7'; /* material-symbols:brightness-6-outline */
-    font-family: 'Material Symbols Outlined';
-    font-weight: normal;
-    font-style: normal;
-    font-size: 18px;
-    line-height: 1;
-    letter-spacing: normal;
-    text-transform: none;
-    display: inline-block;
-    white-space: nowrap;
-    word-wrap: normal;
-    direction: ltr;
-    -webkit-font-feature-settings: 'liga';
-    font-feature-settings: 'liga';
-    -webkit-font-smoothing: antialiased;
-  }
-
-  .markdown-content :global(.devsite-icon-copy)::before {
-    content: '\e14d'; /* material-symbols:content-copy */
-    font-family: 'Material Symbols Outlined';
-    font-weight: normal;
-    font-style: normal;
-    font-size: 18px;
-    line-height: 1;
-    letter-spacing: normal;
-    text-transform: none;
-    display: inline-block;
-    white-space: nowrap;
-    word-wrap: normal;
-    direction: ltr;
-    -webkit-font-feature-settings: 'liga';
-    font-feature-settings: 'liga';
-    -webkit-font-smoothing: antialiased;
-  }
-
-  /* 다크 테마 스타일 */
-  .markdown-content :global(pre.dark-theme) {
-    --devsite-code-background: #1e1e1e;
-    --devsite-code-color: #d4d4d4;
-    background: var(--devsite-code-background);
-    color: var(--devsite-code-color);
-  }
-
-  .markdown-content :global(pre.dark-theme code) {
-    color: var(--devsite-code-color);
-  }
-
-  .markdown-content :global(pre code) {
-    background: none;
-    padding: 0;
-    color: inherit;
-    font-size: inherit;
-    border-radius: 0;
-  }
-
-  .markdown-content :global(blockquote) {
-    border-left: 4px solid #dfe2e5;
-    padding-left: 16px;
-    margin: 16px 0;
-    color: #6a737d;
-  }
-
-  /* 복사 토스트 팝업 스타일 */
-  .markdown-content :global(.copy-toast) {
-    position: absolute;
-    bottom: 8px;
-    right: 8px;
-    background: #2d3748;
-    color: white;
-    padding: 8px 12px;
-    border-radius: 6px;
-    font-size: 12px;
-    font-weight: 500;
-    opacity: 0;
-    transform: translateY(10px);
-    transition: all 0.3s ease;
-    z-index: 10;
-    pointer-events: none;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  }
-
-  .markdown-content :global(.copy-toast.show) {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
   .post-footer {
-    padding-top: 20px;
+    margin-top: 60px;
+    padding-top: 30px;
     border-top: 1px solid #eee;
   }
 
-  .back-link {
+  .back-button {
     background: none;
-    border: none;
+    border: 1px solid #0366d6;
     color: #0366d6;
+    padding: 8px 16px;
+    border-radius: 6px;
     cursor: pointer;
-    font-weight: 500;
-    font-size: inherit;
-    padding: 0;
-    transition: color 0.2s;
+    font-size: 15px;
+    transition: all 0.2s;
+    margin-bottom: 40px;
   }
 
-  .back-link:hover {
-    color: #0256cc;
-    text-decoration: underline;
+  .back-button:hover {
+    background: #0366d6;
+    color: white;
   }
 
-  .post-not-found {
+  .comments-section {
+    margin-top: 40px;
+  }
+
+  .error-container, .loading-container {
     text-align: center;
-    padding: 60px 20px;
+    padding: 100px 20px;
   }
 
-  .post-not-found h1 {
-    color: #24292e;
-    margin-bottom: 15px;
+  :global(.markdown-content) {
+    word-break: break-word;
   }
 
-  .post-not-found p {
-    color: #666;
-    margin-bottom: 30px;
+  :global(.markdown-content h2) {
+    margin-top: 40px;
+    border-bottom: 1px solid #eaecef;
+    padding-bottom: 10px;
   }
 
-  @media (max-width: 640px) {
+  :global(.markdown-content pre) {
+    background-color: #f6f8fa;
+    border-radius: 6px;
+    padding: 16px;
+    overflow: auto;
+    position: relative;
+    margin: 20px 0;
+  }
+
+  :global(.markdown-content code) {
+    font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 85%;
+    background-color: rgba(27, 31, 35, 0.05);
+    padding: 0.2em 0.4em;
+    border-radius: 3px;
+  }
+
+  :global(.markdown-content pre code) {
+    background-color: transparent;
+    padding: 0;
+  }
+
+  :global(.markdown-content img) {
+    max-width: 100%;
+    height: auto;
+  }
+
+  :global(.markdown-content blockquote) {
+    margin: 0;
+    padding: 0 1em;
+    color: #6a737d;
+    border-left: 0.25em solid #dfe2e5;
+  }
+
+  :global(.markdown-content table) {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+  }
+
+  :global(.markdown-content th, .markdown-content td) {
+    padding: 6px 13px;
+    border: 1px solid #dfe2e5;
+  }
+
+  :global(.markdown-content tr:nth-child(2n)) {
+    background-color: #f6f8fa;
+  }
+
+  /* Copy Button and Toast Styles */
+  :global(.devsite-icon-copy), :global(.devsite-icon-theme-toggle) {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    cursor: pointer;
+    opacity: 0.5;
+    transition: opacity 0.2s;
+    z-index: 10;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 4px;
+    font-size: 12px;
+    line-height: 1;
+  }
+
+  :global(.devsite-icon-theme-toggle) {
+    right: 45px;
+  }
+
+  :global(.devsite-icon-copy:hover), :global(.devsite-icon-theme-toggle:hover) {
+    opacity: 1;
+  }
+
+  :global(.copy-toast) {
+    position: absolute;
+    top: 40px;
+    right: 8px;
+    background: #333;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+    z-index: 100;
+  }
+
+  :global(.copy-toast.show) {
+    opacity: 1;
+  }
+
+  /* Dark Theme for Code Blocks */
+  :global(.markdown-content pre.dark-theme) {
+    background-color: #1e1e1e;
+    color: #d4d4d4;
+  }
+
+  :global(.markdown-content pre.dark-theme code) {
+    color: #d4d4d4;
+  }
+
+  @media (max-width: 768px) {
     .post-title {
-      font-size: 24px;
+      font-size: 28px;
     }
 
-    .content-placeholder {
-      padding: 20px;
+    .post-detail {
+      padding: 15px;
     }
   }
 </style>
