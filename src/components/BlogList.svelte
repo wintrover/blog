@@ -5,7 +5,8 @@ import { loadAllPosts } from "../lib/postLoader";
 import { formatDate, slugify } from "../lib/utils";
 import { selectedCategory } from "../stores/category";
 
-export const params: { category?: string } = {};
+// biome-ignore lint/style/useConst: Svelte prop must be let
+export let params: { category?: string } = {};
 let posts = [];
 let filteredPosts = [];
 
