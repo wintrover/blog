@@ -3,20 +3,22 @@ import { onMount } from "svelte";
 import { giscusConfig } from "../lib/giscus-config";
 
 // Use configuration or allow override via props
-// Use configuration or allow override via props
-export const repo = giscusConfig.repo;
-export const repoId = giscusConfig.repoId;
-export const category = giscusConfig.category;
-export const categoryId = giscusConfig.categoryId;
-// Allow override of mapping via props
-export const mapping = giscusConfig.mapping;
-export const term = ""; // Used when mapping is 'specific'
-export const strict = giscusConfig.strict;
-export const reactionsEnabled = giscusConfig.reactionsEnabled;
-export const emitMetadata = giscusConfig.emitMetadata;
-export const inputPosition = giscusConfig.inputPosition;
+export let repo = giscusConfig.repo;
+export let repoId = giscusConfig.repoId;
+export let category = giscusConfig.category;
+export let categoryId = giscusConfig.categoryId;
+export let mapping = giscusConfig.mapping;
+export let term = ""; // Used when mapping is 'specific'
+export let strict = giscusConfig.strict;
+export let reactionsEnabled = giscusConfig.reactionsEnabled;
+export let emitMetadata = giscusConfig.emitMetadata;
+export let inputPosition = giscusConfig.inputPosition;
 export let theme = giscusConfig.theme;
-export const lang = giscusConfig.lang;
+export let lang = giscusConfig.lang;
+
+// Accept additional props from parent to avoid warnings
+export let slug = "";
+export let title = "";
 
 let giscusLoaded = false;
 let container;
@@ -25,8 +27,12 @@ let monitoringTimeouts = [];
 onMount(() => {
 	loadGiscus();
 
+	// Add message listener for Giscus communication monitoring
+	window.addEventListener("message", handleMessage);
+
 	// Cleanup function for component unmount
 	return () => {
+		window.removeEventListener("message", handleMessage);
 		// Clear all pending timeouts to prevent errors after unmount
 		monitoringTimeouts.forEach((timeoutId) => {
 			clearTimeout(timeoutId);
@@ -34,6 +40,27 @@ onMount(() => {
 		monitoringTimeouts = [];
 	};
 });
+
+function handleMessage(event: MessageEvent) {
+	// Only listen to messages from Giscus
+	if (event.origin !== "https://giscus.app") return;
+
+	const { data } = event;
+	if (!(typeof data === "object" && data.giscus)) return;
+
+	const giscusData = data.giscus;
+
+	// Handle specific error messages from Giscus (Advanced Usage)
+	if ("error" in giscusData) {
+		console.error("❌ Giscus Error:", giscusData.error);
+		return;
+	}
+
+	// Log Giscus messages if debug is enabled
+	if (giscusConfig.debug) {
+		console.log("💬 Giscus Message:", giscusData);
+	}
+}
 
 async function loadGiscus() {
 	if (giscusLoaded) return;
