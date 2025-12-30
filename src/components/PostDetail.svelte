@@ -56,6 +56,21 @@ async function loadPostData(slug: string) {
 	} catch (error) {
 		console.error("❌ [PostDetail] 포스트 데이터 로딩 중 에러 발생:", {
 			slug,
+			paramsState: {
+				params,
+				type: typeof params,
+				isNull: params === null,
+				isUndefined: params === undefined,
+				keys: params ? Object.keys(params) : [],
+			},
+			location: browser
+				? {
+						href: window.location.href,
+						pathname: window.location.pathname,
+						hash: window.location.hash,
+						search: window.location.search,
+					}
+				: "SSR",
 			message: error instanceof Error ? error.message : String(error),
 			stack: error instanceof Error ? error.stack : "Stack trace unavailable",
 			error,
@@ -95,6 +110,16 @@ onMount(() => {
 		loadPostData(params.slug);
 	}
 });
+
+$: {
+	if (params) {
+		console.log("🔍 [PostDetail] params 변경 감지:", {
+			params,
+			slug: params?.slug,
+			url: browser ? window.location.href : "SSR",
+		});
+	}
+}
 
 $: if (params?.slug) {
 	loadPostData(params.slug);
