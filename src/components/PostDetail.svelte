@@ -9,30 +9,26 @@ import Comments from "./Comments.svelte";
 // Browser detection
 const browser = typeof window !== "undefined";
 
-export const params = { slug: "" };
+export const params = {};
 let post = null;
 let markdownContent = null;
 let loading = true;
 
-async function loadPostData() {
-	if (!params?.slug) {
-		console.error("❌ [PostDetail] params.slug가 없습니다. params 상태:", {
-			params,
-			type: typeof params,
-			isNull: params === null,
-			isUndefined: params === undefined,
-			keys: params ? Object.keys(params) : [],
-		});
-		loading = false;
-		return;
-	}
+let currentSlug = null;
+
+async function loadPostData(slug: string) {
+	if (!slug) return;
+	if (currentSlug === slug) return;
+
+	currentSlug = slug;
+	loading = true;
 
 	try {
 		// 포스트 데이터 로드
-		const postData = await loadPostBySlug(params.slug);
+		const postData = await loadPostBySlug(slug);
 
 		if (!postData) {
-			throw new Error(`포스트를 찾을 수 없습니다. (slug: ${params.slug})`);
+			throw new Error(`포스트를 찾을 수 없습니다. (slug: ${slug})`);
 		}
 
 		post = postData;
@@ -59,7 +55,7 @@ async function loadPostData() {
 		}, 500);
 	} catch (error) {
 		console.error("❌ [PostDetail] 포스트 데이터 로딩 중 에러 발생:", {
-			slug: params?.slug,
+			slug,
 			message: error instanceof Error ? error.message : String(error),
 			stack: error instanceof Error ? error.stack : "Stack trace unavailable",
 			error,
@@ -95,11 +91,13 @@ function updateLinkTag(rel, href) {
 }
 
 onMount(() => {
-	loadPostData();
+	if (params?.slug) {
+		loadPostData(params.slug);
+	}
 });
 
 $: if (params?.slug) {
-	loadPostData();
+	loadPostData(params.slug);
 }
 
 afterUpdate(() => {
