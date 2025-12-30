@@ -9,7 +9,7 @@ import Comments from "./Comments.svelte";
 // Browser detection
 const browser = typeof window !== "undefined";
 
-export const params = { slug: "" };
+export const params: { slug?: string } = {};
 let post = null;
 let markdownContent = null;
 let loading = true;

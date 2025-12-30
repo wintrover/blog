@@ -264,7 +264,7 @@ async function postToDev(filePath: string) {
 		const checkResponse = await fetch(
 			"https://dev.to/api/articles/me/all?per_page=1000",
 			{
-				headers: { "api-key": devtoApiKey! },
+				headers: { "api-key": devtoApiKey },
 			},
 		);
 
@@ -286,7 +286,7 @@ async function postToDev(filePath: string) {
 				headers: {
 					"Content-Type": "application/json",
 					Accept: "application/vnd.forem.api-v1+json",
-					"api-key": devtoApiKey!,
+					"api-key": devtoApiKey,
 				},
 				body: JSON.stringify({ article }),
 			});
@@ -297,7 +297,7 @@ async function postToDev(filePath: string) {
 				headers: {
 					"Content-Type": "application/json",
 					Accept: "application/vnd.forem.api-v1+json",
-					"api-key": devtoApiKey!,
+					"api-key": devtoApiKey,
 				},
 				body: JSON.stringify({ article }),
 			});

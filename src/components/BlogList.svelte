@@ -5,7 +5,7 @@ import { loadAllPosts } from "../lib/postLoader";
 import { formatDate, slugify } from "../lib/utils";
 import { selectedCategory } from "../stores/category";
 
-export const params = { category: "" };
+export const params: { category?: string } = {};
 let posts = [];
 let filteredPosts = [];
 
