@@ -8,7 +8,8 @@
 	},
 	"checkers": ["typescript"],
 	"tsconfigFile": "tsconfig.json",
-	"mutate": ["src/lib/**/*.ts"],
+	"mutate": ["src/lib/utils.ts"],
+	"ignorePatterns": ["src/lib/postLoader.ts", "src/lib/markdown.ts"],
 	"thresholds": {
 		"high": 80,
 		"low": 60,

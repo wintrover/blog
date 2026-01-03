@@ -15,6 +15,14 @@ export default defineConfig({
 	},
 	assetsInclude: ["**/*.md"],
 	publicDir: "public",
+	test: {
+		globals: true,
+		environment: "node",
+		include: ["tests/**/*.test.ts"],
+		env: {
+			BASE_URL: "/blog/",
+		},
+	},
 	server: {
 		historyApiFallback: true,
 	},

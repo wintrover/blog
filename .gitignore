@@ -31,3 +31,7 @@ _site/
 
 # Environment
 .env.vite/
+
+# Stryker
+.stryker-tmp/
+reports/
