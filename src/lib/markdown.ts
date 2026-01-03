@@ -26,32 +26,40 @@ function joinBase(p: unknown) {
 export function normalizeImageSrc(src: any) {
 	if (!src || typeof src !== "string") return src;
 	if (/^(https?:\/\/|data:)/i.test(src)) return src;
-	if (src.startsWith("/blog/")) {
-		const rest = src.slice("/blog/".length);
-		if (rest.startsWith("assets/images/")) {
-			const flattened = flattenLegacyAssetsPath(rest);
-			return joinBase(flattened);
+
+	let p = src;
+	if (p.startsWith("/blog/")) {
+		p = p.slice("/blog/".length);
+	} else if (p.startsWith(BASE)) {
+		p = p.slice(BASE.length);
+	} else if (p.startsWith("/")) {
+		p = p.slice(1);
+	}
+
+	// Resolve .. and . first (EP-BVA boundary case handling)
+	p = resolveRelativePath(p);
+
+	if (p.startsWith("assets/images/")) {
+		p = flattenLegacyAssetsPath(p);
+	} else if (p.startsWith("images/")) {
+		// already normalized to images/
+	}
+
+	return joinBase(p);
+}
+
+function resolveRelativePath(p: string) {
+	const parts = p.split("/");
+	const stack: string[] = [];
+	for (const part of parts) {
+		if (part === "..") {
+			if (stack.length > 0) stack.pop();
+		} else if (part !== "." && part !== "") {
+			stack.push(part);
 		}
-		return joinBase(rest);
 	}
-	if (src.startsWith(BASE)) return src;
-	if (src.startsWith("/assets/images/")) {
-		const flattened = flattenLegacyAssetsPath(src.slice(1));
-		return joinBase(flattened);
-	}
-	if (src.startsWith("/images/")) {
-		return joinBase(src.slice(1));
-	}
-	const mRelAssetsImages = src.match(
-		/(^|\/?)(?:\.\.\/|\.\/)?assets\/images\/(.+)$/,
-	);
-	if (mRelAssetsImages) {
-		const flattened = flattenLegacyAssetsPath(
-			`assets/images/${mRelAssetsImages[2]}`,
-		);
-		return joinBase(flattened);
-	}
-	return joinBase(src);
+	const result = stack.join("/");
+	return p.startsWith("/") ? `/${result}` : result;
 }
 
 function flattenLegacyAssetsPath(p: string) {

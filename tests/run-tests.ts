@@ -5,7 +5,7 @@ import { runDevtoAbsolutizeTests } from "./devto-absolutize.test";
 
 function extractImgSrcs(html: string) {
 	const out: string[] = [];
-	const re = /<img\s+[^>]*src=["']([^"']+)["'][^>]*>/g;
+	const re = /<img\s+[^>]*src=["']([^"']*)["'][^>]*>/g;
 	let m: RegExpExecArray | null;
 	while ((m = re.exec(html))) out.push(m[1]);
 	return out;
