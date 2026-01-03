@@ -7,29 +7,19 @@ import PostDetail from "./components/PostDetail.svelte";
 import Sidebar from "./components/Sidebar.svelte";
 import { posts } from "./stores/posts";
 
-void Router;
-void Footer;
-void Sidebar;
-void posts;
-
 let sidebarCollapsed = false;
-let sidebarElement;
-let mainContentElement;
-let contentElement;
-let manualToggle = false; // 수동 토글 상태
-let _manualToggleTimeout;
-let resizeTimeout; // 리사이즈 디바운스용
+let sidebarElement: HTMLElement | null = null;
+let mainContentElement: HTMLElement | null = null;
+let contentElement: HTMLElement | null = null;
+let manualToggle = false;
+let resizeTimeout: any = null;
 
-// 라우트 정의
 const routes = {
 	"/": BlogList,
 	"/category/:category": BlogList,
 	"/post/:slug": PostDetail,
 };
 
-void routes;
-
-// 사이드바 상태 변화 감지
 $: {
 	if (typeof document !== "undefined") {
 		if (sidebarCollapsed) {
@@ -40,27 +30,23 @@ $: {
 	}
 }
 
-let checkTimeout = null;
+let checkTimeout: any = null;
 
 function checkSidebarCollision() {
 	if (!sidebarElement || !mainContentElement) {
 		return;
 	}
 
-	// manualToggle 상태일 때는 자동 충돌 감지 비활성화
 	if (manualToggle) {
 		return;
 	}
 
-	// 디바운스: 이전 타이머 취소하고 새로 설정
 	clearTimeout(resizeTimeout);
 	resizeTimeout = setTimeout(() => {
-		// 요소가 null이면 리턴
 		if (!sidebarElement || !contentElement) {
 			return;
 		}
 
-		// 요소가 아직 렌더링되지 않았다면 사이드바를 표시
 		const sidebarRect = sidebarElement.getBoundingClientRect();
 		const contentRect = contentElement.getBoundingClientRect();
 
@@ -71,7 +57,6 @@ function checkSidebarCollision() {
 			return;
 		}
 
-		// 화면이 너무 작으면 자동으로 접기
 		if (window.innerWidth < 768) {
 			if (!sidebarCollapsed) {
 				sidebarCollapsed = true;
@@ -79,7 +64,6 @@ function checkSidebarCollision() {
 			return;
 		}
 
-		// 화면이 충분히 크고 사이드바가 접혀있으면 펼치기
 		if (window.innerWidth >= 1200 && sidebarCollapsed) {
 			if (contentRect.left > 120) {
 				sidebarCollapsed = false;
@@ -87,19 +71,14 @@ function checkSidebarCollision() {
 			return;
 		}
 
-		// 사이드바와 콘텐츠가 겹치는지 확인 (사이드바 오른쪽 끝이 콘텐츠 왼쪽 시작점을 넘어가면 겹침)
 		const isOverlapping = sidebarRect.right >= contentRect.left;
 
-		// 무한 루프 방지: 현재 상태와 다를 때만 변경
-		// 겹치면서 현재 펼쳐져 있으면 접기
 		if (isOverlapping && !sidebarCollapsed) {
 			sidebarCollapsed = true;
-		}
-		// 콘텐츠의 왼쪽 x좌표가 120보다 크고 현재 접혀져 있으면 펼치기
-		else if (contentRect.left > 120 && sidebarCollapsed) {
+		} else if (contentRect.left > 120 && sidebarCollapsed) {
 			sidebarCollapsed = false;
 		}
-	}, 5); // 5ms 디바운스
+	}, 5);
 }
 
 function debouncedCheckSidebarCollision() {
@@ -110,7 +89,6 @@ function debouncedCheckSidebarCollision() {
 }
 
 function handleResize() {
-	// 리사이즈 시 수동 토글 상태 리셋
 	manualToggle = false;
 	checkSidebarCollision();
 }
@@ -121,10 +99,8 @@ function toggleSidebar() {
 }
 
 onMount(() => {
-	// 초기 체크를 여러 번 시도 (배포 환경에서 DOM 로딩 지연 대응)
 	const checkWithRetry = () => {
 		checkSidebarCollision();
-		// 요소가 아직 준비되지 않았으면 다시 시도
 		if (!sidebarElement || !mainContentElement) {
 			setTimeout(checkWithRetry, 200);
 		}
@@ -132,7 +108,6 @@ onMount(() => {
 
 	setTimeout(checkWithRetry, 100);
 
-	// ResizeObserver로 요소 크기 변화 감지
 	const resizeObserver = new ResizeObserver(() => {
 		debouncedCheckSidebarCollision();
 	});
@@ -142,7 +117,6 @@ onMount(() => {
 
 	window.addEventListener("resize", handleResize);
 
-	// 토글 이벤트 리스너
 	const handleToggleSidebar = () => {
 		toggleSidebar();
 	};
@@ -161,15 +135,15 @@ onMount(() => {
 </script>
 
 <div id="app-container" class:sidebar-collapsed={sidebarCollapsed}>
-  <!-- 토글 버튼을 항상 왼쪽 위에 고정 -->
-  <button class="sidebar-toggle" on:click={toggleSidebar}>
-    ☰
+  <button class="sidebar-toggle" on:click={toggleSidebar} aria-label="Toggle Sidebar">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M3 5H17M3 10H17M3 15H17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
   </button>
 
   <aside id="sidebar" class:collapsed={sidebarCollapsed} bind:this={sidebarElement}>
     <Sidebar />
   </aside>
-
 
   <main id="main-content" bind:this={mainContentElement}>
     <div id="content" bind:this={contentElement}>
@@ -184,8 +158,6 @@ onMount(() => {
     <Footer />
   </main>
 </div>
-
-
 
 <style>
   :global(body) {
@@ -219,7 +191,6 @@ onMount(() => {
     transform: translateX(-100%);
   }
 
-
   #main-content {
     flex: 1;
     margin-left: 240px;
@@ -228,8 +199,6 @@ onMount(() => {
     min-height: 100vh;
     transition: margin-left 0.01s ease;
   }
-
-
 
   #content {
     flex: 1;
@@ -248,7 +217,6 @@ onMount(() => {
     }
   }
 
-  /* Mermaid 다이어그램 스타일 */
   :global(.mermaid-diagram) {
     text-align: center;
     margin: 20px 0;
@@ -273,43 +241,41 @@ onMount(() => {
     text-align: center;
   }
 
-  /* 토글 버튼 스타일 - 항상 왼쪽 위에 고정 */
   .sidebar-toggle {
-          position: fixed;
-          top: 15px;
-          left: 15px;
-          z-index: 1002; /* 사이드바보다 높은 z-index */
-          background: #0366d6;
-          color: white;
-          border: none;
-          border-radius: 4px;
-          padding: 8px;
-          font-size: 16px;
-          cursor: pointer;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-          transition: background-color 0.2s;
-        }
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    z-index: 1002;
+    background: #0366d6;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    transition: background-color 0.2s;
+  }
 
   .sidebar-toggle:hover {
     background: #0256cc;
   }
 
-  /* 반응형 디자인 */
-        @media (max-width: 768px) {
-          .sidebar-toggle {
-            top: 10px;
-            left: 10px;
-            padding: 6px;
-            font-size: 14px;
-          }
-        }
+  @media (max-width: 768px) {
+    .sidebar-toggle {
+      top: 10px;
+      left: 10px;
+      padding: 6px;
+      font-size: 14px;
+    }
+  }
 
-        @media (max-width: 480px) {
-          .sidebar-toggle {
-            top: 8px;
-            left: 8px;
-            padding: 5px;
-            font-size: 12px;
-          }
-        }
+  @media (max-width: 480px) {
+    .sidebar-toggle {
+      top: 8px;
+      left: 8px;
+      padding: 5px;
+      font-size: 12px;
+    }
+  }
 </style>
