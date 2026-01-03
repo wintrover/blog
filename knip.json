@@ -21,7 +21,7 @@
 		"@rollup/plugin-dsv",
 		"vite-plugin-raw",
 		"@biomejs/biome",
-		"pre-commit"
+		"@j178/prek"
 	],
-	"ignoreBinaries": ["code-index-mcp"]
+	"ignoreBinaries": ["code-index-mcp", "stryker", "uvx"]
 }

@@ -1,0 +1,14 @@
+node_modules
+dist
+.env
+.git
+.github
+*.md
+LICENSE
+.pre-commit-config.yaml
+biome.json
+knip.json
+tsconfig.json
+vite.config.ts
+tests
+scripts

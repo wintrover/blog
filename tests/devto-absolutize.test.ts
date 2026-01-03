@@ -44,6 +44,4 @@ export async function runDevtoAbsolutizeTests() {
 			"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==";
 		assert.equal(absolutizeSrc(dataUri, base), dataUri);
 	}
-
-	console.log("OK: devto absolutize tests passed");
 }

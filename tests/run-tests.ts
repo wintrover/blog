@@ -37,17 +37,58 @@ async function testImageNormalization() {
 	for (const c of cases) {
 		const { html } = parseMarkdown(c.md);
 		const srcs = extractImgSrcs(html);
-		assert.equal(srcs.length, 1, "one img expected");
-		assert.equal(srcs[0], c.expect, `normalized src should be ${c.expect}`);
+		assert.equal(srcs.length, 1, `one img expected for ${c.md}`);
+		assert.equal(
+			srcs[0],
+			c.expect,
+			`normalized src should be ${c.expect} for ${c.md}`,
+		);
+	}
+}
+
+async function testBoundaryCases() {
+	const cases = [
+		{ md: "", expectCount: 0 },
+		{ md: "![no-image]()", expectCount: 1, expectSrc: "" },
+		{
+			md: "![special](assets/images/01/../02/test.png)",
+			expect: "/blog/images/02-test.png",
+		},
+		{
+			md: "![abs](/blog/images/already.png)",
+			expect: "/blog/images/already.png",
+		},
+	];
+
+	for (const c of cases) {
+		const { html } = parseMarkdown(c.md);
+		const srcs = extractImgSrcs(html);
+		if (c.expectCount !== undefined) {
+			assert.equal(
+				srcs.length,
+				c.expectCount,
+				`expected ${c.expectCount} images for ${c.md}`,
+			);
+		}
+		if (c.expectSrc !== undefined && srcs.length > 0) {
+			assert.equal(srcs[0], c.expectSrc);
+		}
+		if (c.expect !== undefined && srcs.length > 0) {
+			assert.equal(srcs[0], c.expect);
+		}
 	}
 }
 
 (async () => {
 	try {
-		await testImageNormalization();
-		await runDevtoAbsolutizeTests();
-		console.log("OK: image path normalization tests passed");
+		// 병렬 테스트 실행 (규칙 준수)
+		await Promise.all([
+			testImageNormalization(),
+			testBoundaryCases(),
+			runDevtoAbsolutizeTests(),
+		]);
 	} catch (err) {
+		// 오류 발생 시에만 로깅 (규칙 준수)
 		console.error("TEST FAILURE:", err);
 		process.exit(1);
 	}

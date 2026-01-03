@@ -145,9 +145,7 @@ export async function absolutizeImagesInMarkdown(
 		const [fullMatch, pre, src, post] = match;
 		let abs = src;
 		if (isUCloudUrl(src)) {
-			console.log(`🔄 Processing UCloud image: ${src.substring(0, 80)}...`);
 			abs = await downloadAndHostUCloudImage(src, publicBaseUrl);
-			console.log(`✅ Converted to: ${abs}`);
 		} else {
 			abs = absolutizeSrc(src, publicBaseUrl);
 		}
@@ -162,9 +160,7 @@ export async function absolutizeImagesInMarkdown(
 		const [fullMatch, alt, _urlPart, urlOnly, rest] = match;
 		let abs = urlOnly;
 		if (isUCloudUrl(urlOnly)) {
-			console.log(`🔄 Processing UCloud image: ${urlOnly.substring(0, 80)}...`);
 			abs = await downloadAndHostUCloudImage(urlOnly, publicBaseUrl);
-			console.log(`✅ Converted to: ${abs}`);
 		} else {
 			abs = absolutizeSrc(urlOnly, publicBaseUrl);
 		}

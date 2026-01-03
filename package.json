@@ -13,7 +13,8 @@
 		"post:devto": "tsx scripts/post-to-dev.ts",
 		"mcp:code-index": "code-index-mcp",
 		"typecheck": "tsc --noEmit",
-		"lint": "prek run --all-files",
+		"lint": "uvx prek run --all-files",
+		"stryker": "stryker run",
 		"knip": "knip",
 		"depcruise": "depcruise src"
 	},
