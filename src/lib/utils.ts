@@ -37,9 +37,7 @@ export function normalizeImageSrc(src: any) {
 	if (/^(https?:\/\/|data:)/i.test(src)) return src;
 
 	let p = src;
-	if (p.startsWith("/blog/")) {
-		p = p.slice("/blog/".length);
-	} else if (p.startsWith(BASE)) {
+	if (p.startsWith(BASE)) {
 		p = p.slice(BASE.length);
 	} else if (p.startsWith("/")) {
 		p = p.slice(1);
