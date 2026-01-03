@@ -32,6 +32,9 @@ _site/
 # Environment
 .env.vite/
 
+# Coverage
+coverage/
+
 # Stryker
 .stryker-tmp/
 reports/

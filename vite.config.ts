@@ -1,8 +1,22 @@
 import { svelte, vitePreprocess } from "@sveltejs/vite-plugin-svelte";
+import path from "path";
 import { defineConfig } from "vite";
 
-export default defineConfig({
-	plugins: [svelte({ preprocess: vitePreprocess({ script: true }) })],
+export default defineConfig(({ mode }) => ({
+	plugins: [
+		svelte({
+			preprocess: vitePreprocess({ script: true }),
+			emitCss: mode !== "test",
+		}),
+	],
+	resolve: {
+		alias: {
+			"svelte-spa-router": path.resolve(
+				__dirname,
+				"node_modules/svelte-spa-router",
+			),
+		},
+	},
 	base: "/blog/",
 	build: {
 		outDir: "dist",
@@ -17,8 +31,22 @@ export default defineConfig({
 	publicDir: "public",
 	test: {
 		globals: true,
-		environment: "node",
+		environment: "jsdom",
+		setupFiles: ["tests/setup.ts"],
 		include: ["tests/**/*.test.ts"],
+		coverage: {
+			provider: "istanbul",
+			include: ["src/**/*.ts", "scripts/**/*.ts", "src/**/*.svelte"],
+			exclude: ["src/posts/**/*.md", "src/templates/**/*.md"],
+			reporter: ["text", "json", "html"],
+			all: true,
+		},
+		deps: {
+			inline: ["svelte-spa-router", "svelte"],
+		},
+		ssr: {
+			noExternal: ["svelte-spa-router"],
+		},
 		env: {
 			BASE_URL: "/blog/",
 		},
@@ -29,4 +57,4 @@ export default defineConfig({
 	preview: {
 		historyApiFallback: true,
 	},
-});
+}));

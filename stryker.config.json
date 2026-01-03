@@ -6,10 +6,9 @@
 	"vitest": {
 		"configFile": "vite.config.ts"
 	},
-	"checkers": ["typescript"],
-	"tsconfigFile": "tsconfig.json",
+	"checkers": [],
 	"mutate": ["src/lib/utils.ts"],
-	"ignorePatterns": ["src/lib/postLoader.ts", "src/lib/markdown.ts"],
+	"ignorePatterns": ["**/*.svelte"],
 	"thresholds": {
 		"high": 80,
 		"low": 60,

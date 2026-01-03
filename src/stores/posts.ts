@@ -1,7 +1,7 @@
-import { readable } from "svelte/store";
+import { writable } from "svelte/store";
 import { loadAllPosts } from "../lib/postLoader";
 
-export const posts = readable<any[]>([], (set) => {
+export const posts = writable<any[]>([], (set) => {
 	loadAllPosts()
 		.then((data) => {
 			set(data);

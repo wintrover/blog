@@ -1,5 +1,5 @@
 <script lang="ts">
-import { onMount } from "svelte";
+import { afterUpdate, onDestroy, onMount, tick } from "svelte";
 import { giscusConfig } from "../lib/giscus-config";
 
 // Use configuration or allow override via props
@@ -16,29 +16,26 @@ export let inputPosition = giscusConfig.inputPosition;
 export let theme = giscusConfig.theme;
 export let lang = giscusConfig.lang;
 
-// Accept additional props from parent to avoid warnings
-export let slug = "";
-export let title = "";
-
 let giscusLoaded = false;
 let container;
-let monitoringTimeouts = [];
 
-onMount(() => {
+// Use reactive statement since onMount seems unreliable in some test environments
+$: if (container && !giscusLoaded) {
 	loadGiscus();
+}
 
-	// Add message listener for Giscus communication monitoring
+let messageListenerAdded = false;
+$: if (container && !messageListenerAdded) {
 	window.addEventListener("message", handleMessage);
+	messageListenerAdded = true;
+}
 
-	// Cleanup function for component unmount
-	return () => {
+// Cleanup using onDestroy
+onDestroy(() => {
+	if (messageListenerAdded) {
 		window.removeEventListener("message", handleMessage);
-		// Clear all pending timeouts to prevent errors after unmount
-		monitoringTimeouts.forEach((timeoutId) => {
-			clearTimeout(timeoutId);
-		});
-		monitoringTimeouts = [];
-	};
+		messageListenerAdded = false;
+	}
 });
 
 function handleMessage(event: MessageEvent) {
@@ -78,16 +75,7 @@ async function loadGiscus() {
 		return;
 	}
 
-	// Build the URL that Giscus will call
-	const apiUrl = new URL("https://giscus.app/api/discussions");
-	apiUrl.searchParams.append("repo", repo);
-	if (mapping === "specific" && term) {
-		apiUrl.searchParams.append("term", term);
-	}
-	apiUrl.searchParams.append("category", category);
-	apiUrl.searchParams.append("number", "0");
-	apiUrl.searchParams.append("strict", strict);
-	apiUrl.searchParams.append("first", "15");
+	giscusLoaded = true;
 
 	const script = document.createElement("script");
 	script.src = "https://giscus.app/client.js";
@@ -108,117 +96,64 @@ async function loadGiscus() {
 	script.setAttribute("crossorigin", "anonymous");
 	script.async = true;
 
-	// Add event listeners
-	script.addEventListener("load", () => {
-		// script 로드 완료 (로그 삭제됨)
-	});
-
-	script.addEventListener("error", (e) => {
-		console.error("❌ Giscus script failed to load:", {
-			error: e,
-			repo,
-			repoId,
-			categoryId,
-		});
-	});
+	// script.onerror handling
+	script.onerror = () => {
+		console.error("❌ Failed to load Giscus script");
+		giscusLoaded = false;
+	};
 
 	if (container) {
-		container.innerHTML = "";
 		container.appendChild(script);
-		giscusLoaded = true;
-
-		// Monitor for iframe creation
-		const monitorIframe = () => {
-			// Defensive checks to prevent null reference errors
-			if (!container || !container.isConnected) {
-				return false;
-			}
-
-			const iframe = container.querySelector("iframe");
-			if (iframe) {
-				iframe.addEventListener("load", () => {
-					// iframe 로드 완료 (로그 삭제됨)
-				});
-
-				iframe.addEventListener("error", (e) => {
-					console.error("❌ [Comments] Giscus iframe 에러 발생:", {
-						message: e instanceof Error ? e.message : "Iframe error event",
-						event: e,
-						config: { repo, repoId, categoryId },
-					});
-				});
-
-				return true;
-			} else {
-				// iframe을 찾을 수 없음 (로그 삭제됨)
-				return false;
-			}
-		};
-
-		// Try multiple times with increasing delays, tracking timeouts for cleanup
-		const timeout1 = setTimeout(monitorIframe, 2000);
-		const timeout2 = setTimeout(monitorIframe, 5000);
-		const timeout3 = setTimeout(monitorIframe, 10000);
-
-		monitoringTimeouts.push(timeout1, timeout2, timeout3);
 	}
 }
 
-// Function to update theme (optional)
-export function updateTheme(newTheme) {
-	theme = newTheme;
+// Update theme dynamically
+$: if (giscusLoaded && theme) {
+	updateTheme(theme);
+}
 
-	// Defensive checks before accessing iframe
-	if (!container || !container.isConnected) {
+export function updateTheme(newTheme: string) {
+	const iframe = document.querySelector<HTMLIFrameElement>(
+		"iframe.giscus-frame",
+	);
+	if (!iframe) {
+		// If the selector fails, try finding any iframe inside the container
+		const containerIframe = container?.querySelector("iframe");
+		if (!containerIframe) return;
+
+		containerIframe.contentWindow?.postMessage(
+			{
+				giscus: {
+					setConfig: {
+						theme: newTheme,
+					},
+				},
+			},
+			"https://giscus.app",
+		);
 		return;
 	}
 
-	const iframe = container.querySelector("iframe");
-	if (iframe?.contentWindow) {
-		try {
-			iframe.contentWindow.postMessage(
-				{
-					giscus: {
-						setConfig: {
-							theme: newTheme,
-						},
-					},
+	iframe.contentWindow?.postMessage(
+		{
+			giscus: {
+				setConfig: {
+					theme: newTheme,
 				},
-				"https://giscus.app",
-			);
-		} catch (error) {
-			console.error("❌ [Comments] 테마 업데이트 중 에러 발생:", {
-				newTheme,
-				message: error instanceof Error ? error.message : String(error),
-				stack: error instanceof Error ? error.stack : "Stack trace unavailable",
-				error,
-			});
-		}
-	}
+			},
+		},
+		"https://giscus.app",
+	);
 }
 </script>
 
-<div bind:this={container} class="giscus-wrapper"></div>
+<div class="giscus-wrapper" bind:this={container}></div>
 
 <style>
-  .giscus-wrapper {
-    margin-top: 60px;
-    padding-top: 40px;
-    border-top: 1px solid #e1e4e8;
-    min-height: 200px;
-  }
-
-  /* Giscus iframe responsive */
-  .giscus-wrapper :global(iframe) {
-    width: 100%;
-    min-height: 200px;
-    border: none;
-  }
-
-  /* Dark theme support */
-  @media (prefers-color-scheme: dark) {
-    .giscus-wrapper {
-      border-top-color: #30363d;
-    }
-  }
+.giscus-wrapper {
+	margin-top: 50px;
+	padding-top: 20px;
+	border-top: 1px solid var(--border-color);
+	min-height: 300px;
+}
 </style>

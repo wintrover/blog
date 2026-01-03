@@ -1,6 +1,6 @@
 <script lang="ts">
 import mermaid from "mermaid";
-import { afterUpdate, onMount } from "svelte";
+import { onMount, tick } from "svelte";
 import { push } from "svelte-spa-router";
 import { loadPostBySlug } from "../lib/postLoader";
 import { formatDate, slugify } from "../lib/utils";
@@ -11,7 +11,6 @@ const browser = typeof window !== "undefined";
 
 export let params: { slug?: string } = {};
 let post = null;
-let markdownContent = null;
 let loading = true;
 
 let currentSlug = null;
@@ -32,7 +31,6 @@ async function loadPostData(slug: string) {
 		}
 
 		post = postData;
-		markdownContent = postData;
 		loading = false;
 
 		// Update page title and meta tags
@@ -119,14 +117,15 @@ $: if (params?.slug) {
 	loadPostData(params.slug);
 }
 
-afterUpdate(() => {
-	if (!loading && markdownContent) {
-		setTimeout(async () => {
-			setupCodeBlockButtons();
-			await setupMermaidDiagrams();
-		}, 100);
-	}
-});
+$: if (!loading && post) {
+	updatePostEffects();
+}
+
+async function updatePostEffects() {
+	await tick();
+	setupCodeBlockButtons();
+	await setupMermaidDiagrams();
+}
 
 function showCopyToast(codeBlock) {
 	// 기존 토스트 제거
@@ -202,7 +201,6 @@ function setupCodeBlockButtons() {
 
 async function setupMermaidDiagrams() {
 	const mermaidElements = document.querySelectorAll(".mermaid-diagram");
-
 	for (const element of mermaidElements) {
 		if (element.hasAttribute("data-rendered")) continue;
 
@@ -260,14 +258,9 @@ void goBack;
         <div class="loading">
           <p>Loading post content...</p>
         </div>
-      {:else if markdownContent}
-        <div class="markdown-content">
-          {@html markdownContent.html}
-        </div>
       {:else}
-        <div class="content-error">
-          <p><strong>Failed to load post content.</strong></p>
-          <p>The post might not exist or there was an error loading it.</p>
+        <div class="markdown-content">
+          {@html post.html}
         </div>
       {/if}
     </div>
@@ -278,7 +271,7 @@ void goBack;
       </button>
 
       <div class="comments-section">
-        <Comments slug={params.slug} title={post.title} />
+        <Comments />
       </div>
     </footer>
   </article>

@@ -22,8 +22,8 @@
 		"vite-plugin-raw",
 		"@biomejs/biome",
 		"@j178/prek",
-		"@testing-library/svelte",
-		"@testing-library/jest-dom"
+		"@stryker-mutator/typescript-checker",
+		"@vitest/coverage-v8"
 	],
-	"ignoreBinaries": ["code-index-mcp", "stryker", "uvx"]
+	"ignoreBinaries": ["code-index-mcp", "uvx"]
 }
