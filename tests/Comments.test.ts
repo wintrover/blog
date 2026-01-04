@@ -1,5 +1,4 @@
 import { render, waitFor } from "@testing-library/svelte";
-import { tick } from "svelte";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import Comments from "../src/components/Comments.svelte";
 

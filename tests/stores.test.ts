@@ -1,5 +1,5 @@
 import { get } from "svelte/store";
-import { beforeEach, describe, expect, test, vi } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 import * as postLoader from "../src/lib/postLoader";
 import { selectedCategory } from "../src/stores/category";
 

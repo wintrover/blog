@@ -34,7 +34,23 @@ _site/
 
 # Coverage
 coverage/
+*.json
+*.txt
+*.ps1
+!package.json
+!package-lock.json
+!tsconfig.json
+!biome.json
+!stryker.config.json
+!knip.json
+!src/lib/categories.json
 
 # Stryker
 .stryker-tmp/
 reports/
+stryker_output.txt
+
+# Scripts
+*.cjs
+!*.config.cjs
+!.dependency-cruiser.cjs

@@ -1,12 +1,7 @@
 import { marked } from "marked";
 import mermaid from "mermaid";
+import { postFiles } from "./glob";
 import { normalizeImageSrc, parseFrontMatter } from "./utils";
-
-const postFiles = import.meta.glob("../posts/**/*.md", {
-	eager: true,
-	query: "?raw",
-	import: "default",
-});
 
 export async function loadPost(slug: string) {
 	const filePath = (postFiles as Record<string, string>)[slug];

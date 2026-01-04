@@ -101,7 +101,11 @@ export function parseFrontMatter(content: string) {
 					}
 
 					if (key === "tags") {
-						data[key] = value.split(/[,\s]+/).filter(Boolean);
+						let tagValue = value;
+						if (tagValue.startsWith("[") && tagValue.endsWith("]")) {
+							tagValue = tagValue.slice(1, -1);
+						}
+						data[key] = tagValue.split(/[,\s]+/).filter(Boolean);
 					} else if (value === "true") {
 						data[key] = true;
 					} else if (value === "false") {
