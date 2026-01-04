@@ -3,14 +3,19 @@ repos:
     rev: v5.0.0
     hooks:
     -   id: trailing-whitespace
+        priority: 0
     -   id: end-of-file-fixer
+        priority: 0
     -   id: check-yaml
+        priority: 10
     -   id: check-added-large-files
+        priority: 10
 
 -   repo: https://github.com/biomejs/pre-commit
     rev: v2.3.10
     hooks:
     -   id: biome-check
+        priority: 10
 
 -   repo: local
     hooks:
@@ -21,6 +26,7 @@ repos:
         pass_filenames: false
         files: ^src/
         types_or: [ts, tsx]
+        priority: 20
     -   id: knip
         name: knip
         entry: powershell -Command "npm run knip"
@@ -28,6 +34,7 @@ repos:
         pass_filenames: false
         files: ^src/
         types_or: [ts, tsx, javascript, jsx, json]
+        priority: 20
     -   id: dependency-cruiser
         name: dependency-cruiser
         entry: powershell -Command "npm run depcruise"
@@ -35,3 +42,4 @@ repos:
         pass_filenames: false
         files: ^src/
         types_or: [ts, tsx, javascript, jsx]
+        priority: 20
