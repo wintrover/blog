@@ -250,8 +250,11 @@ onMount(() => {
     color: white;
     border: none;
     border-radius: 4px;
-    padding: 8px;
-    font-size: 16px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     cursor: pointer;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     transition: background-color 0.2s;
@@ -265,8 +268,8 @@ onMount(() => {
     .sidebar-toggle {
       top: 10px;
       left: 10px;
-      padding: 6px;
-      font-size: 14px;
+      width: 36px;
+      height: 36px;
     }
   }
 
@@ -274,8 +277,8 @@ onMount(() => {
     .sidebar-toggle {
       top: 8px;
       left: 8px;
-      padding: 5px;
-      font-size: 12px;
+      width: 32px;
+      height: 32px;
     }
   }
 </style>
