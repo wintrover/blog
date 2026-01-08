@@ -80,45 +80,62 @@ export function slugify(text: string) {
 }
 
 export function parseFrontMatter(content: string) {
-	const parts = content.split(/^---\s*$/m);
-	if (parts.length >= 3) {
-		const frontMatter = parts[1];
-		const body = parts.slice(2).join("---").trim();
-		const data: Record<string, any> = {};
-		const lines = frontMatter.split("\n");
-		for (const line of lines) {
-			const trimmed = line.trim();
-			if (trimmed && !trimmed.startsWith("#")) {
-				const colonIndex = trimmed.indexOf(":");
-				if (colonIndex > 0) {
-					const key = trimmed.substring(0, colonIndex).trim();
-					let value = trimmed.substring(colonIndex + 1).trim();
-					if (
-						(value.startsWith('"') && value.endsWith('"')) ||
-						(value.startsWith("'") && value.endsWith("'"))
-					) {
-						value = value.slice(1, -1);
-					}
+	const lines = content.split(/\r?\n/);
+	const delimiter = /^---\s*$/;
+	if (lines.length === 0 || !delimiter.test(lines[0] ?? "")) {
+		return { data: {}, content };
+	}
 
-					if (key === "tags") {
-						let tagValue = value;
-						if (tagValue.startsWith("[") && tagValue.endsWith("]")) {
-							tagValue = tagValue.slice(1, -1);
-						}
-						data[key] = tagValue.split(/[,\s]+/).filter(Boolean);
-					} else if (value === "true") {
-						data[key] = true;
-					} else if (value === "false") {
-						data[key] = false;
-					} else if (value !== "" && !Number.isNaN(Number(value))) {
-						data[key] = Number(value);
-					} else {
-						data[key] = value;
+	let endIndex = -1;
+	for (let i = 1; i < lines.length; i++) {
+		if (delimiter.test(lines[i] ?? "")) {
+			endIndex = i;
+			break;
+		}
+	}
+	if (endIndex === -1) {
+		return { data: {}, content };
+	}
+
+	const frontMatterLines = lines.slice(1, endIndex);
+	const body = lines
+		.slice(endIndex + 1)
+		.join("\n")
+		.trim();
+
+	const data: Record<string, any> = {};
+	for (const line of frontMatterLines) {
+		const trimmed = line.trim();
+		if (trimmed && !trimmed.startsWith("#")) {
+			const colonIndex = trimmed.indexOf(":");
+			if (colonIndex > 0) {
+				const key = trimmed.substring(0, colonIndex).trim();
+				let value = trimmed.substring(colonIndex + 1).trim();
+				if (
+					(value.startsWith('"') && value.endsWith('"')) ||
+					(value.startsWith("'") && value.endsWith("'"))
+				) {
+					value = value.slice(1, -1);
+				}
+
+				if (key === "tags") {
+					let tagValue = value;
+					if (tagValue.startsWith("[") && tagValue.endsWith("]")) {
+						tagValue = tagValue.slice(1, -1);
 					}
+					data[key] = tagValue.split(/[,\s]+/).filter(Boolean);
+				} else if (value === "true") {
+					data[key] = true;
+				} else if (value === "false") {
+					data[key] = false;
+				} else if (value !== "" && !Number.isNaN(Number(value))) {
+					data[key] = Number(value);
+				} else {
+					data[key] = value;
 				}
 			}
 		}
-		return { data, content: body };
 	}
-	return { data: {}, content };
+
+	return { data, content: body };
 }
