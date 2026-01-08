@@ -76,6 +76,71 @@ graph TB
 		);
 		console.log("Generated final architecture diagram");
 
+		// --- New diagrams for 2026-01-08-16 ---
+
+		// 1. Celery Sequence Diagram
+		const celerySequence = `
+sequenceDiagram
+    participant U as User
+    participant A as API Server
+    participant W as Celery Worker
+    participant R as Redis/DB
+
+    U->>A: Upload Image
+    A->>R: Save Image Path & Status
+    A->>W: Trigger Check Task
+    W->>R: Query: Is Video ready?
+    Note over W: No, wait or exit
+
+    U->>A: Upload Video
+    A->>R: Save Video Path & Status
+    A->>W: Trigger Check Task
+    W->>R: Query: Is Image ready?
+    Note over W: Yes, Proceed to Similarity Check
+`;
+		await convertMermaidToImage(
+			celerySequence,
+			path.join(outputDir, "2026-01-08-16-celery-sequence.png"),
+		);
+		console.log("Generated 2026-01-08-16-celery-sequence.png");
+
+		// 2. Temporal Workflow Diagram
+		const temporalWorkflow = `
+graph TD
+    Start((Start Workflow)) --> WaitCondition{Wait for Files}
+    WaitCondition -- Image/Video missing --> WaitCondition
+    WaitCondition -- Both files exist --> Activity[Execute Face Similarity Activity]
+    Activity --> Success((Success))
+
+    subgraph "Temporal Worker"
+        WaitCondition
+    end
+
+    subgraph "GPU Worker"
+        Activity
+    end
+`;
+		await convertMermaidToImage(
+			temporalWorkflow,
+			path.join(outputDir, "2026-01-08-16-temporal-workflow.png"),
+		);
+		console.log("Generated 2026-01-08-16-temporal-workflow.png");
+
+		// 3. Activity Idempotency Diagram
+		const activityIdempotency = `
+flowchart LR
+    A[Start Activity] --> B{Check DB for<br/>Idempotency Key}
+    B -- Exists --> C[Return Existing Result]
+    B -- Not Exists --> D[Perform Heavy GPU Task]
+    D --> E[Save Result with<br/>Idempotency Key]
+    E --> F[Return Success]
+`;
+		await convertMermaidToImage(
+			activityIdempotency,
+			path.join(outputDir, "2026-01-08-16-activity-idempotency.png"),
+		);
+		console.log("Generated 2026-01-08-16-activity-idempotency.png");
+
 		console.log("All images generated successfully!");
 	} catch (error) {
 		console.error("Error generating images:", error);
