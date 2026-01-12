@@ -141,6 +141,36 @@ flowchart LR
 		);
 		console.log("Generated 2026-01-08-16-activity-idempotency.png");
 
+		const testingToolbox = `
+flowchart TB
+    A[AI Agents\nShip More Code] --> B{QA Pressure}
+    B -->|More change| C[Higher Regression Risk]
+    B -->|More surface area| D[Input/State Explosion]
+
+    C --> E[TDD\nFast Feedback Loop]
+    D --> F[EP-BVA\nPartitions + Boundaries]
+    D --> G[Pairwise\nCombinatorial Efficiency]
+    C --> H[State Transition\nWorkflow Correctness]
+
+    E --> I[Confidence\nWithout Slowing Down]
+    F --> I
+    G --> I
+    H --> I
+
+    style A fill:#e1f5fe,stroke:#0b7285,stroke-width:2px,color:#0b1f2a
+    style I fill:#e6fcf5,stroke:#087f5b,stroke-width:2px,color:#0b1f2a
+    style B fill:#fff3bf,stroke:#f08c00,stroke-width:2px,color:#0b1f2a
+    style E fill:#f3e5f5,stroke:#6f42c1,stroke-width:1.5px,color:#0b1f2a
+    style F fill:#f3e5f5,stroke:#6f42c1,stroke-width:1.5px,color:#0b1f2a
+    style G fill:#f3e5f5,stroke:#6f42c1,stroke-width:1.5px,color:#0b1f2a
+    style H fill:#f3e5f5,stroke:#6f42c1,stroke-width:1.5px,color:#0b1f2a
+`;
+		await convertMermaidToImage(
+			testingToolbox,
+			path.join(outputDir, "2026-01-12-17-testing-toolbox.png"),
+		);
+		console.log("Generated 2026-01-12-17-testing-toolbox.png");
+
 		console.log("All images generated successfully!");
 	} catch (error) {
 		console.error("Error generating images:", error);
