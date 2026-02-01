@@ -1,5 +1,5 @@
 <script lang="ts">
-import { onMount } from "svelte";
+import { onDestroy, onMount } from "svelte";
 import Router from "svelte-spa-router";
 import BlogList from "./components/BlogList.svelte";
 import Footer from "./components/Footer.svelte";
@@ -7,6 +7,7 @@ import PostDetail from "./components/PostDetail.svelte";
 import Sidebar from "./components/Sidebar.svelte";
 import { posts } from "./stores/posts";
 
+let innerWidth = typeof window !== "undefined" ? window.innerWidth : 1200;
 let sidebarCollapsed = false;
 let sidebarElement: HTMLElement | null = null;
 let mainContentElement: HTMLElement | null = null;
@@ -33,13 +34,14 @@ $: {
 let checkTimeout: any = null;
 
 function checkSidebarCollision() {
-	console.log(
-		"checkSidebarCollision called. sidebarElement:",
-		!!sidebarElement,
-		"mainContentElement:",
-		!!mainContentElement,
-	);
-	if (!sidebarElement || !mainContentElement) {
+	if (innerWidth < 768) {
+		if (!sidebarCollapsed) {
+			sidebarCollapsed = true;
+		}
+		return;
+	}
+
+	if (!sidebarElement || !contentElement) {
 		return;
 	}
 
@@ -52,13 +54,6 @@ function checkSidebarCollision() {
 		? contentElement.getBoundingClientRect()
 		: ({ width: 0, left: 0, right: 0 } as DOMRect);
 
-	if (window.innerWidth < 768) {
-		if (!sidebarCollapsed) {
-			sidebarCollapsed = true;
-		}
-		return;
-	}
-
 	if (sidebarRect.width === 0 || contentRect.width === 0) {
 		if (sidebarCollapsed) {
 			sidebarCollapsed = false;
@@ -66,7 +61,7 @@ function checkSidebarCollision() {
 		return;
 	}
 
-	if (window.innerWidth >= 1200 && !manualToggle) {
+	if (innerWidth >= 1200 && !manualToggle) {
 		if (sidebarCollapsed && contentRect.left > 120) {
 			sidebarCollapsed = false;
 		}
@@ -99,44 +94,80 @@ function toggleSidebar() {
 	sidebarCollapsed = !sidebarCollapsed;
 }
 
-onMount(() => {
-	const handleToggle = () => {
+let resizeObserver: ResizeObserver | null = null;
+let handleToggleSidebar: (() => void) | null = null;
+
+// Reactive initialization for side effects that depend on browser globals
+$: if (
+	typeof window !== "undefined" &&
+	typeof document !== "undefined" &&
+	!handleToggleSidebar
+) {
+	handleToggleSidebar = () => {
 		sidebarCollapsed = !sidebarCollapsed;
 		manualToggle = true;
 	};
-	document.addEventListener("toggle-sidebar", handleToggle);
+	document.addEventListener("toggle-sidebar", handleToggleSidebar);
 
-	// Initial check
-	if (sidebarElement && mainContentElement) {
-		checkSidebarCollision();
-	} else {
-		const retryInterval = setInterval(() => {
-			if (sidebarElement && mainContentElement) {
-				checkSidebarCollision();
-				clearInterval(retryInterval);
-			}
-		}, 50);
+	resizeObserver = new ResizeObserver(() => {
+		debouncedCheckSidebarCollision();
+	});
+
+	// Cleanup on destroy
+	// In Svelte 4, onDestroy is the way to clean up manual listeners
+}
+
+// React to elements becoming available via bind:this
+let observingSidebar = false;
+$: if (resizeObserver && sidebarElement && !observingSidebar) {
+	resizeObserver.observe(sidebarElement);
+	observingSidebar = true;
+}
+
+let observingMain = false;
+$: if (resizeObserver && mainContentElement && !observingMain) {
+	resizeObserver.observe(mainContentElement);
+	observingMain = true;
+}
+
+// Initial check when everything is ready
+$: if (
+	resizeObserver &&
+	(innerWidth < 768 || (sidebarElement && contentElement))
+) {
+	checkSidebarCollision();
+}
+
+// Reactive check on innerWidth change (bound via <svelte:window>)
+$: if (innerWidth) {
+	checkSidebarCollision();
+}
+
+onDestroy(() => {
+	if (typeof window === "undefined" || typeof document === "undefined") return;
+	if (handleToggleSidebar) {
+		document.removeEventListener("toggle-sidebar", handleToggleSidebar);
 	}
-
-	return () => {
-		document.removeEventListener("toggle-sidebar", handleToggle);
-	};
+	resizeObserver?.disconnect();
+	if (checkTimeout) clearTimeout(checkTimeout);
 });
 </script>
 
-<div id="app-container" class:sidebar-collapsed={sidebarCollapsed} data-collapsed={sidebarCollapsed}>
+<svelte:window bind:innerWidth on:resize={handleResize} />
+
+<div id="app-container" class:sidebar-collapsed={sidebarCollapsed}>
   <button class="sidebar-toggle" on:click={toggleSidebar} aria-label="Toggle Sidebar">
     <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M3 5H17M3 10H17M3 15H17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
   </button>
 
-  <aside id="sidebar" class:collapsed={sidebarCollapsed} bind:this={sidebarElement}>
+  <aside id="sidebar" class:collapsed={sidebarCollapsed} bind:this={sidebarElement} data-testid="sidebar">
     <Sidebar />
   </aside>
 
   <main id="main-content" bind:this={mainContentElement}>
-    <div id="content" bind:this={contentElement}>
+    <div id="content" bind:this={contentElement} data-testid="content">
       {#await $posts}
         <p>Loading posts...</p>
       {:then}

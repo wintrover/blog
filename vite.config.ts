@@ -53,7 +53,7 @@ export default defineConfig(({ mode }) => ({
 			},
 		},
 		deps: {
-			inline: ["svelte-spa-router", "svelte"],
+			inline: ["svelte-spa-router"],
 		},
 		ssr: {
 			noExternal: ["svelte-spa-router"],
