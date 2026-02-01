@@ -1,9 +1,16 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/svelte";
-import { get } from "svelte/store";
+import { get, writable } from "svelte/store";
 import { push } from "svelte-spa-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
-import Sidebar from "../src/components/Sidebar.svelte";
 import { selectedCategory } from "../src/stores/category";
+
+// Mock the posts store
+vi.mock("../src/stores/posts", () => ({
+	posts: writable([]),
+}));
+
+// Now import Sidebar and posts (mocked)
+import Sidebar from "../src/components/Sidebar.svelte";
 import { posts } from "../src/stores/posts";
 
 // Mock svelte-spa-router
@@ -13,15 +20,27 @@ vi.mock("svelte-spa-router", () => ({
 
 describe("Sidebar Component", () => {
 	const mockPosts = [
-		{ title: "Post 1", category: "Project", tags: ["Svelte"] },
-		{ title: "Post 2", category: "Company Work", tags: ["Vitest"] },
-		{ title: "Post 3", category: "Project", tags: ["Svelte"] },
+		{ title: "Post 1", category: "Project", tags: ["Svelte"], slug: "post-1" },
+		{
+			title: "Post 2",
+			category: "Company Work",
+			tags: ["Vitest"],
+			slug: "post-2",
+		},
+		{ title: "Post 3", category: "Project", tags: ["Svelte"], slug: "post-3" },
 	];
 
 	beforeEach(() => {
-		(posts as any).set(mockPosts);
-		(selectedCategory as any).set("all");
+		posts.set(mockPosts);
+		selectedCategory.set("all");
 		vi.clearAllMocks();
+
+		// Reset window width
+		Object.defineProperty(window, "innerWidth", {
+			writable: true,
+			configurable: true,
+			value: 1024,
+		});
 	});
 
 	test("카테고리 목록이 올바르게 표시되어야 함", () => {
@@ -63,7 +82,7 @@ describe("Sidebar Component", () => {
 		expect(push).toHaveBeenCalledWith("/");
 	});
 
-	test("모바일 환경에서 카테고리 클릭 시 사이드바 닫기", async () => {
+	test("모바일 환경에서 카테고리 클릭 시 toggle-sidebar 이벤트 발생 확인", async () => {
 		// Mock window.innerWidth
 		Object.defineProperty(window, "innerWidth", {
 			writable: true,
@@ -71,13 +90,16 @@ describe("Sidebar Component", () => {
 			value: 500,
 		});
 
+		const toggleSpy = vi.fn();
+		document.addEventListener("toggle-sidebar", toggleSpy);
+
 		render(Sidebar);
 		const categoryButton = screen.getByText(/All Posts/i);
 
 		await fireEvent.click(categoryButton);
 
-		await waitFor(() => {
-			expect(document.body.classList.contains("sidebar-collapsed")).toBe(true);
-		});
+		expect(toggleSpy).toHaveBeenCalled();
+
+		document.removeEventListener("toggle-sidebar", toggleSpy);
 	});
 });

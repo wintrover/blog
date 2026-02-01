@@ -14,22 +14,28 @@ $: {
 	const categoryCount = {};
 	const tagCount = {};
 
-	$posts.forEach((post) => {
-		if (post.category) {
-			categoryCount[post.category] = (categoryCount[post.category] || 0) + 1;
+	if (Array.isArray($posts)) {
+		$posts.forEach((post) => {
+			if (post.category) {
+				categoryCount[post.category] = (categoryCount[post.category] || 0) + 1;
 
-			// Company Work과 Project 카테고리의 태그별 카운트
-			if (post.category === "Company Work" || post.category === "Project") {
-				post.tags.forEach((tag) => {
-					const tagKey = `${post.category} - ${tag}`;
-					tagCount[tagKey] = (tagCount[tagKey] || 0) + 1;
-				});
+				// Company Work과 Project 카테고리의 태그별 카운트
+				if (post.category === "Company Work" || post.category === "Project") {
+					post.tags.forEach((tag) => {
+						const tagKey = `${post.category} - ${tag}`;
+						tagCount[tagKey] = (tagCount[tagKey] || 0) + 1;
+					});
+				}
 			}
-		}
-	});
+		});
+	}
 
 	categories = [
-		{ name: "All Posts", slug: "all", count: $posts.length },
+		{
+			name: "All Posts",
+			slug: "all",
+			count: Array.isArray($posts) ? $posts.length : 0,
+		},
 		...Object.entries(categoryCount).map(([name, count]) => ({
 			name,
 			slug: slugify(name),
@@ -47,6 +53,11 @@ function selectCategory(categorySlug, categoryName) {
 	} else {
 		selectedCategory.set(categoryName);
 		push(`/category/${categorySlug}`);
+	}
+
+	// 모바일 환경에서 카테고리 클릭 시 사이드바 닫기
+	if (window.innerWidth < 768) {
+		document.dispatchEvent(new CustomEvent("toggle-sidebar"));
 	}
 }
 

@@ -64,8 +64,8 @@ function checkSidebarCollision() {
 			return;
 		}
 
-		if (window.innerWidth >= 1200 && sidebarCollapsed) {
-			if (contentRect.left > 120) {
+		if (window.innerWidth >= 1200 && !manualToggle) {
+			if (sidebarCollapsed && contentRect.left > 120) {
 				sidebarCollapsed = false;
 			}
 			return;
@@ -75,7 +75,7 @@ function checkSidebarCollision() {
 
 		if (isOverlapping && !sidebarCollapsed) {
 			sidebarCollapsed = true;
-		} else if (contentRect.left > 120 && sidebarCollapsed) {
+		} else if (contentRect.left > 120 && sidebarCollapsed && !manualToggle) {
 			sidebarCollapsed = false;
 		}
 	}, 5);

@@ -76,20 +76,22 @@ describe("BlogList Component", () => {
 		expect(push).toHaveBeenCalledWith("/post/post-1");
 	});
 
-	test("포스트 로드 실패 시 에러 메시지 없이 빈 목록을 보여주어야 함 (no-posts)", async () => {
+	test("에러 발생 시 에러 로그를 출력하고 목록을 비워야 함", async () => {
 		const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-		vi.mocked(postLoader.loadAllPosts).mockRejectedValue(
-			new Error("Fetch error"),
-		);
+		const error = new Error("Fetch error");
+		vi.mocked(postLoader.loadAllPosts).mockRejectedValue(error);
+
 		render(BlogList);
 
 		await waitFor(() => {
+			expect(consoleSpy).toHaveBeenCalledWith(
+				expect.stringContaining("❌ [BlogList] 포스트 목록 로딩 중 에러 발생:"),
+				expect.any(Object),
+			);
 			expect(
 				screen.getByText("No posts found in this category."),
 			).toBeInTheDocument();
 		});
-		expect(consoleSpy).toHaveBeenCalled();
-		consoleSpy.mockRestore();
 	});
 
 	test("카테고리 필터링이 올바르게 작동해야 함", async () => {
@@ -111,20 +113,20 @@ describe("BlogList Component", () => {
 		];
 		vi.mocked(postLoader.loadAllPosts).mockResolvedValue(mockPosts as any);
 
-		const { rerender } = render(BlogList, { params: { category: "all" } });
+		const { rerender } = render(BlogList, { params: {} });
 		await waitFor(() => {
 			expect(screen.getByText("Post 1")).toBeInTheDocument();
 			expect(screen.getByText("Post 2")).toBeInTheDocument();
 		});
 
-		await rerender({ params: { category: "Tech" } });
+		await rerender({ params: { category: "tech" } });
 		await waitFor(() => {
 			expect(screen.getByText("Post 1")).toBeInTheDocument();
 			expect(screen.queryByText("Post 2")).not.toBeInTheDocument();
 		});
 
 		// Life category
-		await rerender({ params: { category: "Life" } });
+		await rerender({ params: { category: "life" } });
 		await waitFor(() => {
 			expect(screen.queryByText("Post 1")).not.toBeInTheDocument();
 			expect(screen.getByText("Post 2")).toBeInTheDocument();
@@ -141,32 +143,21 @@ describe("BlogList Component", () => {
 		});
 	});
 
-	test("포스트 로드 실패 시 Error 객체가 아닌 것이 던져져도 처리해야 함", async () => {
+	test("문자열 에러 발생 시에도 올바르게 처리해야 함", async () => {
 		const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 		vi.mocked(postLoader.loadAllPosts).mockRejectedValue("String error");
-		render(BlogList);
-		await waitFor(() => {
-			expect(
-				screen.getByText("No posts found in this category."),
-			).toBeInTheDocument();
-		});
-		expect(consoleSpy).toHaveBeenCalled();
-		consoleSpy.mockRestore();
-	});
 
-	test("포스트 로드 실패 시 Error 객체인 경우 처리", async () => {
-		const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-		vi.mocked(postLoader.loadAllPosts).mockRejectedValue(
-			new Error("Typed Error"),
-		);
 		render(BlogList);
+
 		await waitFor(() => {
+			expect(consoleSpy).toHaveBeenCalledWith(
+				expect.stringContaining("❌ [BlogList] 포스트 목록 로딩 중 에러 발생:"),
+				expect.objectContaining({ message: "String error" }),
+			);
 			expect(
 				screen.getByText("No posts found in this category."),
 			).toBeInTheDocument();
 		});
-		expect(consoleSpy).toHaveBeenCalled();
-		consoleSpy.mockRestore();
 	});
 
 	test("존재하지 않는 카테고리일 경우 빈 목록을 보여주어야 함", async () => {
