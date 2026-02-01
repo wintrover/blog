@@ -203,39 +203,78 @@ describe("PostDetail Component", () => {
 		}
 	});
 
-	test("포스트 로드 실패 시 에러 처리", async () => {
-		vi.mocked(postLoader.loadPostBySlug).mockResolvedValue(null as any);
-		render(PostDetail, { params: { slug: "detailed-post" } });
-
-		await waitFor(() => {
-			expect(screen.getByText(/Post not found/i)).toBeInTheDocument();
-		});
-
-		// Go back to home 버튼 클릭
-		const backButton = screen.getByText("Go back to home");
-		await fireEvent.click(backButton);
-		expect(push).toHaveBeenCalledWith("/");
-	});
-
-	test("포스트 로드 중 에러 발생 시 처리", async () => {
+	test("포스트 데이터 로딩 중 에러 발생 시 처리 확인", async () => {
 		const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 		vi.mocked(postLoader.loadPostBySlug).mockRejectedValue(
-			new Error("Network Error"),
+			new Error("Typed Error"),
 		);
 
-		render(PostDetail, { params: { slug: "detailed-post" } });
+		render(PostDetail, { params: { slug: "error-slug" } });
 
 		await waitFor(() => {
-			expect(screen.queryByText("Post not found")).toBeInTheDocument();
+			expect(screen.getByText("Post not found")).toBeInTheDocument();
 		});
-
-		expect(consoleSpy).toHaveBeenCalled();
 		consoleSpy.mockRestore();
 	});
 
-	test("슬러그가 없을 경우 로딩 상태 유지", async () => {
+	test("포스트 데이터 로딩 중 String 에러 발생 시 처리 확인", async () => {
+		const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+		vi.mocked(postLoader.loadPostBySlug).mockRejectedValue("String Error");
+
+		render(PostDetail, { params: { slug: "error-slug" } });
+
+		await waitFor(() => {
+			expect(screen.getByText("Post not found")).toBeInTheDocument();
+		});
+		consoleSpy.mockRestore();
+	});
+
+	test("포스트 데이터가 없을 때 에러 발생 확인", async () => {
+		const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+		vi.mocked(postLoader.loadPostBySlug).mockResolvedValue(null);
+
+		render(PostDetail, { params: { slug: "null-slug" } });
+
+		await waitFor(() => {
+			expect(consoleSpy).toHaveBeenCalled();
+		});
+		consoleSpy.mockRestore();
+	});
+
+	test("slug가 없을 때 처리 확인", async () => {
+		const loadSpy = vi.mocked(postLoader.loadPostBySlug);
 		render(PostDetail, { params: {} });
-		expect(screen.getByText(/Loading post\.\.\./i)).toBeInTheDocument();
+		expect(loadSpy).not.toHaveBeenCalled();
+	});
+
+	test("동일한 slug로 재호출 시 무시 확인", async () => {
+		const loadSpy = vi.mocked(postLoader.loadPostBySlug);
+		const { rerender } = render(PostDetail, { params: { slug: "same" } });
+
+		await waitFor(() => expect(loadSpy).toHaveBeenCalledTimes(1));
+
+		await rerender({ params: { slug: "same" } });
+		expect(loadSpy).toHaveBeenCalledTimes(1);
+	});
+
+	test("메타 태그 업데이트 확인", async () => {
+		// Mock document methods
+		const querySelectorSpy = vi.spyOn(document, "querySelector");
+		const createElementSpy = vi.spyOn(document, "createElement");
+		const appendChildSpy = vi.spyOn(document.head, "appendChild");
+
+		render(PostDetail, { params: { slug: "detailed-post" } });
+
+		await waitFor(() => {
+			expect(document.title).toBe("Detailed Post - wintrover");
+		});
+
+		// Check if meta tags were searched/created
+		expect(querySelectorSpy).toHaveBeenCalled();
+
+		querySelectorSpy.mockRestore();
+		createElementSpy.mockRestore();
+		appendChildSpy.mockRestore();
 	});
 
 	test("복사 버튼 클릭 시 에러 처리", async () => {

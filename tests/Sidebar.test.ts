@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/svelte";
+import { fireEvent, render, screen, waitFor } from "@testing-library/svelte";
 import { get } from "svelte/store";
 import { push } from "svelte-spa-router";
 import { beforeEach, describe, expect, test, vi } from "vitest";
@@ -61,5 +61,23 @@ describe("Sidebar Component", () => {
 
 		expect(get(selectedCategory)).toBe("all");
 		expect(push).toHaveBeenCalledWith("/");
+	});
+
+	test("모바일 환경에서 카테고리 클릭 시 사이드바 닫기", async () => {
+		// Mock window.innerWidth
+		Object.defineProperty(window, "innerWidth", {
+			writable: true,
+			configurable: true,
+			value: 500,
+		});
+
+		render(Sidebar);
+		const categoryButton = screen.getByText(/All Posts/i);
+
+		await fireEvent.click(categoryButton);
+
+		await waitFor(() => {
+			expect(document.body.classList.contains("sidebar-collapsed")).toBe(true);
+		});
 	});
 });

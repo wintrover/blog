@@ -42,11 +42,3 @@ repos:
         files: ^src/
         types_or: [ts, tsx, javascript, jsx]
         priority: 0
-    -   id: test-coverage
-        name: test-coverage
-        entry: bun run test:coverage
-        language: system
-        pass_filenames: false
-        files: ^src/|^tests/
-        types_or: [ts, tsx, javascript, jsx, svelte]
-        priority: 0

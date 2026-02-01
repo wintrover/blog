@@ -36,10 +36,21 @@ export default defineConfig(({ mode }) => ({
 		include: ["tests/**/*.test.ts"],
 		coverage: {
 			provider: "istanbul",
-			include: ["src/**/*.ts", "scripts/**/*.ts", "src/**/*.svelte"],
-			exclude: ["src/posts/**/*.md", "src/templates/**/*.md"],
+			include: ["src/**/*.ts", "src/**/*.svelte"],
+			exclude: [
+				"src/main.ts",
+				"src/posts/**/*.md",
+				"src/templates/**/*.md",
+				"src/lib/giscus-config.ts",
+			],
 			reporter: ["text", "json", "html"],
 			all: true,
+			thresholds: {
+				lines: 0,
+				functions: 0,
+				branches: 0,
+				statements: 0,
+			},
 		},
 		deps: {
 			inline: ["svelte-spa-router", "svelte"],

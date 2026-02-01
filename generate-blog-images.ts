@@ -171,6 +171,35 @@ flowchart TB
 		);
 		console.log("Generated 2026-01-12-17-testing-toolbox.png");
 
+		// --- New diagrams for 2026-02-01-18 ---
+		const mutationFlow = `
+flowchart LR
+    A[Original Code] --> B{Mutator}
+    B --> C1[Mutant 1]
+    B --> C2[Mutant 2]
+    B --> C3[Mutant N]
+
+    C1 --> D1[Run Tests]
+    C2 --> D2[Run Tests]
+    C3 --> D3[Run Tests]
+
+    D1 --> E1{Test Failed?}
+    D2 --> E2{Test Failed?}
+    D3 --> E3{Test Failed?}
+
+    E1 -- Yes --> F1[Mutant Killed ✅]
+    E1 -- No --> G1[Mutant Survived ❌]
+
+    style F1 fill:#e6fcf5,stroke:#087f5b
+    style G1 fill:#fff5f5,stroke:#c92a2a
+    style A fill:#e1f5fe,stroke:#0b7285
+`;
+		await convertMermaidToImage(
+			mutationFlow,
+			path.join(outputDir, "2026-02-01-18-mutation-flow.png"),
+		);
+		console.log("Generated 2026-02-01-18-mutation-flow.png");
+
 		console.log("All images generated successfully!");
 	} catch (error) {
 		console.error("Error generating images:", error);
