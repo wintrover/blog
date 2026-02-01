@@ -14,7 +14,7 @@ repos:
     rev: v2.3.10
     hooks:
     -   id: biome-check
-        priority: 1
+        priority: 0
 
 -   repo: local
     hooks:
@@ -25,7 +25,7 @@ repos:
         pass_filenames: false
         files: ^src/
         types_or: [ts, tsx]
-        priority: 1
+        priority: 0
     -   id: knip
         name: knip
         entry: bun run knip
@@ -33,7 +33,7 @@ repos:
         pass_filenames: false
         files: ^src/
         types_or: [ts, tsx, javascript, jsx, json]
-        priority: 1
+        priority: 0
     -   id: dependency-cruiser
         name: dependency-cruiser
         entry: bun run depcruise
@@ -41,7 +41,7 @@ repos:
         pass_filenames: false
         files: ^src/
         types_or: [ts, tsx, javascript, jsx]
-        priority: 1
+        priority: 0
     -   id: test-coverage
         name: test-coverage
         entry: bun run test:coverage
@@ -49,4 +49,4 @@ repos:
         pass_filenames: false
         files: ^src/|^tests/
         types_or: [ts, tsx, javascript, jsx, svelte]
-        priority: 1
+        priority: 0
