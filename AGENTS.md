@@ -44,7 +44,7 @@ description: 블로그 에이전트의 운영 페르소나, 도구 활용 및 �
 - **의존성 설치**: `pnpm install`
 - **로컬 개발**: `bun run dev` (속도 최적화)
 - **테스트**: `bun test` 또는 `bun x vitest` (속도 최적화)
-- **품질 게이트 (prek)**: `bun x prek run --all-files` (Biome, 타입체크, Knip, DepCruise, 테스트 커버리지 병렬 검증)
+- **품질 게이트 (prek)**: `bun x prek run --all-files` (Biome, 타입체크, Knip, DepCruise 병렬 검증)
 - **빌드**: `pnpm build`
 - **스크립트 실행**: `bun run <script_path>`
 

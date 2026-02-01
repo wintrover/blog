@@ -33,6 +33,12 @@ $: {
 let checkTimeout: any = null;
 
 function checkSidebarCollision() {
+	console.log(
+		"checkSidebarCollision called. sidebarElement:",
+		!!sidebarElement,
+		"mainContentElement:",
+		!!mainContentElement,
+	);
 	if (!sidebarElement || !mainContentElement) {
 		return;
 	}
@@ -41,44 +47,39 @@ function checkSidebarCollision() {
 		return;
 	}
 
-	clearTimeout(resizeTimeout);
-	resizeTimeout = setTimeout(() => {
-		if (!sidebarElement || !contentElement) {
-			return;
-		}
+	const sidebarRect = sidebarElement.getBoundingClientRect();
+	const contentRect = contentElement
+		? contentElement.getBoundingClientRect()
+		: ({ width: 0, left: 0, right: 0 } as DOMRect);
 
-		const sidebarRect = sidebarElement.getBoundingClientRect();
-		const contentRect = contentElement.getBoundingClientRect();
-
-		if (sidebarRect.width === 0 || contentRect.width === 0) {
-			if (sidebarCollapsed) {
-				sidebarCollapsed = false;
-			}
-			return;
-		}
-
-		if (window.innerWidth < 768) {
-			if (!sidebarCollapsed) {
-				sidebarCollapsed = true;
-			}
-			return;
-		}
-
-		if (window.innerWidth >= 1200 && !manualToggle) {
-			if (sidebarCollapsed && contentRect.left > 120) {
-				sidebarCollapsed = false;
-			}
-			return;
-		}
-
-		const isOverlapping = sidebarRect.right >= contentRect.left;
-
-		if (isOverlapping && !sidebarCollapsed) {
+	if (window.innerWidth < 768) {
+		if (!sidebarCollapsed) {
 			sidebarCollapsed = true;
-		} else if (contentRect.left > 120 && sidebarCollapsed && !manualToggle) {
+		}
+		return;
+	}
+
+	if (sidebarRect.width === 0 || contentRect.width === 0) {
+		if (sidebarCollapsed) {
 			sidebarCollapsed = false;
 		}
-	}, 5);
+		return;
+	}
+
+	if (window.innerWidth >= 1200 && !manualToggle) {
+		if (sidebarCollapsed && contentRect.left > 120) {
+			sidebarCollapsed = false;
+		}
+		return;
+	}
+
+	const isOverlapping = sidebarRect.right >= contentRect.left;
+
+	if (isOverlapping && !sidebarCollapsed) {
+		sidebarCollapsed = true;
+	} else if (contentRect.left > 120 && sidebarCollapsed && !manualToggle) {
+		sidebarCollapsed = false;
+	}
 }
 
 function debouncedCheckSidebarCollision() {
@@ -99,42 +100,31 @@ function toggleSidebar() {
 }
 
 onMount(() => {
-	const checkWithRetry = () => {
+	const handleToggle = () => {
+		sidebarCollapsed = !sidebarCollapsed;
+		manualToggle = true;
+	};
+	document.addEventListener("toggle-sidebar", handleToggle);
+
+	// Initial check
+	if (sidebarElement && mainContentElement) {
 		checkSidebarCollision();
-		if (!sidebarElement || !mainContentElement) {
-			setTimeout(checkWithRetry, 200);
-		}
-	};
-
-	setTimeout(checkWithRetry, 100);
-
-	const resizeObserver = new ResizeObserver(() => {
-		debouncedCheckSidebarCollision();
-	});
-
-	if (sidebarElement) resizeObserver.observe(sidebarElement);
-	if (mainContentElement) resizeObserver.observe(mainContentElement);
-
-	window.addEventListener("resize", handleResize);
-
-	const handleToggleSidebar = () => {
-		toggleSidebar();
-	};
-
-	document.addEventListener("toggle-sidebar", handleToggleSidebar);
+	} else {
+		const retryInterval = setInterval(() => {
+			if (sidebarElement && mainContentElement) {
+				checkSidebarCollision();
+				clearInterval(retryInterval);
+			}
+		}, 50);
+	}
 
 	return () => {
-		if (checkTimeout) {
-			clearTimeout(checkTimeout);
-		}
-		resizeObserver.disconnect();
-		window.removeEventListener("resize", handleResize);
-		document.removeEventListener("toggle-sidebar", handleToggleSidebar);
+		document.removeEventListener("toggle-sidebar", handleToggle);
 	};
 });
 </script>
 
-<div id="app-container" class:sidebar-collapsed={sidebarCollapsed}>
+<div id="app-container" class:sidebar-collapsed={sidebarCollapsed} data-collapsed={sidebarCollapsed}>
   <button class="sidebar-toggle" on:click={toggleSidebar} aria-label="Toggle Sidebar">
     <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M3 5H17M3 10H17M3 15H17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>

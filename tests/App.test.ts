@@ -110,14 +110,20 @@ test("모바일 환경에서 사이드바 초기 상태 확인", async () => {
 		return { width: 500 } as DOMRect;
 	});
 
-	render(App);
+	const { container } = render(App);
 
 	// Wait for onMount and its timeouts
 	await new Promise((r) => setTimeout(r, 600));
 
 	await waitFor(
 		() => {
-			expect(document.body.classList.contains("sidebar-collapsed")).toBe(true);
+			const appContainer = container.querySelector("#app-container");
+			console.log("AppContainer classes:", appContainer?.className);
+			console.log(
+				"AppContainer data-collapsed:",
+				appContainer?.getAttribute("data-collapsed"),
+			);
+			expect(appContainer?.classList.contains("sidebar-collapsed")).toBe(true);
 		},
 		{ timeout: 3000 },
 	);
@@ -140,64 +146,50 @@ test("넓은 화면에서 사이드바가 겹칠 때 자동으로 접히는지 �
 		return { width: 1000 } as DOMRect;
 	});
 
-	render(App);
+	const { container } = render(App);
 	// Trigger resize to force collision check
 	window.dispatchEvent(new Event("resize"));
 
 	await waitFor(
 		() => {
-			expect(document.body.classList.contains("sidebar-collapsed")).toBe(true);
+			const appContainer = container.querySelector("#app-container");
+			expect(appContainer?.classList.contains("sidebar-collapsed")).toBe(true);
 		},
 		{ timeout: 3000 },
 	);
 });
 
 test("수동 토글 버튼 작동 확인", async () => {
-	render(App);
+	const { container } = render(App);
 	const toggleButton = screen.getByLabelText("Toggle Sidebar");
+	const appContainer = container.querySelector("#app-container");
 
 	// Initial state (not collapsed)
-	expect(document.body.classList.contains("sidebar-collapsed")).toBe(false);
+	expect(appContainer?.classList.contains("sidebar-collapsed")).toBe(false);
 
 	await fireEvent.click(toggleButton);
-	expect(document.body.classList.contains("sidebar-collapsed")).toBe(true);
+	expect(appContainer?.classList.contains("sidebar-collapsed")).toBe(true);
 
 	await fireEvent.click(toggleButton);
-	expect(document.body.classList.contains("sidebar-collapsed")).toBe(false);
+	expect(appContainer?.classList.contains("sidebar-collapsed")).toBe(false);
 });
 
 test("toggle-sidebar 커스텀 이벤트 작동 확인", async () => {
-	render(App);
+	const { container } = render(App);
 	await new Promise((r) => setTimeout(r, 200));
+	const appContainer = container.querySelector("#app-container");
 
 	// Initial state
-	expect(document.body.classList.contains("sidebar-collapsed")).toBe(false);
+	expect(appContainer?.classList.contains("sidebar-collapsed")).toBe(false);
 
 	document.dispatchEvent(new CustomEvent("toggle-sidebar"));
 
 	await waitFor(
 		() => {
-			expect(document.body.classList.contains("sidebar-collapsed")).toBe(true);
+			expect(appContainer?.classList.contains("sidebar-collapsed")).toBe(true);
 		},
 		{ timeout: 3000 },
 	);
-});
-
-test("toggle-sidebar 커스텀 이벤트 작동 확인", async () => {
-	vi.useFakeTimers();
-	render(App);
-	vi.advanceTimersByTime(500); // Wait for onMount to finish registering listener
-
-	// Initial state
-	expect(document.body.classList.contains("sidebar-collapsed")).toBe(false);
-
-	document.dispatchEvent(new CustomEvent("toggle-sidebar"));
-	vi.advanceTimersByTime(100);
-
-	await waitFor(() => {
-		expect(document.body.classList.contains("sidebar-collapsed")).toBe(true);
-	});
-	vi.useRealTimers();
 });
 
 test("포스트 로딩 에러 시 에러 메시지 표시 확인", async () => {
