@@ -10,6 +10,7 @@
 		"preview:github": "vite preview --base=/blog/",
 		"deploy:github": "npm run build:github && tsx deploy-github.ts",
 		"test": "vitest run",
+		"test:coverage": "vitest run --coverage",
 		"post:devto": "tsx scripts/post-to-dev.ts",
 		"mcp:code-index": "code-index-mcp",
 		"typecheck": "tsc --noEmit",

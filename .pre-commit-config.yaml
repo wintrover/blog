@@ -1,15 +1,14 @@
 repos:
--   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
+-   repo: builtin
     hooks:
     -   id: trailing-whitespace
         priority: 0
     -   id: end-of-file-fixer
         priority: 0
     -   id: check-yaml
-        priority: 1
+        priority: 0
     -   id: check-added-large-files
-        priority: 1
+        priority: 0
 
 -   repo: https://github.com/biomejs/pre-commit
     rev: v2.3.10
@@ -21,25 +20,33 @@ repos:
     hooks:
     -   id: typescript-typecheck
         name: typescript-typecheck
-        entry: powershell -Command "npm run typecheck"
+        entry: bun run typecheck
         language: system
         pass_filenames: false
         files: ^src/
         types_or: [ts, tsx]
-        priority: 2
+        priority: 1
     -   id: knip
         name: knip
-        entry: powershell -Command "npm run knip"
+        entry: bun run knip
         language: system
         pass_filenames: false
         files: ^src/
         types_or: [ts, tsx, javascript, jsx, json]
-        priority: 2
+        priority: 1
     -   id: dependency-cruiser
         name: dependency-cruiser
-        entry: powershell -Command "npm run depcruise"
+        entry: bun run depcruise
         language: system
         pass_filenames: false
         files: ^src/
         types_or: [ts, tsx, javascript, jsx]
-        priority: 2
+        priority: 1
+    -   id: test-coverage
+        name: test-coverage
+        entry: bun run test:coverage
+        language: system
+        pass_filenames: false
+        files: ^src/|^tests/
+        types_or: [ts, tsx, javascript, jsx, svelte]
+        priority: 1
