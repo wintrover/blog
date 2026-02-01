@@ -26,6 +26,14 @@ vi.mock("mermaid", () => ({
 	},
 }));
 
+// Mock ResizeObserver
+class MockResizeObserver {
+	observe = vi.fn();
+	unobserve = vi.fn();
+	disconnect = vi.fn();
+}
+window.ResizeObserver = MockResizeObserver as any;
+
 // Import App after mocks
 import App from "../src/App.svelte";
 
@@ -38,7 +46,8 @@ beforeEach(() => {
 	window.HTMLElement.prototype.getBoundingClientRect = vi.fn(function (
 		this: HTMLElement,
 	) {
-		if (this.id === "sidebar") {
+		const id = this.id || this.getAttribute("id");
+		if (id === "sidebar") {
 			return {
 				width: 240,
 				height: 1000,
@@ -48,24 +57,31 @@ beforeEach(() => {
 				bottom: 1000,
 			} as DOMRect;
 		}
-		if (this.id === "content") {
+		if (id === "content") {
 			return {
 				width: 800,
 				height: 1000,
 				top: 0,
-				left: 260, // Not overlapping
+				left: 260, // Not overlapping by default
 				right: 1060,
 				bottom: 1000,
 			} as DOMRect;
 		}
 		return {
-			width: 1000,
-			height: 1000,
+			width: 1024,
+			height: 768,
 			top: 0,
 			left: 0,
-			right: 1000,
-			bottom: 1000,
+			right: 1024,
+			bottom: 768,
 		} as DOMRect;
+	});
+
+	// Default window size
+	Object.defineProperty(window, "innerWidth", {
+		writable: true,
+		configurable: true,
+		value: 1024,
 	});
 });
 
@@ -84,21 +100,20 @@ test("모바일 환경에서 사이드바 초기 상태 확인", async () => {
 		value: 500,
 	});
 
-	// For mobile, make content overlap or just rely on innerWidth < 768 check
 	window.HTMLElement.prototype.getBoundingClientRect = vi.fn(function (
 		this: HTMLElement,
 	) {
-		if (this.id === "sidebar")
-			return { width: 240, right: 240, left: 0 } as DOMRect;
-		if (this.id === "content")
-			return { width: 300, left: 100, right: 400 } as DOMRect; // Overlapping
+		const id = this.id || this.getAttribute("id");
+		if (id === "sidebar") return { width: 240, right: 240, left: 0 } as DOMRect;
+		if (id === "content")
+			return { width: 300, left: 100, right: 400 } as DOMRect;
 		return { width: 500 } as DOMRect;
 	});
 
 	render(App);
 
-	// Need to trigger a resize or wait for onMount's checkWithRetry
-	window.dispatchEvent(new Event("resize"));
+	// Wait for onMount and its timeouts
+	await new Promise((r) => setTimeout(r, 600));
 
 	await waitFor(
 		() => {
@@ -115,18 +130,18 @@ test("넓은 화면에서 사이드바가 겹칠 때 자동으로 접히는지 �
 		value: 1000,
 	});
 
-	// Mock overlapping
 	window.HTMLElement.prototype.getBoundingClientRect = vi.fn(function (
 		this: HTMLElement,
 	) {
-		if (this.id === "sidebar")
-			return { width: 240, right: 240, left: 0 } as DOMRect;
-		if (this.id === "content")
-			return { width: 800, left: 200, right: 1000 } as DOMRect; // Overlapping (240 > 200)
+		const id = this.id || this.getAttribute("id");
+		if (id === "sidebar") return { width: 240, right: 240, left: 0 } as DOMRect;
+		if (id === "content")
+			return { width: 800, left: 200, right: 1000 } as DOMRect; // Overlapping
 		return { width: 1000 } as DOMRect;
 	});
 
 	render(App);
+	// Trigger resize to force collision check
 	window.dispatchEvent(new Event("resize"));
 
 	await waitFor(
@@ -153,15 +168,36 @@ test("수동 토글 버튼 작동 확인", async () => {
 
 test("toggle-sidebar 커스텀 이벤트 작동 확인", async () => {
 	render(App);
+	await new Promise((r) => setTimeout(r, 200));
 
 	// Initial state
 	expect(document.body.classList.contains("sidebar-collapsed")).toBe(false);
 
 	document.dispatchEvent(new CustomEvent("toggle-sidebar"));
 
+	await waitFor(
+		() => {
+			expect(document.body.classList.contains("sidebar-collapsed")).toBe(true);
+		},
+		{ timeout: 3000 },
+	);
+});
+
+test("toggle-sidebar 커스텀 이벤트 작동 확인", async () => {
+	vi.useFakeTimers();
+	render(App);
+	vi.advanceTimersByTime(500); // Wait for onMount to finish registering listener
+
+	// Initial state
+	expect(document.body.classList.contains("sidebar-collapsed")).toBe(false);
+
+	document.dispatchEvent(new CustomEvent("toggle-sidebar"));
+	vi.advanceTimersByTime(100);
+
 	await waitFor(() => {
 		expect(document.body.classList.contains("sidebar-collapsed")).toBe(true);
 	});
+	vi.useRealTimers();
 });
 
 test("포스트 로딩 에러 시 에러 메시지 표시 확인", async () => {
