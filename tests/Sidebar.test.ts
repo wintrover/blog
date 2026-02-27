@@ -1,0 +1,105 @@
+import { fireEvent, render, screen, waitFor } from "@testing-library/svelte";
+import { get, writable } from "svelte/store";
+import { push } from "svelte-spa-router";
+import { beforeEach, describe, expect, test, vi } from "vitest";
+import { selectedCategory } from "../src/stores/category";
+
+// Mock the posts store
+vi.mock("../src/stores/posts", () => ({
+	posts: writable([]),
+}));
+
+// Now import Sidebar and posts (mocked)
+import Sidebar from "../src/components/Sidebar.svelte";
+import { posts } from "../src/stores/posts";
+
+// Mock svelte-spa-router
+vi.mock("svelte-spa-router", () => ({
+	push: vi.fn(),
+}));
+
+describe("Sidebar Component", () => {
+	const mockPosts = [
+		{ title: "Post 1", category: "Project", tags: ["Svelte"], slug: "post-1" },
+		{
+			title: "Post 2",
+			category: "Company Work",
+			tags: ["Vitest"],
+			slug: "post-2",
+		},
+		{ title: "Post 3", category: "Project", tags: ["Svelte"], slug: "post-3" },
+	];
+
+	beforeEach(() => {
+		posts.set(mockPosts);
+		selectedCategory.set("all");
+		vi.clearAllMocks();
+
+		// Reset window width
+		Object.defineProperty(window, "innerWidth", {
+			writable: true,
+			configurable: true,
+			value: 1024,
+		});
+	});
+
+	test("카테고리 목록이 올바르게 표시되어야 함", () => {
+		render(Sidebar);
+
+		expect(screen.getByText(/All Posts \(3\)/)).toBeInTheDocument();
+		expect(screen.getByText(/Project \(2\)/)).toBeInTheDocument();
+		expect(screen.getByText(/Company Work \(1\)/)).toBeInTheDocument();
+	});
+
+	test("카테고리 클릭 시 selectedCategory가 업데이트되고 경로가 이동해야 함", async () => {
+		render(Sidebar);
+
+		const projectButton = screen.getByText(/Project \(2\)/);
+		await fireEvent.click(projectButton);
+
+		expect(get(selectedCategory)).toBe("Project");
+		expect(push).toHaveBeenCalledWith("/category/project");
+	});
+
+	test("All Posts 클릭 시 'all'로 설정되고 홈으로 이동해야 함", async () => {
+		(selectedCategory as any).set("Project");
+		render(Sidebar);
+
+		const allPostsButton = screen.getByText(/All Posts \(3\)/);
+		await fireEvent.click(allPostsButton);
+
+		expect(get(selectedCategory)).toBe("all");
+		expect(push).toHaveBeenCalledWith("/");
+	});
+
+	test("아바타 클릭 시 홈으로 이동하고 'all'로 설정되어야 함", async () => {
+		render(Sidebar);
+
+		const avatar = screen.getByAltText(/wintrover/i); // 대소문자 무시
+		await fireEvent.click(avatar);
+
+		expect(get(selectedCategory)).toBe("all");
+		expect(push).toHaveBeenCalledWith("/");
+	});
+
+	test("모바일 환경에서 카테고리 클릭 시 toggle-sidebar 이벤트 발생 확인", async () => {
+		// Mock window.innerWidth
+		Object.defineProperty(window, "innerWidth", {
+			writable: true,
+			configurable: true,
+			value: 500,
+		});
+
+		const toggleSpy = vi.fn();
+		document.addEventListener("toggle-sidebar", toggleSpy);
+
+		render(Sidebar);
+		const categoryButton = screen.getByText(/All Posts/i);
+
+		await fireEvent.click(categoryButton);
+
+		expect(toggleSpy).toHaveBeenCalled();
+
+		document.removeEventListener("toggle-sidebar", toggleSpy);
+	});
+});
