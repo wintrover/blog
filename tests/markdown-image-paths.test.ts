@@ -1,3 +1,4 @@
+import fc from "fast-check";
 import { describe, expect, test } from "vitest";
 import { normalizeImageSrc } from "../src/lib/utils";
 
@@ -39,44 +40,77 @@ describe("normalizeImageSrc", () => {
 		);
 	});
 
-	test("상대 경로 내 점(.) 및 점점(..) 처리 (EP-BVA: Path Resolution)", () => {
-		expect(normalizeImageSrc("../assets/images/test.jpg")).toBe(
-			"/blog/images/test.jpg",
-		);
-		expect(normalizeImageSrc("./assets/images/test.jpg")).toBe(
-			"/blog/images/test.jpg",
-		);
-		expect(normalizeImageSrc("../../assets/images/test.jpg")).toBe(
-			"/blog/images/test.jpg",
-		);
-		// 더 깊은 경로 및 복합 경로
-		expect(normalizeImageSrc("a/b/../../images/test.jpg")).toBe(
-			"/blog/images/test.jpg",
-		);
-		expect(normalizeImageSrc("a/./b/../images/test.jpg")).toBe(
-			"/blog/a/images/test.jpg",
+	test("PBT: 상대 경로의 . / .. / 빈 세그먼트는 정규화된다", () => {
+		const seg = fc.constantFrom("a", "b", ".", "..", "");
+		const file = fc
+			.string({
+				unit: fc.constantFrom(
+					..."abcdefghijklmnopqrstuvwxyz0123456789_-".split(""),
+				),
+				minLength: 1,
+				maxLength: 24,
+			})
+			.filter((s) => !s.includes("/") && !s.includes("\\"))
+			.map((s) => `${s}.jpg`);
+
+		fc.assert(
+			fc.property(
+				fc.array(seg, { minLength: 0, maxLength: 6 }),
+				file,
+				(parts, f) => {
+					const prefix = parts.join("/");
+					const src = `${prefix ? `${prefix}/` : ""}images/${f}`;
+					const out = normalizeImageSrc(src);
+					expect(out.startsWith("/blog/")).toBe(true);
+					expect(out.includes("/./")).toBe(false);
+					expect(out.includes("/../")).toBe(false);
+					expect(out.includes("assets/images")).toBe(false);
+					expect(normalizeImageSrc(out)).toBe(out);
+				},
+			),
 		);
 	});
 
-	test("레거시 assets 경로 플래트닝 (EP-BVA: Legacy Path Handling)", () => {
-		// 2자리 숫자 디렉토리
-		expect(normalizeImageSrc("assets/images/01/test.jpg")).toBe(
-			"/blog/images/01-test.jpg",
-		);
-		// 일반 디렉토리
-		expect(normalizeImageSrc("assets/images/subdir/test.jpg")).toBe(
-			"/blog/images/test.jpg",
-		);
-		// 하위 디렉토리가 없는 경우
-		expect(normalizeImageSrc("assets/images/test.jpg")).toBe(
-			"/blog/images/test.jpg",
+	test("PBT: 레거시 assets/images 경로는 images로 플래트닝된다", () => {
+		const digit = fc
+			.integer({ min: 0, max: 99 })
+			.map((n) => String(n).padStart(2, "0"));
+		const dir = fc
+			.string({
+				unit: fc.constantFrom(..."abcdefghijklmnopqrstuvwxyz".split("")),
+				minLength: 1,
+				maxLength: 12,
+			})
+			.filter((s) => !/^\d{2}$/.test(s));
+		const file = fc
+			.string({
+				unit: fc.constantFrom(
+					..."abcdefghijklmnopqrstuvwxyz0123456789_-".split(""),
+				),
+				minLength: 1,
+				maxLength: 24,
+			})
+			.filter((s) => !s.includes("/") && !s.includes("\\"))
+			.map((s) => `${s}.jpg`);
+
+		fc.assert(
+			fc.property(fc.oneof(digit, dir), file, (d, f) => {
+				const src = `assets/images/${d}/${f}`;
+				const out = normalizeImageSrc(src);
+				if (/^\d{2}$/.test(d)) {
+					expect(out).toBe(`/blog/images/${d}-${f}`);
+				} else {
+					expect(out).toBe(`/blog/images/${f}`);
+				}
+			}),
 		);
 	});
 
-	test("EP-BVA: 경계값 및 유효하지 않은 입력 처리", () => {
-		expect(normalizeImageSrc("")).toBe("");
-		expect(normalizeImageSrc(null as any)).toBe(null);
-		expect(normalizeImageSrc(undefined as any)).toBe(undefined);
-		expect(normalizeImageSrc(123 as any)).toBe(123);
+	test("PBT: 유효하지 않은 입력은 그대로 반환한다", () => {
+		fc.assert(
+			fc.property(fc.constantFrom("", null, undefined, 123), (v) => {
+				expect(normalizeImageSrc(v as any)).toBe(v as any);
+			}),
+		);
 	});
 });

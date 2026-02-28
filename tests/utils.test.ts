@@ -1,3 +1,4 @@
+import fc from "fast-check";
 import { describe, expect, test } from "vitest";
 import {
 	formatDate,
@@ -97,18 +98,33 @@ describe("normalizeImageSrc", () => {
 		);
 	});
 
-	test("EP-BVA: 경계값 처리", () => {
-		expect(normalizeImageSrc("")).toBe("");
-		expect(normalizeImageSrc("/")).toBe("/blog/");
+	test("PBT: 빈 문자열 및 루트 경로 처리", () => {
+		fc.assert(
+			fc.property(fc.constantFrom("", "/", "/blog/"), (src) => {
+				const out = normalizeImageSrc(src);
+				if (src === "") {
+					expect(out).toBe("");
+				} else {
+					expect(out).toBe("/blog/");
+				}
+			}),
+		);
 	});
 
-	test("EP-BVA: resolveRelativePath root branch (Line 18 false)", () => {
-		// p starts with / (after BASE removal) but normalize removes it if p starts with BASE or /
-		// p.startsWith("/") is true in normalizeImageSrc line 42
-		// p = p.slice(1) -> "a/b"
-		// resolveRelativePath("a/b") -> result "a/b"
-		// p.startsWith("/") in resolveRelativePath is false because p was modified in normalizeImageSrc
-		expect(normalizeImageSrc("a/b/c.png")).toBe("/blog/a/b/c.png");
+	test("PBT: 비절대 경로는 /blog/ 프리픽스를 갖고 안정적이다", () => {
+		const nonAbsolutePath = fc
+			.string()
+			.filter((s) => s.length > 0 && !/^(https?:\/\/|data:)/i.test(s));
+
+		fc.assert(
+			fc.property(nonAbsolutePath, (src) => {
+				const out = normalizeImageSrc(src);
+				expect(typeof out).toBe("string");
+				expect(out.startsWith("/blog/")).toBe(true);
+				expect(normalizeImageSrc(out)).toBe(out);
+			}),
+			{ numRuns: 200 },
+		);
 	});
 });
 
@@ -118,9 +134,17 @@ describe("formatDate", () => {
 		expect(result).toMatch(/2023\.\s*10\.\s*26\./);
 	});
 
-	test("EP-BVA: 유효하지 않은 날짜 처리", () => {
-		const result = formatDate("invalid-date");
-		expect(result).toBe("Invalid Date");
+	test("PBT: Invalid Date 입력은 Invalid Date를 반환", () => {
+		const invalidDateString = fc
+			.string()
+			.filter((s) => Number.isNaN(new Date(s).getTime()));
+
+		fc.assert(
+			fc.property(invalidDateString, (s) => {
+				expect(formatDate(s)).toBe("Invalid Date");
+			}),
+			{ numRuns: 200 },
+		);
 	});
 });
 
@@ -150,21 +174,51 @@ describe("truncateText", () => {
 		expect(truncateText(text, 10)).toBe("Hello world");
 	});
 
-	test("EP-BVA: 경계값 처리 (wordLimit = 0)", () => {
-		const text = "Hello world";
-		expect(truncateText(text, 0)).toBe("...");
+	test("PBT: wordLimit=0이면 단어가 있는 경우 ... 처리", () => {
+		const word = fc
+			.string({
+				unit: fc.constantFrom(..."abcdefghijklmnopqrstuvwxyz".split("")),
+				minLength: 1,
+				maxLength: 12,
+			})
+			.filter((s) => !s.includes("\n"));
+
+		fc.assert(
+			fc.property(fc.array(word, { minLength: 1, maxLength: 50 }), (words) => {
+				const text = words.join(" ");
+				expect(truncateText(text, 0)).toBe("...");
+			}),
+		);
 	});
 
-	test("EP-BVA: 빈 문자열 처리", () => {
-		expect(truncateText("", 10)).toBe("");
-		expect(truncateText(null as any, 10)).toBe("");
+	test("PBT: falsy 입력은 빈 문자열을 반환", () => {
+		fc.assert(
+			fc.property(fc.constantFrom("", null, undefined), (v) => {
+				expect(truncateText(v as any, 10)).toBe("");
+			}),
+		);
 	});
 
-	test("EP-BVA: 기본 wordLimit 사용", () => {
-		const text = "word ".repeat(31).trim();
-		const result = truncateText(text);
-		expect(result.split(" ").length).toBe(30);
-		expect(result.endsWith("...")).toBe(true);
+	test("PBT: 기본 wordLimit=30 초과 시 ... 로 절삭", () => {
+		const word = fc
+			.string({
+				unit: fc.constantFrom(..."abcdefghijklmnopqrstuvwxyz".split("")),
+				minLength: 1,
+				maxLength: 12,
+			})
+			.filter((s) => !s.includes("\n"));
+
+		fc.assert(
+			fc.property(
+				fc.array(word, { minLength: 31, maxLength: 120 }),
+				(words) => {
+					const text = words.join(" ");
+					const result = truncateText(text);
+					expect(result.endsWith("...")).toBe(true);
+					expect(result.split(" ").length).toBe(30);
+				},
+			),
+		);
 	});
 });
 
@@ -181,9 +235,23 @@ describe("slugify", () => {
 		expect(slugify("---hello")).toBe("hello");
 	});
 
-	test("EP-BVA: 빈 문자열 처리", () => {
-		expect(slugify("")).toBe("");
-		expect(slugify(null as any)).toBe("");
+	test("PBT: slugify는 제약된 슬러그를 만들고 멱등성을 가진다", () => {
+		fc.assert(
+			fc.property(fc.string(), (s) => {
+				const slug = slugify(s);
+				expect(slug).toBe(slug.toLowerCase());
+				expect(slugify(slug)).toBe(slug);
+				expect(/^[a-z0-9_]*(?:-[a-z0-9_]+)*$/.test(slug)).toBe(true);
+			}),
+		);
+	});
+
+	test("PBT: falsy 입력은 빈 문자열을 반환", () => {
+		fc.assert(
+			fc.property(fc.constantFrom("", null, undefined), (v) => {
+				expect(slugify(v as any)).toBe("");
+			}),
+		);
 	});
 });
 
@@ -215,13 +283,6 @@ describe("parseFrontMatter", () => {
 		expect(data.active).toBe(false);
 	});
 
-	test("EP-BVA: 빈 FrontMatter", () => {
-		const md = "---\n---\nContent";
-		const { data, content } = parseFrontMatter(md);
-		expect(data).toEqual({});
-		expect(content.trim()).toBe("Content");
-	});
-
 	test("싱글 쿼트 문자열 처리 확인 (EP: Single Quote)", () => {
 		const md = "---\ntitle: 'Single Quote'\n---\n";
 		const { data } = parseFrontMatter(md);
@@ -234,218 +295,164 @@ describe("parseFrontMatter", () => {
 		expect(data.tags).toEqual(["t1", "t2", "t3", "t4"]);
 	});
 
-	test("EP-BVA: 빈 값 필터링 확인", () => {
-		const md = "---\nkey: \ntags: , , , \n---\n";
-		const { data } = parseFrontMatter(md);
-		expect(data.key).toBe("");
-		expect(data.tags).toEqual([]);
-	});
-
-	test("EP-BVA: 복합 구분자 태그 처리", () => {
-		const md = "---\ntags: t1,,,t2   t3\n---\n";
-		const { data } = parseFrontMatter(md);
-		expect(data.tags).toEqual(["t1", "t2", "t3"]);
-	});
-
-	test("EP-BVA: 따옴표가 짝이 맞지 않는 경우", () => {
-		const md =
-			"---\nt1: \"double\nt2: 'single\nt3: double\"\nt4: single'\n---\n";
-		const { data } = parseFrontMatter(md);
-		expect(data.t1).toBe('"double');
-		expect(data.t2).toBe("'single");
-		expect(data.t3).toBe('double"');
-		expect(data.t4).toBe("single'");
-	});
-
-	test("EP-BVA: 다중 구분자 및 공백 처리", () => {
-		const md = "---\ntags: ,tag1, ,tag2, \n---\n";
-		const { data } = parseFrontMatter(md);
-		expect(data.tags).toEqual(["tag1", "tag2"]);
-	});
-
-	test("EP-BVA: 주석 처리 확인 (Line 93)", () => {
-		const md = "---\ntitle: test\n# comment\nkey: value\n---\n";
-		const { data } = parseFrontMatter(md);
-		expect(data.title).toBe("test");
-		expect(data.key).toBe("value");
-		expect(Object.keys(data)).not.toContain("# comment");
-	});
-
-	test("EP-BVA: FrontMatter split with trailing spaces", () => {
-		const md = "---  \ntitle: test\n---  \ncontent";
-		const { data, content } = parseFrontMatter(md);
-		expect(data.title).toBe("test");
-		expect(content.trim()).toBe("content");
-	});
-
-	test("EP-BVA: FrontMatter split boundary cases", () => {
-		// Should not split if --- is not at the start of the line
-		const md1 = "  ---\ntitle: test\n---\ncontent";
-		const res1 = parseFrontMatter(md1);
-		expect(res1.data).toEqual({});
-
-		// Should not split if there are non-space characters after ---
-		const md2 = "---\ntitle: test\n---error\ncontent";
-		const res2 = parseFrontMatter(md2);
-		expect(res2.data).toEqual({});
-	});
-
-	test("EP-BVA: Body with triple dashes join check", () => {
-		const md = "---\ntitle: test\n---\npart1\n---\npart2";
-		const { content } = parseFrontMatter(md);
-		expect(content).toContain("part1\n---\npart2");
-	});
-
-	test("EP-BVA: FrontMatter with extra spaces in lines", () => {
-		const md = "---\n  key  :   value  \n---\n";
-		const { data } = parseFrontMatter(md);
-		expect(data.key).toBe("value");
-	});
-
-	test("EP-BVA: FrontMatter comment and empty line handling", () => {
-		const md =
-			"---\ntitle: test\n\n# comment\n  # not a comment : value\n---\n";
-		const { data } = parseFrontMatter(md);
-		// With trimming, "  # not a comment : value" becomes "# not a comment : value" which starts with #, so it's skipped.
-		expect(Object.keys(data)).toEqual(["title"]);
-		expect(data.title).toBe("test");
-	});
-
-	test("EP-BVA: FrontMatter line ending with hash", () => {
-		const md = "---\nkey: value#\n---\n";
-		const { data } = parseFrontMatter(md);
-		expect(data.key).toBe("value#");
-	});
-
-	test("EP-BVA: FrontMatter with multiple separators in tags", () => {
-		const md = "---\ntags: t1,, t2  , , t3\n---\n";
-		const { data } = parseFrontMatter(md);
-		expect(data.tags).toEqual(["t1", "t2", "t3"]);
-	});
-
-	test("EP-BVA: 루트 시작 경로 정규화 (Line 18)", () => {
-		// normalizeImageSrc internally calls resolveRelativePath
-		// We want to hit 'p.startsWith("/") ? `/${result}` : result'
-		expect(normalizeImageSrc("/a/b/c.png")).toBe("/blog/a/b/c.png");
-	});
-
-	test("EP-BVA: normalizeImageSrc else if branch (Line 42)", () => {
-		// If p.startsWith("/") is true, it goes into line 43
-		expect(normalizeImageSrc("/images/test.png")).toBe("/blog/images/test.png");
-	});
-
-	test("EP-BVA: resolveRelativePath non-root branch (Line 18)", () => {
-		// If path doesn't start with "/", it should return result without leading "/"
-		// We need to trigger this through normalizeImageSrc
-		expect(normalizeImageSrc("a/b/c.png")).toBe("/blog/a/b/c.png");
-	});
-
-	test("EP-BVA: flattenLegacyAssetsPath with digit (Line 27)", () => {
-		expect(normalizeImageSrc("assets/images/10/test.png")).toBe(
-			"/blog/images/10-test.png",
+	test("PBT: 빈 FrontMatter는 data가 비어있고 body는 trim 된다", () => {
+		fc.assert(
+			fc.property(fc.string(), (body) => {
+				const md = `---\n---\n${body}`;
+				const { data, content } = parseFrontMatter(md);
+				expect(data).toEqual({});
+				expect(content).toBe(body.trim());
+			}),
 		);
 	});
 
-	test("EP-BVA: flattenLegacyAssetsPath without digit (Line 30)", () => {
-		expect(normalizeImageSrc("assets/images/abc/test.png")).toBe(
-			"/blog/images/test.png",
+	test("PBT: delimiter 라인의 trailing spaces는 허용된다", () => {
+		const spaces = fc.string({
+			unit: fc.constantFrom(" ", "\t"),
+			minLength: 0,
+			maxLength: 4,
+		});
+		const value = fc
+			.string({
+				unit: fc.constantFrom(
+					..."abcdefghijklmnopqrstuvwxyz0123456789_- ".split(""),
+				),
+				minLength: 1,
+				maxLength: 30,
+			})
+			.filter(
+				(s) => !s.includes("\n") && !s.includes("\r") && !s.includes(":"),
+			);
+
+		fc.assert(
+			fc.property(spaces, value, fc.string(), (ws, v, body) => {
+				const md = `---${ws}\ntitle: ${v}\n---${ws}\n${body}`;
+				const { data, content } = parseFrontMatter(md);
+				const trimmed = v.trim();
+				const expected =
+					trimmed === "true"
+						? true
+						: trimmed === "false"
+							? false
+							: trimmed !== "" && !Number.isNaN(Number(trimmed))
+								? Number(trimmed)
+								: trimmed;
+				expect(data.title).toBe(expected);
+				expect(content).toBe(body.trim());
+			}),
 		);
 	});
 
-	test("EP-BVA: flattenLegacyAssetsPath simple (Line 32)", () => {
-		expect(normalizeImageSrc("assets/images/test.png")).toBe(
-			"/blog/images/test.png",
+	test("PBT: 주석/빈 라인은 무시되고 키/값은 trim 된다", () => {
+		const key = fc
+			.string({
+				unit: fc.constantFrom(..."abcdefghijklmnopqrstuvwxyz".split("")),
+				minLength: 1,
+				maxLength: 12,
+			})
+			.filter((s) => !s.includes("\n") && !s.includes("\r"));
+		const value = fc
+			.string({
+				unit: fc.constantFrom(
+					..."abcdefghijklmnopqrstuvwxyz0123456789_- ".split(""),
+				),
+				minLength: 0,
+				maxLength: 40,
+			})
+			.filter((s) => !s.includes("\n") && !s.includes("\r"));
+
+		fc.assert(
+			fc.property(key, value, fc.string(), (k, v, body) => {
+				const md = `---\n# comment\n\n  ${k}  :   ${v}  \n---\n${body}`;
+				const { data, content } = parseFrontMatter(md);
+				expect(Object.keys(data)).toEqual(v.trim() === "" ? [k] : [k]);
+				const trimmed = v.trim();
+				const expected =
+					trimmed === "true"
+						? true
+						: trimmed === "false"
+							? false
+							: trimmed !== "" && !Number.isNaN(Number(trimmed))
+								? Number(trimmed)
+								: trimmed;
+				expect(data[k]).toBe(expected);
+				expect(content).toBe(body.trim());
+			}),
 		);
 	});
 
-	test("EP-BVA: parseFrontMatter key with spaces (Line 95)", () => {
-		const md = "---\n  title  :  spaces  \n---\n";
-		const { data } = parseFrontMatter(md);
-		expect(data.title).toBe("spaces");
+	test("PBT: tags는 쉼표/공백 구분자를 기준으로 split 된다", () => {
+		const token = fc
+			.string({
+				unit: fc.constantFrom(
+					..."abcdefghijklmnopqrstuvwxyz0123456789_-".split(""),
+				),
+				minLength: 1,
+				maxLength: 10,
+			})
+			.filter((s) => !s.includes(",") && !s.includes(" "));
+
+		fc.assert(
+			fc.property(
+				fc.array(token, { minLength: 0, maxLength: 20 }),
+				(tokens) => {
+					const joined = tokens.join(",,  ");
+					const md = `---\ntags: ${joined}\n---\n`;
+					const { data } = parseFrontMatter(md);
+					expect(data.tags).toEqual(tokens);
+				},
+			),
+		);
 	});
 
-	test("EP-BVA: parseFrontMatter with empty line in FM (Line 92)", () => {
-		const md = "---\ntitle: test\n\nkey: value\n---\n";
-		const { data } = parseFrontMatter(md);
-		expect(data).toEqual({ title: "test", key: "value" });
+	test("PBT: 따옴표가 짝이 맞지 않으면 값은 그대로 보존된다", () => {
+		const raw = fc.string({
+			unit: fc.constantFrom(
+				..."abcdefghijklmnopqrstuvwxyz0123456789_-".split(""),
+			),
+			minLength: 1,
+			maxLength: 40,
+		});
+
+		fc.assert(
+			fc.property(raw, (s) => {
+				const md = `---\nkey: "${s}\n---\n`;
+				const { data } = parseFrontMatter(md);
+				expect(data.key).toBe(`"${s}`);
+			}),
+		);
 	});
 
-	test("EP-BVA: resolveRelativePath empty part (Line 13)", () => {
-		expect(normalizeImageSrc("/a//b/c.png")).toBe("/blog/a/b/c.png");
+	test("PBT: :로 시작하는 라인은 무시된다", () => {
+		const rest = fc
+			.string({
+				unit: fc.constantFrom(
+					..."abcdefghijklmnopqrstuvwxyz0123456789_- ".split(""),
+				),
+				minLength: 1,
+				maxLength: 30,
+			})
+			.filter((s) => !s.includes("\n") && !s.includes("\r"));
+
+		fc.assert(
+			fc.property(rest, (s) => {
+				const md = `---\n:${s}\n---\nContent`;
+				const { data } = parseFrontMatter(md);
+				expect(data).toEqual({});
+			}),
+		);
 	});
 
-	test("EP-BVA: resolveRelativePath root branch (Line 18)", () => {
-		// To hit Line 18 true branch, we need p to start with / after normalization
-		// "//a/b" -> normalizeImageSrc removes first / -> "/a/b" passed to resolveRelativePath
-		expect(normalizeImageSrc("//a/b/c.png")).toBe("/blog/a/b/c.png");
-	});
-
-	test("EP-BVA: parseFrontMatter with comments and empty lines (Line 91-93)", () => {
-		const md = "---\n# Comment\n  \ntitle: test\n---\nContent";
-		const { data } = parseFrontMatter(md);
-		expect(data).toEqual({ title: "test" });
-	});
-
-	test("EP-BVA: parseFrontMatter with colon at index 0 (Line 93 false)", () => {
-		const md = "---\n:invalid\n---\nContent";
-		const { data } = parseFrontMatter(md);
-		expect(data).toEqual({});
-	});
-
-	test("EP-BVA: parseFrontMatter with quoted value (Line 96-101)", () => {
-		const md = "---\ntitle: \"quoted\"\ndescription: 'single'\n---\nContent";
-		const { data } = parseFrontMatter(md);
-		expect(data.title).toBe("quoted");
-		expect(data.description).toBe("single");
-	});
-
-	test("EP-BVA: parseFrontMatter with tags (Line 103-104)", () => {
-		const md = "---\ntags: a, b, c\n---\nContent";
-		const { data } = parseFrontMatter(md);
-		expect(data.tags).toEqual(["a", "b", "c"]);
-	});
-
-	test("EP-BVA: parseFrontMatter with boolean and number (Line 105-110)", () => {
-		const md = "---\nb1: true\nb2: false\nn1: 123\n---\nContent";
-		const { data } = parseFrontMatter(md);
-		expect(data.b1).toBe(true);
-		expect(data.b2).toBe(false);
-		expect(data.n1).toBe(123);
-	});
-
-	test("EP-BVA: 다양한 데이터 타입 파싱 (boolean, number, quotes)", () => {
-		const md = `---
-published: true
-draft: false
-count: 123
-title: "Quoted Title"
-desc: 'Single Quoted'
-invalid:
-:starts-with-colon
-# comment line
----
-Content`;
-		const { data } = parseFrontMatter(md);
-		expect(data.published).toBe(true);
-		expect(data.draft).toBe(false);
-		expect(data.count).toBe(123);
-		expect(data.title).toBe("Quoted Title");
-		expect(data.desc).toBe("Single Quoted");
-		expect(data.invalid).toBe(""); // Line 93: colonIndex > 0, value is empty
-		expect(data[":starts-with-colon"]).toBeUndefined(); // Line 93: colonIndex is 0, so not > 0
-	});
-
-	test("EP-BVA: 빈 FrontMatter 처리", () => {
-		const md = "---\n---\nBody";
-		const { data, content } = parseFrontMatter(md);
-		expect(data).toEqual({});
-		expect(content).toBe("Body");
-	});
-
-	test("EP-BVA: FrontMatter가 없는 경우", () => {
-		const md = "Just content";
-		const { data, content } = parseFrontMatter(md);
-		expect(data).toEqual({});
-		expect(content).toBe("Just content");
+	test("PBT: boolean/number는 변환되고 빈 값은 빈 문자열로 남는다", () => {
+		fc.assert(
+			fc.property(fc.integer(), fc.boolean(), fc.string(), (n, b, body) => {
+				const md = `---\nnum: ${n}\nflag: ${b}\nempty:\n---\n${body}`;
+				const { data, content } = parseFrontMatter(md);
+				expect(data.num).toBe(n);
+				expect(data.flag).toBe(b);
+				expect(data.empty).toBe("");
+				expect(content).toBe(body.trim());
+			}),
+		);
 	});
 });

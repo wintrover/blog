@@ -1,5 +1,8 @@
 import "@testing-library/jest-dom";
+import fc from "fast-check";
 import { vi } from "vitest";
+
+fc.configureGlobal({ numRuns: 100 });
 
 // Mock global fetch if needed
 global.fetch = vi.fn();

@@ -5,7 +5,7 @@ import { normalizeImageSrc, parseFrontMatter } from "./utils";
 
 export async function loadPost(slug: string) {
 	const filePath = (postFiles as Record<string, string>)[slug];
-	if (!filePath) {
+	if (typeof filePath !== "string" || !filePath) {
 		return null;
 	}
 	try {
@@ -37,7 +37,10 @@ export function parseMarkdown(content: string) {
 			/<img\s+[^>]*src=["']([^"']+)["'][^>]*>/g,
 			(m: string, src: string) => {
 				const fixed = normalizeImageSrc(src);
-				return m.replace(src, fixed);
+				return m.replace(
+					/src=(["'])([^"']+)\1/,
+					(_full: string, q: string) => `src=${q}${fixed}${q}`,
+				);
 			},
 		);
 

@@ -64,12 +64,15 @@ describe("postLoader", () => {
 	});
 
 	test("loadPostBySlug - 에러 핸들링 (Catch block coverage)", async () => {
+		const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
 		// 강제로 에러를 내기 위해 잘못된 데이터 구조를 전달.
 		const post = await loadPostBySlug("slug", null as any);
 		expect(post).toBeNull();
+		warnSpy.mockRestore();
 	});
 
 	test("loadAllPosts - 치명적 에러 핸들링 (Catch block coverage)", async () => {
+		const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 		// Object.entries를 모킹하여 에러 발생 유도
 		const spy = vi.spyOn(Object, "entries").mockImplementationOnce(() => {
 			throw new Error("Critical Error");
@@ -78,6 +81,7 @@ describe("postLoader", () => {
 		const posts = await loadAllPosts();
 		expect(posts).toEqual([]);
 		spy.mockRestore();
+		errorSpy.mockRestore();
 	});
 
 	test("determineCategoryFromPath - all categories", async () => {

@@ -141,16 +141,7 @@ void goHome;
     margin: 0 0 8px 0;
     font-size: 24px;
     font-weight: 600;
-  }
-
-  .site-name a {
     color: #24292e;
-    text-decoration: none;
-    transition: color 0.2s;
-  }
-
-  .site-name a:hover {
-    color: #0366d6;
   }
 
   .site-description {

@@ -21,6 +21,7 @@ export default defineConfig(({ mode }) => ({
 	build: {
 		outDir: "dist",
 		copyPublicDir: true,
+		chunkSizeWarningLimit: 900,
 		rollupOptions: {
 			output: {
 				manualChunks: undefined,
@@ -34,6 +35,7 @@ export default defineConfig(({ mode }) => ({
 		environment: "jsdom",
 		setupFiles: ["tests/setup.ts"],
 		include: ["tests/**/*.test.ts"],
+		pool: "threads",
 		coverage: {
 			provider: "istanbul",
 			include: ["src/**/*.ts", "src/**/*.svelte"],

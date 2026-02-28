@@ -1,5 +1,7 @@
+import fc from "fast-check";
 import { describe, expect, test } from "vitest";
 import { parseMarkdown } from "../src/lib/markdown";
+import { normalizeImageSrc } from "../src/lib/utils";
 
 function extractImgSrcs(html: string) {
 	const out: string[] = [];
@@ -42,42 +44,73 @@ describe("parseMarkdown", () => {
 		}
 	});
 
-	test("EP-BVA: 경계값 및 특수 케이스 처리", () => {
-		const cases = [
-			{ md: "", expectCount: 0 },
-			{ md: "![no-image]()", expectCount: 1, expectSrc: "" },
+	test("PBT: 경계값 및 특수 케이스 처리", () => {
+		const cases = fc.constantFrom<
+			| { kind: "empty"; md: string }
+			| { kind: "empty-src"; md: string }
+			| { kind: "path-normalize"; md: string; expect: string }
+			| { kind: "already-abs"; md: string; expect: string }
+		>(
+			{ kind: "empty", md: "" },
+			{ kind: "empty-src", md: "![no-image]()" },
 			{
+				kind: "path-normalize",
 				md: "![special](assets/images/01/../02/test.png)",
 				expect: "/blog/images/02-test.png",
 			},
 			{
+				kind: "already-abs",
 				md: "![abs](/blog/images/already.png)",
 				expect: "/blog/images/already.png",
 			},
-		];
+		);
 
-		for (const c of cases) {
-			const { html } = parseMarkdown(c.md);
-			const srcs = extractImgSrcs(html);
-			if (c.expectCount !== undefined) {
-				expect(srcs).toHaveLength(c.expectCount);
-			}
-			if (c.expectSrc !== undefined && srcs.length > 0) {
-				expect(srcs[0]).toBe(c.expectSrc);
-			}
-			if (c.expect !== undefined && srcs.length > 0) {
+		fc.assert(
+			fc.property(cases, (c) => {
+				const { html } = parseMarkdown(c.md);
+				const srcs = extractImgSrcs(html);
+				if (c.kind === "empty") {
+					expect(srcs).toHaveLength(0);
+					return;
+				}
+				expect(srcs).toHaveLength(1);
+				if (c.kind === "empty-src") {
+					expect(srcs[0]).toBe("");
+					return;
+				}
 				expect(srcs[0]).toBe(c.expect);
-			}
-		}
+			}),
+		);
 	});
 
-	test("EP-BVA: 다중 이미지 처리", () => {
-		const md = "![1](assets/images/01/a.png) ![2](assets/images/02/b.png)";
-		const { html } = parseMarkdown(md);
-		const srcs = extractImgSrcs(html);
-		expect(srcs).toHaveLength(2);
-		expect(srcs[0]).toBe("/blog/images/01-a.png");
-		expect(srcs[1]).toBe("/blog/images/02-b.png");
+	test("PBT: 다중 이미지 처리 시 각 src가 정규화된다", () => {
+		const digit = fc
+			.integer({ min: 0, max: 99 })
+			.map((n) => String(n).padStart(2, "0"));
+		const name = fc
+			.string({
+				unit: fc.constantFrom(
+					..."abcdefghijklmnopqrstuvwxyz0123456789_-".split(""),
+				),
+				minLength: 1,
+				maxLength: 18,
+			})
+			.filter((s) => !s.includes("/") && !s.includes("\\"));
+		const legacy = fc
+			.tuple(digit, name)
+			.map(([d, n]) => `assets/images/${d}/${n}.png`);
+
+		fc.assert(
+			fc.property(fc.array(legacy, { minLength: 1, maxLength: 8 }), (paths) => {
+				const md = paths.map((p, i) => `![${i}](${p})`).join(" ");
+				const { html } = parseMarkdown(md);
+				const srcs = extractImgSrcs(html);
+				expect(srcs).toHaveLength(paths.length);
+				for (let i = 0; i < paths.length; i++) {
+					expect(srcs[i]).toBe(normalizeImageSrc(paths[i]));
+				}
+			}),
+		);
 	});
 
 	test("FrontMatter 파싱 테스트", () => {

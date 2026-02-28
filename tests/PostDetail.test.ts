@@ -326,6 +326,7 @@ describe("PostDetail Component", () => {
 	});
 
 	test("Mermaid 렌더링 에러 처리", async () => {
+		const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 		const mockPostWithMermaid = {
 			...mockPost,
 			html: '<div class="markdown-content"><div class="mermaid-diagram" id="mermaid-err" data-mermaid-code="invalid"></div></div>',
@@ -354,5 +355,6 @@ describe("PostDetail Component", () => {
 		);
 
 		expect(renderSpy).toHaveBeenCalled();
+		consoleSpy.mockRestore();
 	}, 20000);
 });

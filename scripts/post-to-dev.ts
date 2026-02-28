@@ -1,10 +1,6 @@
-import "dotenv/config";
-import dotenv from "dotenv";
-
-dotenv.config({ path: ".env.local" });
-
 import fs from "node:fs/promises";
 import path from "node:path";
+import dotenv from "dotenv";
 import matter from "gray-matter";
 import { processMermaidDiagrams } from "./mermaid-to-image";
 
@@ -371,6 +367,7 @@ function isUCloudUrl(url: string) {
 }
 
 if (process.argv[1] && path.basename(process.argv[1]) === "post-to-dev.ts") {
+	dotenv.config({ path: ".env.local" });
 	const postFilePath = process.argv[2];
 	if (!postFilePath) {
 		console.error("Please provide a path to a markdown file.");
